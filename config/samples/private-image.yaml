@@ -1,0 +1,12 @@
+apiVersion: core.spinoperator.dev/v1
+kind: SpinApp
+metadata:
+  name: private-image-spinapp
+spec:
+  image: "ghcr.io/<username>/<image>:<tag>"
+  # For testing, you can create a secret with the following command:
+  # kubectl create secret docker-registry spin-image-secret --docker-server=https://ghcr.io --docker-username=$YOUR_GITHUB_USERNAME --docker-password=$YOUR_GITHUB_PERSONAL_ACCESS_TOKEN --docker-email=$YOUR_EMAIL
+  imagePullSecrets:
+    - name: spin-image-secret
+  replicas: 1
+  executor: containerd-shim-spin

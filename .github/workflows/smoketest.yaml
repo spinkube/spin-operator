@@ -1,0 +1,55 @@
+name: Smoketest
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21.x"
+
+      - name: setup k3d
+        uses: engineerd/configurator@v0.0.10
+        with:
+          name: k3d
+          url: https://github.com/k3d-io/k3d/releases/download/v5.6.0/k3d-linux-amd64
+
+      - name: start k3d cluster
+        run: |
+          k3d cluster create wasm-cluster \
+          --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.10.0 \
+          --port  "8081:80@loadbalancer" \
+          --agents 2
+
+      - name: apply runtime class
+        run: kubectl apply -f spin-runtime-class.yaml
+
+      - name: start controller
+        timeout-minutes: 5
+        run: |
+          make install
+          make run &
+
+          timeout 300s bash -c 'until curl -s http://localhost:8082/healthz; do echo "waiting for controller to start"; sleep 2; done'
+          echo ""
+          echo "controller started successfully"
+
+      - name: run spin app
+        run: |
+          kubectl apply -f config/samples/shim-executor.yaml
+          kubectl apply -f config/samples/simple.yaml
+          kubectl rollout status deployment simple-spinapp --timeout 90s
+
+          kubectl port-forward svc/simple-spinapp 8083:80 &
+          timeout 15s bash -c 'until curl -f -vvv http://localhost:8083/hello; do sleep 2; done'
+
+      - name: Verify curl
+        run: curl localhost:8083/hello

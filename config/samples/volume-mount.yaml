@@ -1,0 +1,42 @@
+apiVersion: core.spinoperator.dev/v1
+kind: SpinApp
+metadata:
+  name: volume-mount-spinapp
+spec:
+  image: "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0"
+  replicas: 1
+  executor: containerd-shim-spin
+  volumes:
+    - name: example-volume
+      persistentVolumeClaim:
+        claimName: example-pv-claim
+  volumeMounts:
+    - name: example-volume
+      mountPath: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: example-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"

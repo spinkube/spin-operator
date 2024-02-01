@@ -1,0 +1,39 @@
+spin-operator {{ .Chart.Version }} is now deployed!
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm --namespace {{ .Release.Namespace }} status {{ .Release.Name }}
+  $ helm --namespace {{ .Release.Namespace }} get all {{ .Release.Name }}
+
+Note: spin-operator requires a few additional resources to be present on the
+Kubernetes cluster before it can run the first Spin application.
+
+1. Install the spin-operator CustomResourceDefinition (CRD) resources:
+
+  {{ if eq .Values.controllerManager.manager.image.tag "latest" }}
+  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/latest/download/spin-operator.crds.yaml
+  {{ else }}
+  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v{{ .Chart.AppVersion }}/spin-operator.crds.yaml
+  {{ end }}
+
+2. Install the wasmtime-spin-v2 RuntimeClass:
+
+  {{ if eq .Values.controllerManager.manager.image.tag "latest" }}
+  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/latest/download/spin-operator.runtime-class.yaml
+  {{ else }}
+  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v{{ .Chart.AppVersion }}/spin-operator.runtime-class.yaml
+  {{ end }}
+
+3. Finally, install the containerd wasm shim on at least one node. This shim is
+necessary for running Spin application workloads. We use the Kwasm Operator
+to handle this installation, via node annotations.
+
+  $ kubectl annotate node <node> kwasm.sh/kwasm-node=true
+
+You are now ready to deploy your first Spin app!
+
+For further details, see this chart's README:
+
+  $ helm show readme oci://ghcr.io/spinkube/spin-operator

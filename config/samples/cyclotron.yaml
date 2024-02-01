@@ -1,0 +1,8 @@
+apiVersion: core.spinoperator.dev/v1
+kind: SpinApp
+metadata:
+  name: cyclotron-spinapp
+spec:
+  image: "public.ecr.aws/m8p2l5g2/cyclotron-demo-apps:hello"
+  replicas: 1
+  executor: "cyclotron"

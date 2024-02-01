@@ -1,0 +1,9 @@
+dependencies:
+- name: kwasm-operator
+  repository: http://kwasm.sh/kwasm-operator
+  version: 0.2.3
+- name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.13.3
+digest: sha256:656e3b0c5aadd5694ec9271cb9d257a619ab0ce6453466f61de060346144dd91
+generated: "2024-01-25T13:44:43.972708-07:00"

@@ -1,0 +1,25 @@
+spin_manifest_version = 2
+
+[application]
+name = "variabletester"
+version = "0.1.0"
+authors = ["Danielle Lancashire <dani@builds.terrible.systems>"]
+description = ""
+
+[[trigger.http]]
+route = "/..."
+component = "variabletester"
+
+[variables]
+greetee = { required = true }
+
+[component.variabletester]
+source = "main.wasm"
+allowed_outbound_hosts = []
+
+[component.variabletester.variables]
+greetee = "{{ greetee }}"
+
+[component.variabletester.build]
+command = "tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go"
+watch = ["**/*.go", "go.mod"]

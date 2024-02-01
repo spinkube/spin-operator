@@ -1,0 +1,15 @@
+## Append samples of your project ##
+resources:
+- annotations.yaml
+- cyclotron.yaml
+- hpa.yaml
+- private-image.yaml
+- probes.yaml
+- redis.yaml
+- resources.yaml
+- runtime-config.yaml
+- shim-executor.yaml
+- simple.yaml
+- variables.yaml
+- volume-mount.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

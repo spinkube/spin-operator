@@ -1,0 +1,8 @@
+apiVersion: core.spinoperator.dev/v1
+kind: SpinApp
+metadata:
+  name: simple-spinapp
+spec:
+  image: "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0"
+  replicas: 1
+  executor: containerd-shim-spin

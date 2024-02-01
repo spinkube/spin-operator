@@ -1,0 +1,42 @@
+name: Publish Sample Apps
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  publish-image:
+    name: Publish sample app images
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          app: [cpu-load-gen, hello-world]
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+
+    steps:
+        - uses: actions/checkout@v4
+
+        - name: Set the release version
+          shell: bash
+          run: |
+            echo "RELEASE_VERSION=$(date +%Y%m%d-%H%M%S)-g$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+        - name: Install Spin
+          uses: fermyon/actions/spin/setup@v1
+
+        - name: Install TinyGo
+          uses: acifani/setup-tinygo@v2
+
+        - name: Build and push versioned image
+          uses: fermyon/actions/spin/push@v1
+          with:
+            registry: ${{ env.REGISTRY }}
+            registry_username: ${{ github.actor }}
+            registry_password: ${{ secrets.GITHUB_TOKEN }}
+            registry_reference: "ghcr.io/spinkube/spin-operator/${{ matrix.app }}:${{ env.RELEASE_VERSION }}"
+            manifest_file: apps/${{ matrix.app }}/spin.toml

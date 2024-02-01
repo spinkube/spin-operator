@@ -1,0 +1,9 @@
+apiVersion: core.spinoperator.dev/v1
+kind: SpinApp
+metadata:
+  name: redis-spinapp
+spec:
+  image: "ttl.sh/caleb-redis-thing-2:24h"
+  replicas: 1
+  executor: containerd-shim-spin
+# Steps to run this found at https://github.com/spinkube/spin-operator/pull/131

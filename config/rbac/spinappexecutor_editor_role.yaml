@@ -1,0 +1,31 @@
+# permissions for end users to edit spinappexecutors.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: spinappexecutor-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: spin-operator
+    app.kubernetes.io/part-of: spin-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: spinappexecutor-editor-role
+rules:
+- apiGroups:
+  - core.spinoperator.dev
+  resources:
+  - spinappexecutors
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.spinoperator.dev
+  resources:
+  - spinappexecutors/status
+  verbs:
+  - get

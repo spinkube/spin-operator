@@ -1,0 +1,111 @@
+name: Go Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  packages: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+          cache: true
+
+      - name: Setup gotestsum
+        uses: autero1/action-gotestsum@v2.0.0
+        with:
+          gotestsum_version: "1.8.2"
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Build
+        run: CGO_ENABLED=0 go build -v ./...
+
+      - name: Setup EnvTest
+        run: make envtest
+
+      - name: Test
+        run: |
+          mkdir .results
+          gotestsum \
+            --junitfile .results/results.xml \
+            --jsonfile .results/results.json \
+            --format testname \
+            -- -coverprofile=.results/cover.out ./...
+
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: ".results/results.xml"
+        if: always()
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results.xml
+          path: ./.results/results.xml
+        if: always()
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: cover.out
+          path: ./.results/cover.out
+        if: always()
+      - name: Upload Go test results json
+        uses: actions/upload-artifact@v4
+        with:
+          name: results.json
+          path: ./.results/results.json
+
+  lint_go:
+    name: lint go
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+      - uses: actions/checkout@v4
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.55.2
+          args: --timeout=10m
+
+  lint_shell:
+    name: lint shell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+
+  lint_chart:
+    name: lint chart
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.x'
+          cache: true
+      - name: Install dependencies
+        run: go mod download
+      - name: Install helm
+        uses: Azure/setup-helm@v3
+        with:
+          version: v3.14.0
+      - name: Lint chart
+        run: make helm-lint
+

@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "spin-operator.fullname" . }}-serving-cert
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "2"
+  labels:
+  {{- include "spin-operator.labels" . | nindent 4 }}
+spec:
+  dnsNames:
+  - '{{ include "spin-operator.fullname" . }}-webhook-service.{{ .Release.Namespace
+    }}.svc'
+  - '{{ include "spin-operator.fullname" . }}-webhook-service.{{ .Release.Namespace
+    }}.svc.{{ .Values.kubernetesClusterDomain }}'
+  issuerRef:
+    kind: Issuer
+    name: '{{ include "spin-operator.fullname" . }}-selfsigned-issuer'
+  secretName: webhook-server-cert

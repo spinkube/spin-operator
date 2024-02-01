@@ -1,0 +1,27 @@
+# permissions for end users to view spinappexecutors.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: spinappexecutor-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: spin-operator
+    app.kubernetes.io/part-of: spin-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: spinappexecutor-viewer-role
+rules:
+- apiGroups:
+  - core.spinoperator.dev
+  resources:
+  - spinappexecutors
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.spinoperator.dev
+  resources:
+  - spinappexecutors/status
+  verbs:
+  - get

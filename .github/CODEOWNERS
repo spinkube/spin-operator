@@ -1,0 +1,9 @@
+# CODEOWNERS
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# NOTE: Order is important; the last matching pattern takes the most precedence. When someone opens a pull request that
+# only modifies files under a certain matching pattern, only those code owners will be requested for a review.
+
+# These owners will be the default owners for everything in the repository. Unless a later match takes precedence, they
+# will be requested for review when someone opens a pull request.
+*  @calebschoepp @endocrimes @lann @michelleN

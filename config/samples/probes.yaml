@@ -1,0 +1,15 @@
+apiVersion: spinoperator.dev/v1
+kind: SpinApp
+metadata:
+  name: healthchecks-spinapp
+spec:
+  image: "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0"
+  replicas: 1
+  executor: containerd-shim-spin
+  checks:
+    liveness:
+      httpGet:
+        path: "/hello"
+    readiness:
+      httpGet:
+        path: "/go-hello"

@@ -1,0 +1,18 @@
+apiVersion: core.spinoperator.dev/v1
+kind: SpinApp
+metadata:
+  name: runtime-config-spinapp
+spec:
+  image: "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0"
+  replicas: 1
+  executor: containerd-shim-spin
+  runtimeConfig:
+    loadFromSecret: runtime-config
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: runtime-config
+type: Opaque
+data:
+  runtime-config.toml: bG9nX2RpciA9ICIvYXNkZiIK

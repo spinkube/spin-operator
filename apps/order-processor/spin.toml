@@ -1,0 +1,20 @@
+spin_manifest_version = 2
+
+[application]
+name = "order-processor"
+version = "0.1.0"
+authors = ["Caleb Schoepp <caleb.schoepp@fermyon.com>"]
+description = "Process orders off of redis queue"
+
+[application.trigger.redis]
+address = "redis://:txfM5aXAOe@redis-master.default.svc.cluster.local:6379"
+
+[[trigger.redis]]
+channel = "orders"
+component = "order-processor"
+
+[component.order-processor]
+source = "main.wasm"
+allowed_outbound_hosts = []
+[component.order-processor.build]
+command = "tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go"
