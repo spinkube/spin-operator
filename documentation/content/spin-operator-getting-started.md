@@ -2,7 +2,7 @@
 
 [SpinKube](https://github.com/spinkube) is a new open source project that streamlines the experience of developing, deploying, and operating Wasm workloads on Kubernetes, using [Spin](https://github.com/fermyon/spin), the `[runwasi](https://github.containerd/runwasi)`, and [KWasm](https://kwasm.sh/) open source projects.
 
-Using SpinKube, you're able to get the benefits of using Wasm for your workloads:
+With SpinKube, you can leverage the advantages of using WebAssembly (Wasm) for your workloads:
 
 - artifacts are orders of magnitude smaller compared to container images
 - so they can can be fetched over the network and started much faster (* we have at least a few known optimizations we still need to apply to improve the startup time for workloads)
