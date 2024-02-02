@@ -75,7 +75,7 @@ configuration, and the actual commands for building and running your app can be 
 
 ### Creating, distributing, and deploying a Spin application
 
-> Note: clusters that do not yet support containerd >1.7.7, the fallback is to
+> Note: For clusters that do not yet support containerd >=1.7.7, the fallback is to
 continue to use the Dockerfile-based approach. We are working with the AKS team
 to add support for this to the Azure Kubernetes Service.
 > 
