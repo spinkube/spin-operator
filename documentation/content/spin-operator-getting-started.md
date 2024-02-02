@@ -5,7 +5,7 @@
 With SpinKube, you can leverage the advantages of using WebAssembly (Wasm) for your workloads:
 
 - Artifacts are significantly smaller in size compared to container images.
-- so they can can be fetched over the network and started much faster (* we have at least a few known optimizations we still need to apply to improve the startup time for workloads)
+- Artifacts can be quickly fetched over the network and started much faster (*Note: We are aware of several optimizations that still need to be implemented to enhance the startup time for workloads).
 - can consume significantly fewer resrources while idle
 
 All of this while being able to integrate with with Kubernetes primitives (DNS, probes, autoscaling, metrics, and a lot more cloud native and CNCF projects).
