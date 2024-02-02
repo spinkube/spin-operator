@@ -224,4 +224,4 @@ hpa-spinapp   1/1     1            1           3m13s
 
 With a dashboard configured (such as Grafana, or AppInsights), we can see the graphs for the resource utilization and replica count.
 
-![grafan_dash](static/images/grafana_dash.png)
+![grafana_dash](static/images/grafana_dash.png)
