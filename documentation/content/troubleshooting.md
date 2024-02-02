@@ -50,7 +50,7 @@ INFO[0002] Successfully deleted cluster wasm-cluster!
 
 ## Too long: must have at most 262144 bytes
 
-When running `kubectl apply -f my-file.yaml`, the following error can occur of the `.yam.` file is too large:
+When running `kubectl apply -f my-file.yaml`, the following error can occur if the `.yaml` file is too large:
 
 ```bash
 Too long: must have at most 262144 bytes
