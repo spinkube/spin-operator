@@ -10,6 +10,16 @@ With SpinKube, you can leverage the advantages of using WebAssembly (Wasm) for y
 
 All of this while being able to integrate with with Kubernetes primitives (DNS, probes, autoscaling, metrics, and a lot more cloud native and CNCF projects).
 
+## Prerequisites
+
+### Spin
+
+If you have not already done so, please [install](https://developer.fermyon.com/spin/v2/install) Spin. If you already have Spin installed, please [upgrade](https://developer.fermyon.com/spin/v2/upgrade) to the latest version.
+
+### Spin k8s plugin
+
+Please install [the `spin k8s` plugin](https://github.com/spinkube/spin-plugin-k8s).
+
 ### Configuration
 
 Follow the instructions on the [Spin Operator](https://github.com/spinkube/spin-operator) to configure your cluster, then install [the `spin k8s` plugin](https://github.com/spinkube/spin-plugin-k8s).
