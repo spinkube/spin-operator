@@ -192,7 +192,7 @@ However, the `SpinApp` manifest currently supports configuring options such as:
 Let's create an application that can be used with a horizontal pod autoscaler:
 
 ```bash
-$ kubectl apply -f hpa.yaml
+$ kubectl apply -f config/samples/hpa.yaml
 spinapp.core.spinoperator.dev/hpa-spinapp created
 horizontalpodautoscaler.autoscaling/spinapp-autoscaler created
 ```
