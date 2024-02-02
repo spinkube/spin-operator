@@ -20,6 +20,23 @@ If you have not already done so, please [install](https://developer.fermyon.com/
 
 Please install [the `spin k8s` plugin](https://github.com/spinkube/spin-plugin-k8s).
 
+### k3d
+
+Please install [k3d](./prerequisites.md#k3d)
+
+### kubectl
+
+Please install [kubectl](./prerequisites.md#kubectl)
+
+### Spin Operator
+
+Clone the Spin Operator repository:
+
+    ```bash
+    $ git clone https://github.com/spinkube/spin-operator.git
+    $ cd spin-operator
+    ```
+
 ### Configuration
 
 Follow the instructions on the [Spin Operator](https://github.com/spinkube/spin-operator) to configure your cluster, then install [the `spin k8s` plugin](https://github.com/spinkube/spin-plugin-k8s).
