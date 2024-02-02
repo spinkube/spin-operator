@@ -10,7 +10,7 @@
 # Scaling Spinapp on Kubernetes (k8s) With Horizontal Pod Autoscaling (HPA)
 
 Horizontal scaling, in the k8s sense, means deploying more pods to meet demand (different from vertical scaling whereby more memory and CPU resources are assigned to already running pods). In this tutorial, we configure [HPA](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) to dynamically scale the instance count of our SpinApps to meet the demand.
-    
+
 ## Prerequisites
 
 > We use k3d to run a k8s cluster locally as part of this tutorial, but you can follow these steps to configure HPA autoscaling on your desired k8s environment.
