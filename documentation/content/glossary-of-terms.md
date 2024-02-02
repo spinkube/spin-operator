@@ -15,6 +15,7 @@
   - [Scheduler](#scheduler)
   - [Service](#service)
   - [Spin](#spin)
+  - [SpinApp Manifest](#spinapp-manifest)
   - [Spin Operator](#spin-operator)
 
 # Glossary of Terms
@@ -98,6 +99,25 @@ In Kubernetes, a Service is an abstraction that defines a logical set of Pods th
 
 Spin is a framework designed for building and running event-driven microservice applications using WebAssembly (Wasm) components.
 
+## `SpinApp` Manifest
+The goal of the `SpinApp` manifest is twofold:
+
+- to represent the possible options for configuring a Wasm workload running in Kubernetes
+- to simplify and abstract the internals of *how* that Wasm workload is executed, while
+allowing the user to configure it to their needs
+
+As a result, the simplest `SpinApp` manifest only requires the registry reference to create a deployment, pod, and service with the right Wasm executor.
+
+However, the `SpinApp` manifest currently supports configuring options such as:
+
+- image pull secrets to fetch applications from private registries
+- liveness and readiness probes
+- resource limits (and requests*)
+- Spin variables
+- volume mounts
+- autoscaling
+
 ## Spin Operator
 
 Spin Operator is a Kubernetes (K8s) operator in charge of handling the lifecycle of Spin applications based on their SpinApp resources.
+
