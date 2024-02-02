@@ -39,7 +39,20 @@ Clone the Spin Operator repository:
 
 ### Configuration
 
-Follow the instructions on the [Spin Operator](https://github.com/spinkube/spin-operator) to configure your cluster, then install [the `spin k8s` plugin](https://github.com/spinkube/spin-plugin-k8s).
+Create a Kubernetes k3d cluster that has containerd-wasm-shim prerequisites installed:
+
+    ```
+    k3d cluster create wasm-cluster-scale --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.10.0 -p "8081:80@loadbalancer" --agents 2
+    ```
+
+Apply the Runtime Class:
+
+    ```
+    $ kubectl apply -f spin-runtime-class.yaml
+    ```
+<!---
+Will there be a next containerd shim release in time for open-sourcing Spin Operator?
+-->
 
 For a developer, the local experience of creating an application starts with `spin new`,
 where they can use templates built by the community, or internal templates built by their
