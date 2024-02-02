@@ -28,7 +28,7 @@ NAME           SERVERS   AGENTS   LOADBALANCER
 wasm-cluster   1/1       2/2      true
 ```
 
-With `kubectl installed, you can use the following command to dump cluster information (this is much more verbose):
+With `kubectl` installed, you can use the following command to dump cluster information (this is much more verbose):
 
 ```bash
 $ kubectl cluster-info dump

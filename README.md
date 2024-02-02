@@ -1,5 +1,6 @@
 - [Spin Operator](#spin-operator)
   - [Getting Started](#getting-started)
+  - [Documentation](#documentation)
   - [Contributing](#contributing)
   - [Official Documentation](#official-documentation)
 
@@ -9,7 +10,16 @@ The spin operator enables deploying Spin applications to Kubernetes. It watches 
 
 ## Getting Started
 
-See [Quickstart](./documentation/content/quickstart.md).
+[Quickstart](./documentation/content/quickstart.md).
+
+## Documentation
+
+[Deploying With Helm](./documentation/content/deploying-with-helm.md).
+[Running Locally](./documentation/content/running-locally.md).
+[Running on a Cluster](./documentation/content/).
+[Scaling With HPA](./documentation/content/scaling-spinapp-on-k8s-with-hpa.md).
+[Troubleshooting](./documentation/content/troubleshooting.md).
+[Uninstall](./documentation/content/uninstall.md).
 
 ## Contributing
 
