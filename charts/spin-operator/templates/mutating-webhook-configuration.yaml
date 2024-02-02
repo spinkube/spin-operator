@@ -27,3 +27,23 @@ webhooks:
     resources:
     - spinapps
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: '{{ include "spin-operator.fullname" . }}-webhook-service'
+      namespace: '{{ .Release.Namespace }}'
+      path: /mutate-core-spinoperator-dev-v1-spinappexecutor
+  failurePolicy: Fail
+  name: mspinappexecutor.kb.io
+  rules:
+  - apiGroups:
+    - core.spinoperator.dev
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - spinappexecutors
+  sideEffects: None
