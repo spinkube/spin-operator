@@ -118,10 +118,6 @@ spin registry push ttl.sh/cpu-load-gen:1h
 
 Note that the tag at the end of [ttl.sh/cpu-load-gen:1h](http://ttl.sh/cpu-load-gen:1h) indicates how long the image will last e.g. `1h` (1 hour). The maximum is `24h` and you will need to repush if ttl exceeds 24 hours.
 
-<aside>
-☁️ In the future, we will be storing this application in an OCI registry (like [ghcr.io](https://docs.github.com/en/packages/learn-github-packages)) for more permanent persistence. For now, we’re making the recommendation to use [ttl.sh](http://ttl.sh) for convenience.
-</aside>
-
 ## Deploy SpinApp and the KEDA ScaledObject
 
 We can take a look at the SpinApp and the KEDA ScaledObject definitions in our deployment files below. As you can see, we have explicitly specified resource limits to `500m` of `cpu` (`spec.resources.limits.cpu`) and `500Mi` of `memory` (`spec.resources.limits.memory`) per Spin application:
