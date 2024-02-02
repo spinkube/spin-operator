@@ -19,7 +19,7 @@ Make sure you have the proper permission to the registry if the above commands d
 **Apply the Runtime Class to the cluster:**
 
 ```sh
-k apply -f config/samples/runtime-class.yaml
+kubectl apply -f spin-runtime-class.yaml
 ```
 
 **Install the CRDs into the cluster:**
@@ -71,7 +71,7 @@ make uninstall
 **Delete the Runtime Class from the cluster:**
 
 ```sh
-k delete -f config/samples/runtime-class.yaml
+kubectl delete -f spin-runtime-class.yaml
 ```
 
 **UnDeploy the controller from the cluster:**
@@ -83,7 +83,7 @@ make undeploy
 **UnDeploy cert-manager from the cluster:**
 
 ```sh
-kubectl remove -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.yaml
+kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.yaml
 ```
 
 ### Packaging and deployment via Helm
@@ -106,7 +106,7 @@ make helm-generate
 
 **Install the Helm chart onto the cluster:**
 
-> **Note**: [CRDs](./config/crd/bases/) and the [wasm-spin-v2](./config/samples/runtime-class.yaml)
+> **Note**: [CRDs](./config/crd/bases/) and the [wasm-spin-v2](./spin-runtime-class.yaml)
 > RuntimeClass are currently _not_ installed as part of the chart. You'll need to ensure these are
 > present via the method(s) mentioned above.
 
