@@ -155,7 +155,7 @@ connecting to pod default/hello-friends-74595f9f4b-tnkfs
 
 Serving <http://0.0.0.0:80>
 Available Routes:
-  hello-zeiss: <http://0.0.0.0:80> (wildcard)
+  hello-world: <http://0.0.0.0:80> (wildcard)
 Forwarding from 127.0.0.1:5555 -> 80
 Forwarding from [::1]:5555 -> 80
 Handling request to Some(HeaderValue { inner: String("<http://localhost:5555/>") })
