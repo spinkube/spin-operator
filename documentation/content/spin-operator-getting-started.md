@@ -24,7 +24,6 @@ Please install [the `spin k8s` plugin](https://github.com/spinkube/spin-plugin-k
 
 Follow the instructions on the [Spin Operator](https://github.com/spinkube/spin-operator) to configure your cluster, then install [the `spin k8s` plugin](https://github.com/spinkube/spin-plugin-k8s).
 
-
 For a developer, the local experience of creating an application starts with `spin new`,
 where they can use templates built by the community, or internal templates built by their
 team.
