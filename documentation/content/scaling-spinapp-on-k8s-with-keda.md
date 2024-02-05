@@ -107,7 +107,7 @@ helm install keda kedacore/keda --namespace keda --create-namespace
 
 ## Build and Store Spinapp in an OCI Registry
 
-Next up we’re going to build the SpinApp we will be scaling and storing inside of a [ttl.sh](http://ttl.sh) registry. Change into the [apps/cpu-load-gen](https://github.com/spinkube/spin-operator/tree/hpa-tutorial/apps/cpu-load-gen) directory and build the SpinApp we’ve provided:
+Next up we’re going to build the SpinApp we will be scaling and storing inside of a [ttl.sh](http://ttl.sh) registry. We've chosen TTL for ease of set-up, but you're welcome to use any OCI registry of your choosing, Change into the [apps/cpu-load-gen](https://github.com/spinkube/spin-operator/tree/hpa-tutorial/apps/cpu-load-gen) directory and build the SpinApp we’ve provided:
 
 ```bash
 # Build and publish the sample app
