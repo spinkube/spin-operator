@@ -164,7 +164,7 @@ spec:
         value: "50"
 ```
 
-The k8s documentation is the place to learn more about [limits and requests](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits). Consult the KEDA documentation to learn more about [ScaledObject](https://keda.sh/docs/2.13/concepts/scaling-deployments/#scaledobject-spec) and [KEDA's built-in scalers](https://keda.sh/docs/2.13/scalers/).
+> The k8s documentation is the place to learn more about [limits and requests](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits). Consult the KEDA documentation to learn more about [ScaledObject](https://keda.sh/docs/2.13/concepts/scaling-deployments/#scaledobject-spec) and [KEDA's built-in scalers](https://keda.sh/docs/2.13/scalers/).
 
 Let’s deploy the SpinApp and the KEDA ScaledObject instance onto our cluster with the following command:
 
