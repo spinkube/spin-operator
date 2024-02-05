@@ -48,7 +48,7 @@ k3d cluster create wasm-cluster-scale --image ghcr.io/deislabs/containerd-wasm-s
 
 Next, from within the `spin-operator` directory, run the following commands to install the Spin runtime class and Spin Operator:
 
-```sql
+```bash
 kubectl apply -f spin-runtime-class.yaml
 make install
 ```
