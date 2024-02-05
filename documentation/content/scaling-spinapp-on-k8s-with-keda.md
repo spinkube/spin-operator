@@ -120,7 +120,7 @@ Note that the tag at the end of [ttl.sh/cpu-load-gen:1h](http://ttl.sh/cpu-load-
 
 ## Deploy SpinApp and the KEDA ScaledObject
 
-We can take a look at the SpinApp and the KEDA ScaledObject definitions in our deployment files below. As you can see, we have explicitly specified resource limits to `500m` of `cpu` (`spec.resources.limits.cpu`) and `500Mi` of `memory` (`spec.resources.limits.memory`) per Spin application:
+We can take a look at the SpinApp and the KEDA ScaledObject definitions in our deployment files below. As you can see, we have explicitly specified resource limits to `500m` of `cpu` (`spec.resources.limits.cpu`) and `500Mi` of `memory` (`spec.resources.limits.memory`) per SpinApp:
 
 ```yaml
 # config/samples/keda-app.yaml
