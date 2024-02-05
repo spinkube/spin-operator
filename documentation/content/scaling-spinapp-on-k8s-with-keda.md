@@ -4,7 +4,7 @@
   - [Setting Up k8s Cluster](#setting-up-k8s-cluster)
   - [Setting Up Ingress](#setting-up-ingress)
   - [Setting Up KEDA](#setting-up-keda)
-  - [Build and Store Spinapp in a TTL Registry](#build-and-store-spinapp-in-a-ttl-registry)
+  - [Build and Store SpinApp in a TTL Registry](#build-and-store-spinapp-in-a-ttl-registry)
   - [Deploy SpinApp and the KEDA ScaledObject](#deploy-spinapp-and-the-keda-scaledobject)
   - [Generate Load to Test Autoscale](#generate-load-to-test-autoscale)
 
