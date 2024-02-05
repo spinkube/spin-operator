@@ -55,7 +55,7 @@ make install
 
 Lastly, start the operator locally with the following command:
 
-```sql
+```bash
 make run
 ```
 
