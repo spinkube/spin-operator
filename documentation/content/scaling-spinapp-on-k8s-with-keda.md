@@ -16,7 +16,7 @@
 
 > We use k3d to run a k8s cluster locally as part of this tutorial, but you can follow these steps to configure KEDA autoscaling on your desired k8s environment.
 
-Please see the following sections in the [Prerequisites]() page and fulfill those prerequisite requirements before continuing:
+Please see the following sections in the [Prerequisites](./prerequisites.md) page and fulfil those prerequisite requirements before continuing:
 
 - [kubectl](./prerequisites.md#kubectl) - the Kubernetes CLI
 - [k3d](./prerequisites.md#k3d) - a lightweight Kubernetes distribution that runs on Docker
