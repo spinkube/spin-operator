@@ -15,7 +15,7 @@ Horizontal scaling, in the k8s sense, means deploying more pods to meet demand (
 
 > We use k3d to run a k8s cluster locally as part of this tutorial, but you can follow these steps to configure HPA autoscaling on your desired k8s environment.
 
-Please see the following sections in the [Prerequisites]() page and fulfill those prerequisite requirements before continuing:
+Please see the following sections in the [Prerequisites](./prerequisites.md) page and fulfil those prerequisite requirements before continuing:
 
 - [Go](./prerequisites.md#go)
 - [Docker](./prerequisites.md#docker) - for running k3d
