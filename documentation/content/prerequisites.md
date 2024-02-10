@@ -38,3 +38,7 @@ If running/deploying your Spin application involves the use of Helm, then the Sp
 ## Bombardier
 
 Installing [Bombardier](https://pkg.go.dev/github.com/codesenberg/bombardier) is **not** required to use Spin Operator. Bombardier is used in tutorials like [Scaling Spinapps on k8s With HPA](./scaling-spinapp-on-k8s-with-hpa.md) to generate load to test autoscaling.
+
+## Spin
+
+Please install the latest version of [Spin](https://developer.fermyon.com/spin/v2/install) on your local machine for creating Spin Apps.
