@@ -1,0 +1,37 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: spin-app-cfg
+data:
+  logLevel: INFO
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: spin-app-secret
+data:
+  password: c2VjcmV0X3NhdWNlCg==
+---
+kind: SpinApp
+apiVersion: core.spinoperator.dev/v1
+metadata:
+  name: variable-explorer
+spec:
+  replicas: 1
+  image: ttl.sh/variable-explorer:1h
+  executor: containerd-shim-spin
+  variables:
+    - name: platform_name
+      value: Kubernetes
+    - name: log_level
+      valueFrom:
+        configMapKeyRef:
+          name: spin-app-cfg
+          key: logLevel
+          optional: true
+    - name: db_password
+      valueFrom:
+        secretKeyRef:
+          name: spin-app-secret
+          key: password
+          optional: false

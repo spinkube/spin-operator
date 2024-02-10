@@ -1,0 +1,29 @@
+spin_manifest_version = 2
+
+[application]
+name = "variable-explorer"
+version = "0.1.0"
+authors = ["Thorsten Hans <thorsten.hans@fermyon.com>"]
+description = ""
+
+[variables]
+log_level = { default = "WARN" }
+platform_name = { default = "Fermyon Cloud" }
+db_password = { required = true }
+
+[[trigger.http]]
+route = "/..."
+component = "variable-explorer"
+
+[component.variable-explorer]
+source = "target/wasm32-wasi/release/variable_explorer.wasm"
+allowed_outbound_hosts = []
+
+[component.variable-explorer.variables]
+log_level = "{{ log_level }}"
+platform_name = "{{ platform_name }}"
+db_password = "{{ db_password }}"
+
+[component.variable-explorer.build]
+command = "cargo build --target wasm32-wasi --release"
+watch = ["src/**/*.rs", "Cargo.toml"]
