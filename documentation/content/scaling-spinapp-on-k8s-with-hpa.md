@@ -15,19 +15,20 @@ Horizontal scaling, in the k8s sense, means deploying more pods to meet demand (
 
 > We use k3d to run a k8s cluster locally as part of this tutorial, but you can follow these steps to configure HPA autoscaling on your desired k8s environment.
 
-Please see the [Go](./prerequisites.md#go), [Docker](./prerequisites.md#docker), [Kubectl](./prerequisites.md#kubectl), [k3d](./prerequisites.md#k3d) and [Bombardier](#prerequisites#bombardier) sections in the [Prerequisites](./prerequisites.md) page and fulfill those prerequisite requirements before continuing.
+Please see the following sections in the [Prerequisites](./prerequisites.md) page and fulfil those prerequisite requirements before continuing:
+
+- [Go](./prerequisites.md#go)
+- [Docker](./prerequisites.md#docker) - for running k3d
+- [kubectl](./prerequisites.md#kubectl) - the Kubernetes CLI
+- [k3d](./prerequisites.md#k3d) - a lightweight Kubernetes distribution that runs on Docker
+- [Bombardier](#prerequisites#bombardier) - cross-platform HTTP benchmarking CLI
 
 ## Fetch Spin Operator (Source Code)
 
-If you haven't already, please go ahead and clone the Spin Operator repository:
+If you haven't already, please go ahead and clone the Spin Operator repository and move into the Spin Operator directory:
 
 ```bash
 git clone https://github.com/spinkube/spin-operator.git
-```
-
-Change into the Spin Operator directory:
-
-```bash
 cd spin-operator
 ```
 
@@ -35,20 +36,20 @@ cd spin-operator
 
 Run the following command to create a k8s k3d cluster that has [the containerd-wasm-shims](https://github.com/deislabs/containerd-wasm-shims) pre-requisites installed: If you have a k3d cluster already, please feel free to use it:
 
-```sql
+```bash
 k3d cluster create wasm-cluster-scale --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.10.0 -p "8081:80@loadbalancer" --agents 2
 ```
 
 Next, from within the `spin-operator` directory, run the following commands to install the Spin runtime class and Spin Operator:
 
-```sql
+```bash
 kubectl apply -f spin-runtime-class.yaml
 make install
 ```
 
 Lastly, start the operator with the following command:
 
-```sql
+```bash
 make run
 ```
 
@@ -59,8 +60,8 @@ Great, now you have Spin Operator up and running on your cluster. This means you
 Use the following command to set up ingress on your k8s cluster. This ensures traffic can reach your SpinApp once we’ve created it in future steps:
 
 ```bash
-# Setup ingress following this tutorialhttps://k3d.io/v5.4.6/usage/exposing_services/
-cat <<EOF >nginx-ingress.yaml
+# Setup ingress following this tutorial https://k3d.io/v5.4.6/usage/exposing_services/
+cat <<EOF | kubectl apply -f -
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -81,7 +82,7 @@ spec:
 EOF
 ```
 
-Hit enter to create the ingress resource. It can live inside the `config/samples` directory alongside other sample applications.
+Hit enter to create the ingress resource.
 
 ## Build and Store Spinapp in an OCI Registry
 
