@@ -6,6 +6,8 @@
   - [K3d](#k3d)
   - [Helm](#helm)
   - [Bombardier](#bombardier)
+  - [Spin](#spin)
+  - [Azure CLI](#azure-cli)
 
 # Prerequisites
 
@@ -42,3 +44,7 @@ Installing [Bombardier](https://pkg.go.dev/github.com/codesenberg/bombardier) is
 ## Spin
 
 Please install the latest version of [Spin](https://developer.fermyon.com/spin/v2/install) on your local machine for creating Spin Apps.
+
+## Azure CLI
+
+Installing [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) is **not** required to use Spin Operator. Azure CLI is used to provision Azure Kubernetes Service (AKS) and necessary Azure resources as part of the [Running Spin Operator on Azure Kubernetes Service](./running-on-azure-kubernetes-service.md) tutorial.
