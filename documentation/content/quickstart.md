@@ -36,7 +36,7 @@ cd spin-operator
 
 ```
 k3d cluster create wasm-cluster \
-  --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.10.0 \
+  --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.11.0 \
   --port "8081:80@loadbalancer" \
   --agents 2
 ```
