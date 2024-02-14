@@ -7,7 +7,13 @@
   - [Removing the Azure Infrastructure](#removing-the-azure-infrastructure)
 
 # Running on Azure Kubernetes Service (AKS)
+In this tutorial, you install Spin Operator on an Azure Kubernetes Service (AKS) cluster and deploy a simple Spin application. You will learn how to:
+* Deploy an AKS cluster 
+* Install Spin Operator Custom Resource Definition and Runtime Class
+* Install and verify containerd shim via Kwasm
+* Deploy a simple Spin App custom resource on your cluster
 
+<!-- TODO: To learn more about any of these concepts, please visit the [Spin Operator Conceptual article](link-to-concept-article). -->
 ## Prerequisites
 
 Please see the following sections in the [Prerequisites](./prerequisites.md) page and fulfill those prerequisite requirements before continuing:
