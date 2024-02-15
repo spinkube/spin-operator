@@ -7,6 +7,12 @@
 
 # Package and Deploy Spin Apps
 
+This article explains how Spin Apps are packaged and distributed via both public and private registries. You will learn how to:
+
+- Package and distribute Spin Apps
+- Deploy Spin Apps
+- Use private registries that require authentication
+
 ## Prerequisites
 
 Ensure the necessary [prerequisites](./prerequisites.md) are installed.
@@ -55,7 +61,7 @@ You can test the app on your local machine by invoking the `spin up` command fro
 
 ## Packaging and Distributing Spin Apps
 
-Spin Apps are packaged and distributed as OCI artifacts. By leveraging OCI artifacts, Spin Apps can be distributed using any registry that implements the [Open Container Initiative Distribution Specification](https://github.com/opencontainers/distribution-spec/tree/main) (a.k.a. "OCI Distribution Spec").
+Spin Apps are packaged and distributed as OCI artifacts. By leveraging OCI artifacts, Spin Apps can be distributed using any registry that implements the [Open Container Initiative Distribution Specification](https://github.com/opencontainers/distribution-spec) (a.k.a. "OCI Distribution Spec").
 
 The `spin` CLI simplifies packaging and distribution of Spin Apps and provides an atomic command for this (`spin registry push`). You can package and distribute the `hello-spin` app that you created as part of the previous section like this:
 
