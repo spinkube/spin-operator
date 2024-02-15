@@ -22,7 +22,7 @@ For this guide in particular, you will need:
 
 Also, ensure you have cloned this repository and have navigated to the root of the project:
 
-```shell
+```console
 git clone git@github.com:spinkube/spin-operator.git
 cd spin-operator
 ```
@@ -39,7 +39,7 @@ The [Custom Resource Definition (CRD)](glossary-of-terms#custom-resource-definit
 
 <!-- TODO: replace with e.g. 'kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.crds.yaml' -->
 
-```shell
+```console
 make install
 ```
 
@@ -47,7 +47,7 @@ A [RuntimeClass](glossary-of-terms/#runtime-class) resource for the `wasmtime-sp
 
 <!-- TODO: replace with e.g. 'kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml' -->
 
-```shell
+```console
 kubectl apply -f spin-runtime-class.yaml
 ```
 
@@ -69,7 +69,7 @@ The following installs the chart with the release name `spin-operator`:
 
 <!-- TODO: remove '--devel' flag once we have our first non-prerelease chart available, e.g. when v0.1.0 of this project is released and public -->
 
-```shell
+```console
 helm install spin-operator \
   --namespace spin-operator \
   --create-namespace \
@@ -92,7 +92,7 @@ To upgrade the `spin-operator` release, run the following:
 
 <!-- TODO: remove '--devel' flag once we have our first non-prerelease chart available, e.g. when v0.1.0 of this project is released and public -->
 
-```shell
+```console
 helm upgrade spin-operator \
   --namespace spin-operator \
   --devel \
@@ -104,7 +104,7 @@ helm upgrade spin-operator \
 
 To delete the `spin-operator` release, run:
 
-```shell
+```console
 helm delete spin-operator --namespace spin-operator
 ```
 
@@ -113,14 +113,14 @@ This will remove all Kubernetes resources associated with the chart and deletes 
 To completely uninstall all resources related to spin-operator, you may want to delete the corresponding CRD resources and, optionally, the RuntimeClass:
 
 <!-- TODO: replace with:
-```shell
+```console
 kubectl delete -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.crds.yaml
 
 kubectl delete -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml
 ```
 -->
 
-```shell
+```console
 make uninstall
 kubectl delete -f spin-runtime-class.yaml
 ```

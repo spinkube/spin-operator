@@ -23,7 +23,7 @@ For this Quickstart in particular, you will need:
 
 Also, ensure you have cloned this repository and have navigated to the root of the project:
 
-```
+```console
 git clone git@github.com:spinkube/spin-operator.git
 cd spin-operator
 ```
@@ -34,7 +34,7 @@ cd spin-operator
 
 <!-- TODO: update below with ghcr.io/spinkube/containerd-shim-spin/examples/k3d:<tag> -->
 
-```
+```console
 k3d cluster create wasm-cluster \
   --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.11.0 \
   --port "8081:80@loadbalancer" \
@@ -47,7 +47,7 @@ k3d cluster create wasm-cluster \
 
 <!-- TODO: replace with e.g. 'kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml' -->
 
-```
+```console
 kubectl apply -f spin-runtime-class.yaml
 ```
 
@@ -55,7 +55,7 @@ kubectl apply -f spin-runtime-class.yaml
 
 <!-- TODO: replace with e.g. 'kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.crds.yaml' -->
 
-```
+```console
 make install
 ```
 
@@ -65,7 +65,7 @@ Now that your Kubernetes cluster is prepared, you can install the Spin Operator 
 
 <!-- TODO: remove '--devel' flag once we have our first non-prerelease chart available, e.g. when v0.1.0 of this project is out -->
 
-```
+```console
 helm install spin-operator \
   --namespace spin-operator \
   --create-namespace \
@@ -86,7 +86,7 @@ You are now ready to deploy Spin applications onto the cluster!
 
 <!-- Note: the default 'containerd-shim-spin' SpinAppExecutor CR needs to be present on the cluster before apps using this default can run. However, as of writing, it is a namespaced resource. As such, apps can only be deployed in the same namespace(s) that the CR is present. -->
 
-```
+```console
 kubectl -n spin-operator apply -f config/samples/simple.yaml
 ```
 
@@ -94,19 +94,19 @@ kubectl -n spin-operator apply -f config/samples/simple.yaml
 
 2. Forward a local port to the application pod so that it can be reached:
 
-```
+```console
 kubectl -n spin-operator port-forward svc/simple-spinapp 8083:80
 ```
 
 3. In a different terminal window, make a request to the application:
 
-```
+```console
 curl localhost:8083/hello
 ```
 
 You should see:
 
-```bash
+```console
 Hello world from Spin!
 ```
 

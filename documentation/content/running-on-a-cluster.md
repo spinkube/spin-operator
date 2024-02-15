@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-Please ensure that your system has all of the [./prerequisites.md](prequisites) installed before continuing.
+Please ensure that your system has all the [./prerequisites.md](prequisites) installed before continuing.
 
 ## Running on Your Kubernetes Cluster
 
@@ -16,13 +16,13 @@ This is the standard development workflow for when you want to test running Spin
 
 To install cert-manager with the default config
 
-```sh
+```console
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
 ```
 
 Deploy the Manager to the cluster with the image specified by `IMG`:
 
-```sh
+```console
 make deploy IMG=<some-registry>/spin-operator:tag
 ```
 
@@ -31,7 +31,7 @@ make deploy IMG=<some-registry>/spin-operator:tag
 
 To create instances of your solution, apply the samples (examples) from the config/sample:
 
-```sh
+```console
 kubectl apply -k config/samples/
 ```
 

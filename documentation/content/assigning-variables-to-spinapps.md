@@ -54,9 +54,9 @@ platform_name = "{{ platform_name }}"
 db_password = "{{ db_password }}"
 ```
 
-## Configration data in Kubernetes
+## Configuration data in Kubernetes
 
-In Kubernetes, you use `ConfigMaps` for storing non-senstive, and `Secrets` for storing sesitive configuration data. The deployment manifest (`config/samples/variable-explorer.yaml`) contains specifications for both a `ConfigMap` and a `Secret`:
+In Kubernetes, you use `ConfigMaps` for storing non-sensitive, and `Secrets` for storing sensitive configuration data. The deployment manifest (`config/samples/variable-explorer.yaml`) contains specifications for both a `ConfigMap` and a `Secret`:
 
 ```yaml
 kind: ConfigMap

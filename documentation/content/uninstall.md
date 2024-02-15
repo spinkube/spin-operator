@@ -11,7 +11,7 @@ These are commands to delete, uninstall and undeploy resources.
 
 The following command will delete the instances (CRs) from the cluster:
 
-```bash
+```console
 kubectl delete -k config/samples/
 ```
 
@@ -19,7 +19,7 @@ kubectl delete -k config/samples/
 
 The following command will uninstall CRDs from the K8s cluster specified in `~/.kube/config`:
 
-```sh
+```console
 make uninstall
 ```
 
@@ -29,7 +29,7 @@ make uninstall
 
 The following command will undeploy the controller from the K8s cluster specified in `~/.kube/config`:
 
-```sh
+```console
 make undeploy
 ```
 

@@ -12,9 +12,9 @@ The following is a list of common error messages and potential troubleshooting s
 
 ## Cluster Already Exists
 
-When trying to create a cluster (e.g. a cluster named `wasm-cluster`) you may recieve an error message similar to the following:
+When trying to create a cluster (e.g. a cluster named `wasm-cluster`) you may receive an error message similar to the following:
 
-```bash
+```console
 FATA[0000] Failed to create cluster 'wasm-cluster' because a cluster with that name already exists
 ```
 
@@ -22,7 +22,7 @@ FATA[0000] Failed to create cluster 'wasm-cluster' because a cluster with that n
 
 With `k3d` installed, you can use the following command to get a cluster list:
 
-```bash
+```console
 $ k3d cluster list
 NAME           SERVERS   AGENTS   LOADBALANCER
 wasm-cluster   1/1       2/2      true
@@ -30,15 +30,15 @@ wasm-cluster   1/1       2/2      true
 
 With `kubectl installed, you can use the following command to dump cluster information (this is much more verbose):
 
-```bash
-$ kubectl cluster-info dump
+```console
+kubectl cluster-info dump
 ```
 
 ### Cluster Delete
 
 With `k3d` installed, you can delete the cluster by name, as shown in the command below:
 
-```bash
+```console
 $ k3d cluster delete wasm-cluster
 INFO[0000] Deleting cluster 'wasm-cluster'
 INFO[0002] Deleting cluster network 'k3d-wasm-cluster'
@@ -50,15 +50,15 @@ INFO[0002] Successfully deleted cluster wasm-cluster!
 
 ## Too long: must have at most 262144 bytes
 
-When running `kubectl apply -f my-file.yaml`, the following error can occur if the `.yaml` file is too large:
+When running `kubectl apply -f my-file.yaml`, the following error can occur if the yaml file is too large:
 
-```bash
+```console
 Too long: must have at most 262144 bytes
 ```
 
 Using the `--server-side=true` option resolves this issue:
 
-```bash
+```console
 kubectl apply --server-side=true -f my-file.yaml
 ```
 
@@ -66,7 +66,7 @@ kubectl apply --server-side=true -f my-file.yaml
 
 Noted an error when installing Redis Operator:
 
-```bash
+```console
 $ helm repo add redis-operator https://spotahome.github.io/redis-operator
 "redis-operator" has been added to your repositories
 $ helm repo update
@@ -79,7 +79,7 @@ Error: INSTALLATION FAILED: failed to install CRD crds/databases.spotahome.com_r
 
 Used the following commands to enforce using a different version of Redis Operator (whilst waiting on [this PR fix](https://github.com/spotahome/redis-operator/pull/685) to be merged).
 
-```bash
+```console
 $ helm install redis-operator redis-operator/redis-operator --version 3.2.9
 NAME: redis-operator
 LAST DEPLOYED: Mon Jan 22 12:33:54 2024
@@ -91,9 +91,9 @@ TEST SUITE: None
 
 ## error: requires go version
 
-When building apps like the [cpu-load-gen](../../apps/cpu-load-gen/) Spin app, you may get the following error if your TinyGo is not up to date. The error requires go version `1.18` through `1.20` but this is not necessarily the case. It **is** recommended that you have the latest go installed e.g. `1.21` and downgrading is not necessary. Instead please go ahead and [install the latest version of TinyGo](./prerequisites.md#tinygo) to resolve this error:
+When building apps like the [cpu-load-gen](../../apps/cpu-load-gen/) Spin app, you may get the following error if your TinyGo is not up to date. The error requires go version `1.18` through `1.20` but this is not necessarily the case. It **is** recommended that you have the latest go installed e.g. `1.21` and downgrading is unnecessary. Instead please go ahead and [install the latest version of TinyGo](./prerequisites.md#tinygo) to resolve this error:
 
-```bash
+```console
 user@user:~/spin-operator/apps/cpu-load-gen$ spin build
 Building component cpu-load-gen with `tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go`
 error: requires go version 1.18 through 1.20, got go1.21
