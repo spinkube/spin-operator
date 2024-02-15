@@ -8,7 +8,7 @@
 
 **Build and push your image to the location specified by `IMG`:**
 
-```sh
+```console
 make docker-build docker-push IMG=<some-registry>/spin-operator:tag
 ```
 
@@ -18,19 +18,19 @@ Make sure you have the proper permission to the registry if the above commands d
 
 **Apply the Runtime Class to the cluster:**
 
-```sh
+```console
 kubectl apply -f spin-runtime-class.yaml
 ```
 
 **Install the CRDs into the cluster:**
 
-```sh
+```console
 make install
 ```
 
 **Deploy cert-manager to the cluster:**
 
-```sh
+```console
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.yaml
 ```
 
@@ -38,7 +38,7 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 
 **Deploy the Manager to the cluster with the image specified by `IMG`:**
 
-```sh
+```console
 make deploy IMG=<some-registry>/spin-operator:tag
 ```
 
@@ -48,7 +48,7 @@ make deploy IMG=<some-registry>/spin-operator:tag
 **Create instances of your solution**
 You can apply the samples (examples) from the config/sample:
 
-```sh
+```console
 kubectl apply -k config/samples/
 ```
 
@@ -58,31 +58,31 @@ kubectl apply -k config/samples/
 
 **Delete the instances (CRs) from the cluster:**
 
-```sh
+```console
 kubectl delete -k config/samples/
 ```
 
 **Delete the APIs(CRDs) from the cluster:**
 
-```sh
+```console
 make uninstall
 ```
 
 **Delete the Runtime Class from the cluster:**
 
-```sh
+```console
 kubectl delete -f spin-runtime-class.yaml
 ```
 
 **UnDeploy the controller from the cluster:**
 
-```sh
+```console
 make undeploy
 ```
 
 **UnDeploy cert-manager from the cluster:**
 
-```sh
+```console
 kubectl delete -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.yaml
 ```
 
@@ -100,7 +100,7 @@ The [Spin Operator chart](./charts/spin-operator) is assembled via a combination
 
 **Generate the Helm chart:**
 
-```sh
+```console
 make helm-generate
 ```
 
@@ -110,7 +110,7 @@ make helm-generate
 > RuntimeClass are currently _not_ installed as part of the chart. You'll need to ensure these are
 > present via the method(s) mentioned above.
 
-```sh
+```console
 make helm-install
 ```
 
@@ -118,12 +118,12 @@ Follow the release notes printed after helm installs the chart for next steps.
 
 **Upgrade the Helm release on the cluster:**
 
-```sh
+```console
 make helm-upgrade
 ```
 
 **Delete the Helm release from the cluster:**
 
-```sh
+```console
 make helm-uninstall
 ```

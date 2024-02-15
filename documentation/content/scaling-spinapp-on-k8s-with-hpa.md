@@ -27,7 +27,7 @@ Please see the following sections in the [Prerequisites](./prerequisites.md) pag
 
 If you haven't already, please go ahead and clone the Spin Operator repository and move into the Spin Operator directory:
 
-```bash
+```console
 git clone https://github.com/spinkube/spin-operator.git
 cd spin-operator
 ```
@@ -36,20 +36,20 @@ cd spin-operator
 
 Run the following command to create a k8s k3d cluster that has [the containerd-wasm-shims](https://github.com/deislabs/containerd-wasm-shims) pre-requisites installed: If you have a k3d cluster already, please feel free to use it:
 
-```bash
+```console
 k3d cluster create wasm-cluster-scale --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.11.0 -p "8081:80@loadbalancer" --agents 2
 ```
 
 Next, from within the `spin-operator` directory, run the following commands to install the Spin runtime class and Spin Operator:
 
-```bash
+```console
 kubectl apply -f spin-runtime-class.yaml
 make install
 ```
 
 Lastly, start the operator with the following command:
 
-```bash
+```console
 make run
 ```
 
@@ -59,7 +59,7 @@ Great, now you have Spin Operator up and running on your cluster. This means you
 
 Use the following command to set up ingress on your k8s cluster. This ensures traffic can reach your SpinApp once we’ve created it in future steps:
 
-```bash
+```console
 # Setup ingress following this tutorial https://k3d.io/v5.4.6/usage/exposing_services/
 cat <<EOF | kubectl apply -f -
 apiVersion: networking.k8s.io/v1
@@ -88,7 +88,7 @@ Hit enter to create the ingress resource.
 
 Next up we’re going to build the SpinApp we will be scaling and storing inside of a [ttl.sh](http://ttl.sh) registry. Change into the [apps/cpu-load-gen](https://github.com/spinkube/spin-operator/tree/hpa-tutorial/apps/cpu-load-gen) directory and build the SpinApp we’ve provided:
 
-```bash
+```console
 # Build and publish the sample app
 cd apps/cpu-load-gen
 spin build
@@ -151,13 +151,13 @@ The k8s documentation is the place to learn more about [limits and requests](htt
 
 Let’s deploy the SpinApp and the HPA instance onto our cluster with the following command:
 
-```bash
+```console
 kubectl apply -f config/samples/hpa.yaml
 ```
 
 You can see your running Spin application by running the following command:
 
-```bash
+```console
 kubectl get spinapps
 NAME          AGE
 hpa-spinapp   92m
@@ -165,7 +165,7 @@ hpa-spinapp   92m
 
 You can also see your HPA instance with the following command:
 
-```bash
+```console
 NAME                 REFERENCE                TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
 spinapp-autoscaler   Deployment/hpa-spinapp   6%/50%    1         10        1          97m
 ```
@@ -174,14 +174,14 @@ spinapp-autoscaler   Deployment/hpa-spinapp   6%/50%    1         10        1   
 
 Now let’s use Bombardier to generate traffic to test how well HPA scales our SpinApp. The following Bombardier command will attempt to establish 40 connections during a period of 3 minutes (or less). If a request is not responded to within 5 seconds that request will timeout:
 
-```bash
+```console
 # Generate a bunch of load
 bombardier -c 40 -t 5s -d 3m http://localhost:8081
 ```
 
 To watch the load, we can run the following command to get the status of our deployment:
 
-```bash
+```console
 kubectl describe deploy hpa-spinapp
 ...
 ---

@@ -9,19 +9,19 @@
 
 ## Prerequisites
 
-Please ensure that your system has all of the [prerequisites](./prerequisites.md) installed before continuing.
+Please ensure that your system has all the [prerequisites](./prerequisites.md) installed before continuing.
 
 ## Fetch Spin Operator (Source Code)
 
 Clone the Spin Operator repository:
 
-```bash
+```console
 git clone https://github.com/spinkube/spin-operator.git
 ```
 
 Change into the Spin Operator directory:
 
-```bash
+```console
 cd spin-operator
 ```
 
@@ -29,13 +29,13 @@ cd spin-operator
 
 Run the following command to create a Kubernetes k3d cluster that has [the containerd-wasm-shims](https://github.com/deislabs/containerd-wasm-shims) pre-requisites installed:
 
-```bash
+```console
 k3d cluster create wasm-cluster --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.11.0 -p "8081:80@loadbalancer" --agents 2
 ```
 
 Run the following command to create the Runtime Class:
 
-```bash
+```console
 kubectl apply -f - <<EOF
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
@@ -49,7 +49,7 @@ EOF
 
 Run the following command to install the Custom Resource Definition (CRD) into the cluster:
 
-```bash
+```console
 make install
 ```
 
@@ -57,25 +57,25 @@ make install
 
 Run the following command to run the Spin Operator locally:
 
-```bash
+```console
 make run
 ```
 
 Run the following command, in a different terminal window:
 
-```bash
-$ kubectl apply -f ./config/samples/simple.yaml --validate=false
+```console
+kubectl apply -f ./config/samples/simple.yaml --validate=false
 ```
 
 Run the following command to obtain the name of the pod you have running:
 
-```bash
+```console
 kubectl get pods
 ```
 
 The above command will return information similar to the following:
 
-```bash
+```console
 NAME                              READY   STATUS    RESTARTS   AGE
 simple-spinapp-5b8d8d69b4-snscs   1/1     Running   0          3m40s
 
@@ -83,25 +83,25 @@ simple-spinapp-5b8d8d69b4-snscs   1/1     Running   0          3m40s
 
 Using the `NAME` from above, run the following `kubectl` command to listen on port 8083 locally and forward to port 80 in the pod:
 
-```bash
+```console
 kubectl port-forward simple-spinapp-5b8d8d69b4-snscs 8083:80
 ```
 
 The above command will return the following forwarding mappings:
 
-```bash
+```console
 Forwarding from 127.0.0.1:8083 -> 80
 Forwarding from [::1]:8083 -> 80
 ```
 
 Run the following command, in a different terminal window:
 
-```bash
+```console
 curl localhost:8083/hello
 ```
 
 The above command will return the following message:
 
-```bash
+```console
 Hello world from Spin!
 ```

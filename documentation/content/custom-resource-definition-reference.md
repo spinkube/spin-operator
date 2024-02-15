@@ -47,7 +47,7 @@ In some cases, your image might be coming from a private registry. Lets you refe
 
 For example, a secret which is created with the following command:
 
-```bash
+```console
 kubectl create secret docker-registry spin-image-secret --docker-server=https://ghcr.io --docker-username=$YOUR_GITHUB_USERNAME --docker-password=$YOUR_GITHUB_PERSONAL_ACCESS_TOKEN --docker-email=$YOUR_EMAIL
 ```
 
