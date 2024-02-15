@@ -102,7 +102,7 @@ You are now ready to deploy Spin applications onto the cluster!
 <!-- Note: the default 'containerd-shim-spin' SpinAppExecutor CR needs to be present on the cluster before apps using this default can run. However, as of writing, it is a namespaced resource. As such, apps can only be deployed in the same namespace(s) that the CR is present. -->
 
 ```
-kubectl -n spin-operator apply -f config/samples/simple.yaml
+kubectl apply -f config/samples/simple.yaml
 ```
 
 <!-- TODO: Use spin-k8s-plugin here? -->
