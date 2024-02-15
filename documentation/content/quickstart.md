@@ -110,7 +110,7 @@ kubectl apply -f config/samples/simple.yaml
 2. Forward a local port to the application pod so that it can be reached:
 
 ```
-kubectl -n spin-operator port-forward svc/simple-spinapp 8083:80
+kubectl port-forward svc/simple-spinapp 8083:80
 ```
 
 3. In a different terminal window, make a request to the application:
