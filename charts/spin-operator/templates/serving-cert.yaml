@@ -9,9 +9,9 @@ metadata:
   {{- include "spin-operator.labels" . | nindent 4 }}
 spec:
   dnsNames:
-  - '{{ include "spin-operator.fullname" . }}-webhook-service.{{ .Release.Namespace
+  - '{{ include "{{ .Release.Namespace }}.fullname" . }}-webhook-service.{{ .Release.Namespace
     }}.svc'
-  - '{{ include "spin-operator.fullname" . }}-webhook-service.{{ .Release.Namespace
+  - '{{ include "{{ .Release.Namespace }}.fullname" . }}-webhook-service.{{ .Release.Namespace
     }}.svc.{{ .Values.kubernetesClusterDomain }}'
   issuerRef:
     kind: Issuer

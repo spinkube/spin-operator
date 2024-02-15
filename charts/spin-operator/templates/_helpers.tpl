@@ -23,6 +23,17 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+
+{{/*
+helmify replaces namespace name with `{{ .Release.Namespace }}` in dnsNames for Certificate object
+which means `{{ include "spin-operator.fullname" . }}` gets replaced with `{{ include "{{ .Release.Namespace }}.fullname" . }}`
+
+This is most likely a bug in helmify, but we can workaround it by defining a new template helper with name `{{ .Release.Namespace }}.fullname`
+*/}}
+{{- define "{{ .Release.Namespace }}.fullname" -}}
+{{ include "spin-operator.fullname" . }}
+{{- end }}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}
