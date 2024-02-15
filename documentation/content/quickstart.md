@@ -1,8 +1,7 @@
 - [Quickstart](#quickstart)
   - [Prerequisites](#prerequisites)
   - [Set up your Kubernetes cluster](#set-up-your-kubernetes-cluster)
-  - [Option A: Install Spin Operator (Make)](#option-a-install-spin-operator-make)
-  - [Option B: Install Spin Operator (Helm)](#option-b-install-spin-operator-helm)
+  - [Deploy the Spin Operator](#deploy-the-spin-operator)
   - [Run the sample application](#run-the-sample-application)
 
 # Quickstart
@@ -18,7 +17,6 @@ For this Quickstart in particular, you will need:
 - [kubectl](./prerequisites.md#kubectl) - the Kubernetes CLI
 - [k3d](./prerequisites.md#k3d) - a lightweight Kubernetes distribution that runs on Docker
 - [Docker](./prerequisites.md#docker) - for running k3d
-- [Helm](./prerequisites.md#helm) - the package manager for Kubernetes
 
 <!-- NOTE: remove this prerequisite when the runtime-class and CRDs can be applied from their release artifacts, i.e. when repo and release are public -->
 
@@ -35,9 +33,9 @@ cd spin-operator
 
 <!-- TODO: update below with ghcr.io/spinkube/containerd-shim-spin/examples/k3d:<tag> -->
 
-```
+```console
 k3d cluster create wasm-cluster \
-  --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.10.0 \
+  --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.11.0 \
   --port "8081:80@loadbalancer" \
   --agents 2
 ```
