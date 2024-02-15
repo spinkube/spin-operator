@@ -72,6 +72,8 @@ spec:
           10 }}
         securityContext: {{- toYaml .Values.controllerManager.kubeRbacProxy.containerSecurityContext
           | nindent 10 }}
+      imagePullSecrets:
+      - name: registry-credentials
       securityContext:
         runAsNonRoot: true
       serviceAccountName: {{ include "spin-operator.fullname" . }}-controller-manager

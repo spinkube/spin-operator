@@ -10,6 +10,10 @@ LDFLAGS               := -s -w -X ${PKG_LDFLAGS}.Version=${VERSION} -X ${PKG_LDF
 IMG_REPO ?= ghcr.io/spinkube/spin-operator
 IMG ?= $(IMG_REPO):$(shell git rev-parse --short HEAD)-dev
 
+# Default registry and secret name for working with private container registries
+DEFAULT_REGISTRY := https://ghcr.io
+DEFAULT_REGISTRY_SECRET_NAME := registry-credentials
+
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.28.3
 
@@ -288,3 +292,13 @@ $(ENVTEST): $(LOCALBIN)
 helmify: $(HELMIFY) ## Download helmify locally if necessary.
 $(HELMIFY): $(LOCALBIN)
 	@test -s $(LOCALBIN)/helmify || GOBIN=$(LOCALBIN) go install github.com/arttor/helmify/cmd/helmify@$(HELMIFY_VESRION)
+
+.PHONY: container-registry-secret
+container-registry-secret: ## Create a secret for the container registry
+	@echo "Creating secret for container registry"
+	@kubectl create ns $(HELM_NAMESPACE) 2>/dev/null || true
+	@kubectl create secret docker-registry $(DEFAULT_REGISTRY_SECRET_NAME) \
+		--docker-server=$(DEFAULT_REGISTRY) \
+		--docker-username=$(REGISTRY_USERNAME) \
+		--docker-password=$(REGISTRY_TOKEN) \
+		--namespace=$(HELM_NAMESPACE) || true
