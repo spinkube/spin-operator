@@ -136,6 +136,8 @@ HELM_CHART := spin-operator
 helm-generate: manifests kustomize helmify ## Create/update the Helm chart based on kustomize manifests. (Note: CRDs not included)
 	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir -cert-manager-as-subchart -cert-manager-version v1.13.3 charts/$(HELM_CHART)
 	rm -rf charts/$(HELM_CHART)/crds
+	@# Copy the containerd-shim-spin SpinAppExecutor yaml from its canonical location into the chart
+	cp config/samples/shim-executor.yaml charts/$(HELM_CHART)/templates/containerd-shim-spin-executor.yaml
 	$(HELM) dep up charts/$(HELM_CHART)
 
 ##@ Deployment
