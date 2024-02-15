@@ -22,7 +22,7 @@ For this Quickstart in particular, you will need:
 
 Also, ensure you have cloned this repository and have navigated to the root of the project:
 
-```
+```console
 git clone git@github.com:spinkube/spin-operator.git
 cd spin-operator
 ```
@@ -54,7 +54,7 @@ make docker-build IMG=ghcr.io/spinkube/spin-operator:dev
 
 ```console
 k3d image import -c wasm-cluster ghcr.io/spinkube/spin-operator:dev
-
+```
 
 4. Apply the [Runtime Class](../../spin-runtime-class.yaml) used for scheduling Spin apps onto nodes running the shim:
 
@@ -101,21 +101,19 @@ You are now ready to deploy Spin applications onto the cluster!
 
 <!-- Note: the default 'containerd-shim-spin' SpinAppExecutor CR needs to be present on the cluster before apps using this default can run. However, as of writing, it is a namespaced resource. As such, apps can only be deployed in the same namespace(s) that the CR is present. -->
 
-```
+```console
 kubectl apply -f config/samples/simple.yaml
 ```
 
-<!-- TODO: Use spin-k8s-plugin here? -->
-
 2. Forward a local port to the application pod so that it can be reached:
 
-```
+```console
 kubectl port-forward svc/simple-spinapp 8083:80
 ```
 
 3. In a different terminal window, make a request to the application:
 
-```
+```console
 curl localhost:8083/hello
 ```
 
