@@ -56,7 +56,13 @@ make docker-build IMG=ghcr.io/spinkube/spin-operator:dev
 k3d image import -c wasm-cluster ghcr.io/spinkube/spin-operator:dev
 ```
 
-4. Apply the [Runtime Class](../../spin-runtime-class.yaml) used for scheduling Spin apps onto nodes running the shim:
+4. Install cert manager
+
+```console
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
+```
+
+5. Apply the [Runtime Class](../../spin-runtime-class.yaml) used for scheduling Spin apps onto nodes running the shim:
 
 <!-- TODO: replace with e.g. 'kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml' -->
 
@@ -64,18 +70,12 @@ k3d image import -c wasm-cluster ghcr.io/spinkube/spin-operator:dev
 kubectl apply -f spin-runtime-class.yaml
 ```
 
-5. Apply the [Custom Resource Definitions](./glossary-of-terms.md#custom-resource-definition-crd) used by the Spin Operator:
+6. Apply the [Custom Resource Definitions](./glossary-of-terms.md#custom-resource-definition-crd) used by the Spin Operator:
 
 <!-- TODO: replace with e.g. 'kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.crds.yaml' -->
 
 ```console
 make install
-```
-
-6. Install cert manager
-
-```console
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
 ```
 
 ## Deploy the Spin Operator 
