@@ -42,9 +42,9 @@ k3d cluster create wasm-cluster \
 
 > Note: Spin Operator requires a few Kubernetes resources that are installed globally to the cluster. We create these directly through `kubectl` as a best practice, since their lifetimes are usually managed separately from a given Spin Operator installation.
 
->> For now in private preview, the installation workflow uses `make`. In the future, we will add Helm chart support
+> > For now in private preview, the installation workflow uses `make`. In the future, we will add Helm chart support
 
-2. Build the Spin Operator image. 
+2. Build the Spin Operator image.
 
 ```console
 make docker-build IMG=ghcr.io/spinkube/spin-operator:dev
@@ -78,7 +78,8 @@ make install
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
 ```
 
-## Deploy the Spin Operator 
+## Deploy the Spin Operator
+
 Run the following command to run the Spin Operator locally. This will create all of the Kubernetes resources required by Spin Operator under the Kubernetes namespace spin-operator. It may take a moment for the installation to complete as dependencies are installed and pods are spinning up.
 
 ```console
@@ -127,5 +128,5 @@ Hello world from Spin!
 
 Congrats on deploying your first SpinApp! Recommended next steps:
 
-* Scale your [Spin Apps with Horizontal Pod Autoscaler](./scaling-spinapp-on-k8s-with-hpa.md)
-* Scale your [Spin Apps with Kubernetes Event Driven Autoscaler](./scaling-spinapp-on-k8s-with-keda.md)
+- Scale your [Spin Apps with Horizontal Pod Autoscaler](./scaling-spinapp-on-k8s-with-hpa.md)
+- Scale your [Spin Apps with Kubernetes Event Driven Autoscaler](./scaling-spinapp-on-k8s-with-keda.md)
