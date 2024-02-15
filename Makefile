@@ -164,7 +164,7 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 	$(KUSTOMIZE) build config/default | $(KUBECTL) delete --ignore-not-found=$(ignore-not-found) -f -
 
 HELM_RELEASE   ?= $(HELM_CHART)
-HELM_NAMESPACE ?= $(HELM_CHART)
+HELM_NAMESPACE ?= $(HELM_CHART)-system
 IMG_REPO := $(shell echo "${IMG}" | cut -d ':' -f 1)
 IMG_TAG  := $(shell echo "${IMG}" | cut -d ':' -f 2)
 

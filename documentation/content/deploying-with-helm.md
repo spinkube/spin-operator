@@ -71,11 +71,11 @@ The following installs the chart with the release name `spin-operator`:
 
 ```console
 helm install spin-operator \
-  --namespace spin-operator \
+  --namespace spin-operator-system \
   --create-namespace \
   --devel \
   --wait \
-  oci://ghcr.io/spinkube/spin-operator
+  charts/spin-operator
 ```
 
 ### Upgrading the Chart
@@ -94,10 +94,10 @@ To upgrade the `spin-operator` release, run the following:
 
 ```console
 helm upgrade spin-operator \
-  --namespace spin-operator \
+  --namespace spin-operator-system \
   --devel \
   --wait \
-  oci://ghcr.io/spinkube/spin-operator
+  charts/spin-operator
 ```
 
 ### Uninstalling the Chart
@@ -105,7 +105,7 @@ helm upgrade spin-operator \
 To delete the `spin-operator` release, run:
 
 ```console
-helm delete spin-operator --namespace spin-operator
+helm delete spin-operator --namespace spin-operator-system
 ```
 
 This will remove all Kubernetes resources associated with the chart and deletes the Helm release.
