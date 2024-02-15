@@ -90,7 +90,7 @@ lint-fix: golangci-lint ## Run golangci-lint linter and perform fixes
 
 .PHONY: helm-lint
 helm-lint: helm-generate ## Lint the Helm chart
-	$(HELM) lint ./charts/$(HELM_CHART)
+	$(HELM) lint ./charts/$(CHART_NAME)
 
 .PHONY: lint-markdown
 lint-markdown: ## Lint markdown files
@@ -130,15 +130,55 @@ docker-build-and-publish-all: ## Build the docker image for all supported platfo
 
 ##@ Package
 
-HELM_CHART := spin-operator
+CHART_NAME     := spin-operator
+# We strip the 'v' prefix from the tag per Helm's semver restrictions.
+# Although you can 'helm push' and `helm install --version` with v* versions,
+# they aren't valid/recognized by 'helm install' or 'helm install --devel'.
+# TODO: swap '0.0.0' with '$(shell git describe --tags --abbrev=0 | sed -rn 's/(v)?(.*)/\2/p')' when we have our first tag
+CHART_VERSION  ?= 0.0.0-dev
+CHART_REGISTRY ?= ghcr.io/fermyon
+
+STAGING_DIR := _dist
+CRD_DIR     := ./config/crd/bases
 
 .PHONY: helm-generate
 helm-generate: manifests kustomize helmify ## Create/update the Helm chart based on kustomize manifests. (Note: CRDs not included)
-	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir -cert-manager-as-subchart -cert-manager-version v1.13.3 charts/$(HELM_CHART)
-	rm -rf charts/$(HELM_CHART)/crds
+	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir -cert-manager-as-subchart -cert-manager-version v1.13.3 charts/$(CHART_NAME)
+	rm -rf charts/$(CHART_NAME)/crds
 	@# Copy the containerd-shim-spin SpinAppExecutor yaml from its canonical location into the chart
-	cp config/samples/shim-executor.yaml charts/$(HELM_CHART)/templates/containerd-shim-spin-executor.yaml
-	$(HELM) dep up charts/$(HELM_CHART)
+	cp config/samples/shim-executor.yaml charts/$(CHART_NAME)/templates/containerd-shim-spin-executor.yaml
+	$(HELM) dep up charts/$(CHART_NAME)
+
+.PHONY: helm-publish
+helm-publish: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz ## Publish the helm chart to an OCI registry
+	helm push \
+		$(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz \
+		oci://$(CHART_REGISTRY)
+
+.PHONY: dist
+## Assemble Helm chart and manifests into $(STAGING_DIR) for distribution/release
+dist: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz $(STAGING_DIR)/spin-operator.runtime-class.yaml $(STAGING_DIR)/spin-operator.crds.yaml
+
+$(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION): helm-generate
+	mkdir -p $(STAGING_DIR)
+	cp -r charts/$(CHART_NAME) $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)
+
+$(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)
+	sed -r -i.bak -e 's%^version: .*%version: $(CHART_VERSION)%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
+	sed -r -i.bak -e 's%^appVersion: .*%appVersion: "v$(CHART_VERSION)"%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
+	$(HELM) package \
+		--version $(CHART_VERSION) \
+		--destination $(STAGING_DIR) \
+		$(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)
+
+$(STAGING_DIR)/spin-operator.runtime-class.yaml:
+	cp spin-runtime-class.yaml $(STAGING_DIR)/spin-operator.runtime-class.yaml
+
+$(STAGING_DIR)/spin-operator.crds.yaml: manifests
+	for file in $$(ls $(CRD_DIR)) ; \
+	do \
+		cat $(CRD_DIR)/$$file >> $(STAGING_DIR)/spin-operator.crds.yaml ; \
+	done
 
 ##@ Deployment
 
@@ -163,8 +203,8 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | $(KUBECTL) delete --ignore-not-found=$(ignore-not-found) -f -
 
-HELM_RELEASE   ?= $(HELM_CHART)
-HELM_NAMESPACE ?= $(HELM_CHART)
+HELM_RELEASE   ?= $(CHART_NAME)
+HELM_NAMESPACE ?= $(CHART_NAME)
 IMG_REPO := $(shell echo "${IMG}" | cut -d ':' -f 1)
 IMG_TAG  := $(shell echo "${IMG}" | cut -d ':' -f 2)
 
@@ -175,7 +215,7 @@ helm-install: helm-generate ## Install the Helm chart onto the K8s cluster speci
 		--create-namespace \
 		--set controllerManager.manager.image.repository=$(IMG_REPO) \
 		--set controllerManager.manager.image.tag=$(IMG_TAG) \
-		$(HELM_RELEASE) charts/$(HELM_CHART)
+		$(HELM_RELEASE) charts/$(CHART_NAME)
 
 .PHONY: helm-upgrade
 helm-upgrade: helm-install ## Upgrade the Helm release.

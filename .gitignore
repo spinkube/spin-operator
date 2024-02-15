@@ -29,3 +29,6 @@ Dockerfile.cross
 # Helm chart dependencies
 
 charts/spin-operator/charts
+
+# Staging dir for packaging/releasing
+_dist
