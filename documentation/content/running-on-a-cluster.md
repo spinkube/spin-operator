@@ -14,6 +14,12 @@ This is the standard development workflow for when you want to test running Spin
 
 > Note that you need to [install cert-manager](https://cert-manager.io/docs/installation/) for webhook support.
 
+To install cert-manager with the default config
+
+```sh
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
+```
+
 Deploy the Manager to the cluster with the image specified by `IMG`:
 
 ```sh
