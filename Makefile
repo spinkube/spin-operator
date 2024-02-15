@@ -231,3 +231,30 @@ $(ENVTEST): $(LOCALBIN)
 helmify: $(HELMIFY) ## Download helmify locally if necessary.
 $(HELMIFY): $(LOCALBIN)
 	test -s $(LOCALBIN)/helmify || GOBIN=$(LOCALBIN) go install github.com/arttor/helmify/cmd/helmify@$(HELMIFY_VESRION)
+
+.PHONY: container-registry-secret
+container-registry-secret: ## Create a secret for the container registry
+	@echo "Creating secret for container registry"
+	@kubectl create ns $(HELM_NAMESPACE) || true
+	@kubectl create secret docker-registry ghcr-credentials \
+		--docker-server=https://ghcr.io \
+		--docker-username=$(GH_USERNAME) \
+		--docker-password=$(GH_PAT) \
+		--namespace=$(HELM_NAMESPACE) || true
+
+.PHONY: install-runtime-config
+install-runtime-config: ## Install the runtime configuration for the operator
+	@echo "Installing runtime configuration for the operator"
+	kubectl apply -f spin-runtime-class.yaml
+
+.PHONY: deploy-latest-cert-manager
+deploy-latest-cert-manager: ## Deploy the latest version of cert-manager
+	@echo "Deploying the latest version of cert-manager"
+	kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
+
+.PHONY: deploy-latest
+deploy-latest: install deploy-latest-cert-manager container-registry-secret install-runtime-config 
+	kubectl apply -n spin-operator -f config/samples/shim-executor.yaml
+	$(MAKE) manifests kustomize
+	cd config/manager && $(KUSTOMIZE) edit set image $(DEFAULT_IMG_REPO)=ghcr.io/spinkube/spin-operator:20240215-045414-g0d84cbd
+	$(KUSTOMIZE) build config/default | $(KUBECTL) apply -f -
