@@ -127,8 +127,61 @@ type SpinAppList struct {
 type RuntimeConfig struct {
 	// LoadFromSecret is the name of the secret to load runtime config from. The
 	// secret should have a single key named "runtime-config.toml" that contains
-	// the base64 encoded runtime config.
+	// the base64 encoded runtime config. If this is provided all other runtime
+	// config is ignored.
+	//
+	// +optional
 	LoadFromSecret string `json:"loadFromSecret,omitempty"`
+
+	// SqliteDatabases provides spin bindings to different SQLite database providers.
+	// e.g on-disk or turso.
+	SqliteDatabases []SqliteDatabaseConfig `json:"sqliteDatabases,omitempty"`
+
+	KeyValueStores []KeyValueStoreConfig `json:"keyValueStores,omitempty"`
+
+	LLMCompute *LLMComputeConfig `json:"llmCompute,omitempty"`
+}
+
+type SqliteDatabaseConfig struct {
+	Name    string                `json:"name"`
+	Type    string                `json:"type"`
+	Options []RuntimeConfigOption `json:"options,omitempty"`
+}
+
+type KeyValueStoreConfig struct {
+	Name    string                `json:"name"`
+	Type    string                `json:"type"`
+	Options []RuntimeConfigOption `json:"options,omitempty"`
+}
+
+type LLMComputeConfig struct {
+	Type    string                `json:"type"`
+	Options []RuntimeConfigOption `json:"options,omitempty"`
+}
+
+type RuntimeConfigOption struct {
+	// Name of the config option.
+	Name string `json:"name"`
+
+	// Value is the static value to bind to the variable.
+	//
+	// +optional
+	Value string `json:"value,omitempty"`
+
+	// ValueFrom is a reference to dynamically bind the variable to.
+	//
+	// +optional
+	ValueFrom *RuntimeConfigVarSource `json:"valueFrom,omitempty"`
+}
+
+type RuntimeConfigVarSource struct {
+	// Selects a key of a ConfigMap.
+	// +optional
+	ConfigMapKeyRef *corev1.ConfigMapKeySelector `json:"configMapKeyRef,omitempty"`
+
+	// Selects a key of a secret in the apps namespace
+	// +optional
+	SecretKeyRef *corev1.SecretKeySelector `json:"secretKeyRef,omitempty"`
 }
 
 // SpinVar defines a binding between a spin variable and a static or dynamic value.
