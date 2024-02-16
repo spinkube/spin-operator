@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	"github.com/spinkube/spin-operator/internal/generics"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -92,14 +93,6 @@ func ConstructEnvForApp(ctx context.Context, app *spinv1.SpinApp) []corev1.EnvVa
 	return envs
 }
 
-func mapList[V, Y any](input []V, mapper func(V) Y) []Y {
-	result := make([]Y, len(input))
-	for idx, value := range input {
-		result[idx] = mapper(value)
-	}
-	return result
-}
-
 func SpinHealthCheckToCoreProbe(probe *spinv1.HealthProbe) (*corev1.Probe, error) {
 	if probe == nil {
 		return nil, nil
@@ -117,7 +110,7 @@ func SpinHealthCheckToCoreProbe(probe *spinv1.HealthProbe) (*corev1.Probe, error
 			HTTPGet: &corev1.HTTPGetAction{
 				Path: probe.HTTPGet.Path,
 				Port: intstr.FromInt(spinapp.DefaultHTTPPort),
-				HTTPHeaders: mapList(probe.HTTPGet.HTTPHeaders, func(h spinv1.HTTPHealthProbeHeader) corev1.HTTPHeader {
+				HTTPHeaders: generics.MapList(probe.HTTPGet.HTTPHeaders, func(h spinv1.HTTPHealthProbeHeader) corev1.HTTPHeader {
 					return corev1.HTTPHeader{
 						Name:  h.Name,
 						Value: h.Value,

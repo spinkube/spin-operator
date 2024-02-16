@@ -1,18 +1,42 @@
 apiVersion: core.spinoperator.dev/v1
 kind: SpinApp
 metadata:
-  name: runtime-config-spinapp
+  name: runtime-config
 spec:
   image: "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0"
   replicas: 1
   executor: containerd-shim-spin
   runtimeConfig:
-    loadFromSecret: runtime-config
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: runtime-config
-type: Opaque
-data:
-  runtime-config.toml: bG9nX2RpciA9ICIvYXNkZiIK
+    sqliteDatabase:
+      - name: "default"
+        type: "libsql"
+        options:
+          - key: "url"
+            value: "https://sensational-penguin-ahacker.libsql.example.com"
+          - key: "token"
+            valueFrom:
+              secretKeyRef:
+                name: "my-super-secret"
+                key: "turso-token"
+
+    llmCompute:
+      type: "remote_http"
+      options:
+        - key: "url"
+          value: "https://llm-app.fermyon.app"
+        - key: "token"
+          valueFrom:
+            secretKeyRef:
+              name: "my-super-secret"
+              key: "llm-token"
+
+    keyValueStores:
+      - name: "default"
+        type: "redis"
+        options:
+          - key: "url"
+            valueFrom:
+              secretKeyRef:
+                name: "my-super-secret"
+                key: "redis-full-url"
+
