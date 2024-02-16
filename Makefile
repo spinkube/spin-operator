@@ -139,6 +139,7 @@ CHART_NAME     := spin-operator
 # they aren't valid/recognized by 'helm install' or 'helm install --devel'.
 # TODO: swap '0.0.0' with '$(shell git describe --tags --abbrev=0 | sed -rn 's/(v)?(.*)/\2/p')' when we have our first tag
 CHART_VERSION  ?= 0.0.0-dev
+APP_VERSION    ?= v$(CHART_VERSION)
 CHART_REGISTRY ?= ghcr.io/fermyon
 
 STAGING_DIR := _dist
@@ -168,7 +169,7 @@ $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION): helm-generate
 
 $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)
 	sed -r -i.bak -e 's%^version: .*%version: $(CHART_VERSION)%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
-	sed -r -i.bak -e 's%^appVersion: .*%appVersion: "v$(CHART_VERSION)"%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
+	sed -r -i.bak -e 's%^appVersion: .*%appVersion: "$(APP_VERSION)"%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
 	$(HELM) package \
 		--version $(CHART_VERSION) \
 		--destination $(STAGING_DIR) \

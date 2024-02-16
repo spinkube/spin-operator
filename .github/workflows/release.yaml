@@ -2,8 +2,6 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "v*"
 
@@ -18,7 +16,7 @@ jobs:
     name: Package and publish chart and manifests
     runs-on: ubuntu-latest
     env:
-      RELEASE_VERSION: ${{ needs.release-version.outputs.version }}
+      APP_VERSION: "${{ github.ref_name }}"
       CHART_REGISTRY: "ghcr.io/${{ github.repository_owner }}"
     steps:
       - name: Checkout
@@ -38,13 +36,7 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
-      - name: Determine chart version - main
-        if: ${{ ! startsWith(github.ref, 'refs/tags/v') }}
-        # TODO: swap '0.0.0' with '$(git describe --tags --abbrev=0 | sed -rn 's/(v)?(.*)/\2/p')' when we have our first tag
-        run: echo "CHART_VERSION=0.0.0-$(date +%Y%m%d-%H%M%S)-g$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
       - name: Determine chart version - tag
-        if: startsWith(github.ref, 'refs/tags/v')
         # NOTE: We remove the leading 'v' to comply with helm's versioning requirements
         run: echo "CHART_VERSION=$(echo -n ${{ github.ref_name }} | sed -rn 's/(v)?(.*)/\2/p')" >> "$GITHUB_ENV"
 
