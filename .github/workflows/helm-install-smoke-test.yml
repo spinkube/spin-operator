@@ -42,7 +42,7 @@ jobs:
 
       - name: helm install
         run: |
-          helm dependency build
+          helm dependency build charts/spin-operator
           helm install spin-operator \
             --namespace spin-operator \
             --create-namespace \
