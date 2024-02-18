@@ -1,0 +1,66 @@
+name: Helm Install Smoke Test
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21.x"
+
+      - name: Install helm
+        uses: Azure/setup-helm@v3
+        with:
+          version: v3.14.0
+
+      - name: setup k3d
+        uses: engineerd/configurator@v0.0.10
+        with:
+          name: k3d
+          url: https://github.com/k3d-io/k3d/releases/download/v5.6.0/k3d-linux-amd64
+
+      - name: start k3d cluster
+        run: |
+          k3d cluster create wasm-cluster \
+          --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.11.0 \
+          --port  "8081:80@loadbalancer" \
+          --agents 2
+
+      - name: install crd
+        run: make install
+
+      - name: apply runtime class
+        run: kubectl apply -f spin-runtime-class.yaml
+
+      - name: helm install
+        run: |
+          helm install spin-operator \
+            --namespace spin-operator \
+            --create-namespace \
+            --devel \
+            --wait \
+            --set controllerManager.manager.image.repository=ttl.sh/spoopy-operator-pr-${{ github.event.number }} \
+            --set controllerManager.manager.image.tag=24h \
+            charts/spin-operator
+          
+      - name: annotate nodes
+        run: kubectl annotate node --all kwasm.sh/kwasm-node=true
+
+      - name: run spin app
+        run: |
+          kubectl apply -f config/samples/simple.yaml
+          kubectl rollout status deployment simple-spinapp --timeout 90s
+
+          kubectl port-forward svc/simple-spinapp 8083:80 &
+          timeout 15s bash -c 'until curl -f -vvv http://localhost:8083/hello; do sleep 2; done'
+
+      - name: Verify curl
+        run: curl localhost:8083/hello
