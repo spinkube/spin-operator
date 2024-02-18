@@ -114,13 +114,6 @@ kubectl logs -n spin-operator -l app.kubernetes.io/name=kwasm-operator
 {"level":"info","time":"2024-02-12T11:24:00Z","message":"Job aks-nodepool1-31687461-vmss000000-provision-kwasm is Completed. Happy WASMing"}
 ```
 
-The final step for setting up Spin Operator is creating a `SpinAppExecutor`:
-
-```shell
-# Create a SpinAppExecutor
-kubectl apply -f https://github.com/spinkube/spin-operator/blob/main/config/samples/shim-executor.yaml
-```
-
 ## Deploying a Spin App to AKS
 
 To validate the Spin Operator deployment, you will deploy a simple Spin App to the AKS cluster. The following command will install a simple Spin App using the `SpinApp` CRD you provisioned in the previous section:
