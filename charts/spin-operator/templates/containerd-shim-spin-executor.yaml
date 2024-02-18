@@ -2,4 +2,7 @@ apiVersion: core.spinoperator.dev/v1
 kind: SpinAppExecutor
 metadata:
   name: containerd-shim-spin
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
 spec:
