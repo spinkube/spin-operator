@@ -132,6 +132,7 @@ jobs:
             --wait \
             --set controllerManager.manager.image.repository=ttl.sh/spoopy-operator-pr-${{ github.event.number }} \
             --set controllerManager.manager.image.tag=24h \
+            --debug \
             charts/spin-operator
           
       - name: annotate nodes
