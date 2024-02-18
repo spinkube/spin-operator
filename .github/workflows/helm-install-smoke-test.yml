@@ -42,7 +42,8 @@ jobs:
 
       - name: helm install
         run: |
-          helm dependency update charts/spin-operator
+          helm repo add kwasm-operator http://kwasm.sh/kwasm-operator
+          helm repo add cert-manager https://charts.jetstack.io
           helm dependency build charts/spin-operator
           helm install spin-operator \
             --namespace spin-operator \
