@@ -116,14 +116,12 @@ func main() {
 		os.Exit(1)
 	}
 	if enableWebhooks {
-		if err = webhook.SetupSpinAppWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "SpinApp")
-			os.Exit(1)
-		}
-		if err = webhook.SetupSpinAppExecutorWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "SpinAppExecutor")
-			os.Exit(1)
-		}
+		go func() {
+			if err = webhook.LazyWebhookStarter(mgr); err != nil {
+				setupLog.Error(err, "unable to create webhook", "webhook", "SpinApp")
+				os.Exit(1)
+			}
+		}()
 	}
 	//+kubebuilder:scaffold:builder
 

@@ -1,9 +1,47 @@
 package webhook
 
 import (
+	"fmt"
+	"os"
+	"time"
+
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
+
+func LazyWebhookStarter(mgr ctrl.Manager) error {
+	ticker := time.NewTicker(2 * time.Second)
+	timeout := time.NewTimer(5 * time.Minute)
+
+	crtFile := "/tmp/k8s-webhook-server/serving-certs/tls.crt"
+
+	for {
+		select {
+		case <-ticker.C:
+			_, err := os.ReadFile(crtFile)
+			if err != nil && os.IsNotExist(err) {
+				fmt.Printf("file %s does not exist yet\n", crtFile)
+				continue
+			}
+
+			fmt.Printf("crtfile found, setting up webhook")
+
+			webhookSetupLog := ctrl.Log.WithName("webhook-setup")
+			if err = SetupSpinAppWebhookWithManager(mgr); err != nil {
+				webhookSetupLog.Error(err, "unable to create webhook", "webhook", "SpinApp")
+				os.Exit(1)
+			}
+			if err = SetupSpinAppExecutorWebhookWithManager(mgr); err != nil {
+				webhookSetupLog.Error(err, "unable to create webhook", "webhook", "SpinAppExecutor")
+				os.Exit(1)
+			}
+
+			return nil
+		case <-timeout.C:
+			panic("timed out while waiting for webhook to start")
+		}
+	}
+}
 
 func SetupSpinAppWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
