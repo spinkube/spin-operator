@@ -38,6 +38,7 @@ func LazyWebhookStarter(mgr ctrl.Manager) error {
 
 			return nil
 		case <-timeout.C:
+			ticker.Stop()
 			panic("timed out while waiting for webhook to start")
 		}
 	}
