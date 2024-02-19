@@ -1,3 +1,8 @@
+**Update - Monday 19th February 2024:** 
+The SpinKube documentation has been moved to [the documentation repository](https://github.com/spinkube/documentation/tree/main/content/en/docs) at the surface of the SpinKube GitHub organization. Please ensure that all new content is written in the new location. Content in this repository is currently being moved to the new location. The following README file and content herein is in the process of being migrated to [the new location](https://github.com/spinkube/documentation/tree/main/content/en/docs)
+
+---
+
 - [Spin Operator](#spin-operator)
   - [Getting Started](#getting-started)
   - [Deploying Spin Operator On Your Cluster](#deploying-spin-operator-on-your-cluster)
