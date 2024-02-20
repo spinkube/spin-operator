@@ -21,7 +21,7 @@ func LazyWebhookStarter(mgr ctrl.Manager) error {
 		case <-ticker.C:
 			_, err := os.ReadFile(crtFile)
 			if err != nil && os.IsNotExist(err) {
-				webhookSetupLog.Info("file %s does not exist yet\n", crtFile)
+				webhookSetupLog.Info("file does not exist yet\n", "file", crtFile)
 				continue
 			}
 
