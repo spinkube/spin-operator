@@ -15,7 +15,7 @@ The following prerequisites are required.
 
 ## Go
 
-If building the Spin Operator from source or contributing to the development of Spin Operator then you will require [Go](https://go.dev/doc/install) version v1.21.0+ to be installed on your machine. Otherwise, please ignore this section, and move to the next prerequisite.
+If building the Spin Operator from source or contributing to the development of Spin Operator then you will require [Go](https://go.dev/doc/install) version v1.22.0+ to be installed on your machine. Otherwise, please ignore this section, and move to the next prerequisite.
 
 ### TinyGo
 

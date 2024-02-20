@@ -17,7 +17,7 @@
         pkgs = import nixpkgs { inherit system; };
 
         buildDeps = with pkgs; [
-          go_1_21
+          go_1_22
           gnumake
           git
         ];
