@@ -70,29 +70,30 @@ func SetupEnvTest(t *testing.T) *envTestState {
 	}
 }
 
-func TestReconcile_Integration_StartupShutdown(t *testing.T) {
+func TestSpinAppReconcilerStartupShutdown(t *testing.T) {
 	t.Parallel()
 
 	envTest := SetupEnvTest(t)
-
-	ctrlr := &SpinAppReconciler{
-		Client: envTest.k8sClient,
-		Scheme: scheme.Scheme,
-	}
 
 	mgr, err := ctrl.NewManager(envTest.cfg, manager.Options{
 		Metrics: metricsserver.Options{BindAddress: "0"},
 	})
 	require.NoError(t, err)
 
-	require.NoError(t, ctrlr.SetupWithManager(mgr))
+	reconciler := &SpinAppReconciler{
+		Client:   envTest.k8sClient,
+		Scheme:   scheme.Scheme,
+		Recorder: mgr.GetEventRecorderFor("spinapp-controller"),
+	}
+
+	require.NoError(t, reconciler.SetupWithManager(mgr))
 
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelFunc()
 	require.NoError(t, mgr.Start(ctx))
 }
 
-func TestConstructDeployment_MinimalApp(t *testing.T) {
+func TestConstructDeploymentMinimalApp(t *testing.T) {
 	t.Parallel()
 
 	app := minimalSpinApp()

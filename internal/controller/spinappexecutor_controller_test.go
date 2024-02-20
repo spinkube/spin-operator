@@ -1,90 +1,119 @@
-/*
-Copyright 2023.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package controller
 
-// import (
-// 	"fmt"
-// 	"path/filepath"
-// 	"runtime"
-// 	"testing"
+import (
+	"context"
+	"testing"
+	"time"
 
-// 	. "github.com/onsi/ginkgo/v2"
-// 	. "github.com/onsi/gomega"
+	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+)
 
-// 	"k8s.io/client-go/kubernetes/scheme"
-// 	"k8s.io/client-go/rest"
-// 	"sigs.k8s.io/controller-runtime/pkg/client"
-// 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-// 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-// 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+func TestSpinAppExecutorReconcilerStartupShutdown(t *testing.T) {
+	t.Parallel()
 
-// 	spinv1 "github.com/spinkube/spin-operator/api/v1"
-// 	//+kubebuilder:scaffold:imports
-// )
+	envTest := SetupEnvTest(t)
 
-// // These tests use Ginkgo (BDD-style Go testing framework). Refer to
-// // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
+	mgr, err := ctrl.NewManager(envTest.cfg, manager.Options{
+		Metrics: metricsserver.Options{BindAddress: "0"},
+	})
+	require.NoError(t, err)
 
-// var cfg *rest.Config
-// var k8sClient client.Client
-// var testEnv *envtest.Environment
+	reconciler := &SpinAppExecutorReconciler{
+		Client:   envTest.k8sClient,
+		Scheme:   scheme.Scheme,
+		Recorder: mgr.GetEventRecorderFor("spinappexecutor-controller"),
+	}
 
-// func TestControllers(t *testing.T) {
-// 	RegisterFailHandler(Fail)
+	require.NoError(t, reconciler.SetupWithManager(mgr))
 
-// 	RunSpecs(t, "Controller Suite")
-// }
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFunc()
+	require.NoError(t, mgr.Start(ctx))
+}
 
-// var _ = BeforeSuite(func() {
-// 	logf.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
+func TestDeleteSpinAppExecutor(t *testing.T) {
+	t.Parallel()
 
-// 	By("bootstrapping test environment")
-// 	testEnv = &envtest.Environment{
-// 		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
-// 		ErrorIfCRDPathMissing: true,
+	envTest := SetupEnvTest(t)
 
-// 		// The BinaryAssetsDirectory is only required if you want to run the tests directly
-// 		// without call the makefile target test. If not informed it will look for the
-// 		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
-// 		// Note that you must have the required binaries setup under the bin directory to perform
-// 		// the tests directly. When we run make test it will be setup and used automatically.
-// 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-// 			fmt.Sprintf("1.28.3-%s-%s", runtime.GOOS, runtime.GOARCH)),
-// 	}
+	mgr, err := ctrl.NewManager(envTest.cfg, manager.Options{
+		Metrics: metricsserver.Options{BindAddress: "0"},
+	})
+	require.NoError(t, err)
 
-// 	var err error
-// 	// cfg is defined in this file globally.
-// 	cfg, err = testEnv.Start()
-// 	Expect(err).NotTo(HaveOccurred())
-// 	Expect(cfg).NotTo(BeNil())
+	reconciler := &SpinAppExecutorReconciler{
+		Client:   envTest.k8sClient,
+		Scheme:   scheme.Scheme,
+		Recorder: mgr.GetEventRecorderFor("spinappexecutor-controller"),
+	}
 
-// 	err = spinv1.AddToScheme(scheme.Scheme)
-// 	Expect(err).NotTo(HaveOccurred())
+	require.NoError(t, reconciler.SetupWithManager(mgr))
 
-// 	//+kubebuilder:scaffold:scheme
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
 
-// 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
-// 	Expect(err).NotTo(HaveOccurred())
-// 	Expect(k8sClient).NotTo(BeNil())
+	go func() {
+		require.NoError(t, mgr.Start(ctx))
+	}()
 
-// })
+	// Create SpinAppExecutor
+	err = envTest.k8sClient.Create(ctx, &spinv1.SpinAppExecutor{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "containerd-shim-spin",
+			Namespace: "default",
+		},
+	})
+	require.NoError(t, err)
 
-// var _ = AfterSuite(func() {
-// 	By("tearing down the test environment")
-// 	err := testEnv.Stop()
-// 	Expect(err).NotTo(HaveOccurred())
-// })
+	// Create dependent SpinApp
+	err = envTest.k8sClient.Create(ctx, &spinv1.SpinApp{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "spinapp",
+			Namespace: "default",
+		},
+		Spec: spinv1.SpinAppSpec{
+			Executor: "containerd-shim-spin",
+			Replicas: 1,
+			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
+		},
+	})
+	require.NoError(t, err)
+
+	// Attempt to delete SpinAppExecutor
+	innerCtx, innerCancelFunc := context.WithTimeout(ctx, 2*time.Second)
+	defer innerCancelFunc()
+	err = envTest.k8sClient.Delete(innerCtx, &spinv1.SpinAppExecutor{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "containerd-shim-spin",
+			Namespace: "default",
+		},
+	})
+	require.NoError(t, err)
+
+	// Get SpinAppExecutor and verify the deletion timestamp is set
+	executor := &spinv1.SpinAppExecutor{}
+	err = envTest.k8sClient.Get(ctx, client.ObjectKey{
+		Name:      "containerd-shim-spin",
+		Namespace: "default",
+	}, executor)
+	require.NoError(t, err)
+	require.False(t, executor.DeletionTimestamp.IsZero())
+
+	// Delete dependent SpinApp
+	err = envTest.k8sClient.Delete(ctx, &spinv1.SpinApp{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "spinapp",
+			Namespace: "default",
+		},
+	})
+	require.NoError(t, err)
+
+	// TODO: Verify that the SpinAppExecutor is deleted
+}
