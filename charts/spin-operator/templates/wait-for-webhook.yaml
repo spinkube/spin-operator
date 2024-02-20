@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "spin-operator.fullname" . }}-serving-cert
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+  labels:
+  {{- include "spin-operator.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      containers:
+      - name: curl
+        image: denolehov/curl:latest
+        command: ["curl",  "-kf", "-vvv", "https://spin-operator-webhook-service.spin-operator.svc.cluster.local/webhooks-ready"]
+      restartPolicy: OnFailure
+  backoffLimit: 100
