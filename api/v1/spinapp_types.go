@@ -102,7 +102,8 @@ type SpinAppStatus struct {
 //
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:JSONPath=".status.readyReplicas",name=Ready Replicas,type=integer
+// +kubebuilder:printcolumn:JSONPath=".spec.replicas",name=Replicas,type=string
+// +kubebuilder:printcolumn:JSONPath=".status.readyReplicas",name=Ready,type=string
 // +kubebuilder:printcolumn:JSONPath=".spec.executor",name=Executor,type=string
 type SpinApp struct {
 	metav1.TypeMeta   `json:",inline"`

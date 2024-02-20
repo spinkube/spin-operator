@@ -15,9 +15,12 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .spec.replicas
+      name: Replicas
+      type: string
     - jsonPath: .status.readyReplicas
-      name: Ready Replicas
-      type: integer
+      name: Ready
+      type: string
     - jsonPath: .spec.executor
       name: Executor
       type: string
