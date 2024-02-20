@@ -1,7 +1,6 @@
 package webhook
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -15,19 +14,19 @@ func LazyWebhookStarter(mgr ctrl.Manager) error {
 	timeout := time.NewTimer(5 * time.Minute)
 
 	crtFile := "/tmp/k8s-webhook-server/serving-certs/tls.crt"
+	webhookSetupLog := ctrl.Log.WithName("webhook-setup")
 
 	for {
 		select {
 		case <-ticker.C:
 			_, err := os.ReadFile(crtFile)
 			if err != nil && os.IsNotExist(err) {
-				fmt.Printf("file %s does not exist yet\n", crtFile)
+				webhookSetupLog.Info("file %s does not exist yet\n", crtFile)
 				continue
 			}
 
-			fmt.Printf("crtfile found, setting up webhook")
+			webhookSetupLog.Info("crtfile found, setting up webhook")
 
-			webhookSetupLog := ctrl.Log.WithName("webhook-setup")
 			if err = SetupSpinAppWebhookWithManager(mgr); err != nil {
 				webhookSetupLog.Error(err, "unable to create webhook", "webhook", "SpinApp")
 				os.Exit(1)
@@ -38,7 +37,7 @@ func LazyWebhookStarter(mgr ctrl.Manager) error {
 			}
 
 			mgr.GetWebhookServer().WebhookMux().HandleFunc("webhooks-ready", func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("OK"))
+				_, _ = w.Write([]byte("OK"))
 			})
 
 			return nil
