@@ -140,10 +140,10 @@ jobs:
         run: |
           kubectl get pods -A
           kubectl get pods -n spin-operator
-          kubectl logs -n spin-operator -f $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}')
+          kubectl logs -n spin-operator $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}')
           kubectl describe -n spin-operator -f $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}')
 
-          kubectl logs -n spin-operator -f $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}')
+          kubectl logs -n spin-operator $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}')
           kubectl describe -n spin-operator -f $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}')
 
       - name: annotate nodes
