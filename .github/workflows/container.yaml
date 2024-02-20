@@ -154,6 +154,8 @@ jobs:
           kubectl apply -f config/samples/simple.yaml
           kubectl rollout status deployment simple-spinapp --timeout 90s
 
+          kubectl get pods -A
+
           kubectl port-forward svc/simple-spinapp 8083:80 &
           timeout 15s bash -c 'until curl -f -vvv http://localhost:8083/hello; do sleep 2; done'
 
