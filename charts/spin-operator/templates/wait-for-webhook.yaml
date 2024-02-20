@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "spin-operator.fullname" . }}-serving-cert
+  name: {{ include "spin-operator.fullname" . }}-wait-for-webhook-svc
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "3"
