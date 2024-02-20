@@ -1,7 +1,6 @@
 package webhook
 
 import (
-	"net/http"
 	"os"
 	"time"
 
@@ -35,10 +34,6 @@ func LazyWebhookStarter(mgr ctrl.Manager) error {
 				webhookSetupLog.Error(err, "unable to create webhook", "webhook", "SpinAppExecutor")
 				os.Exit(1)
 			}
-
-			mgr.GetWebhookServer().WebhookMux().HandleFunc("webhooks-ready", func(w http.ResponseWriter, r *http.Request) {
-				_, _ = w.Write([]byte("OK"))
-			})
 
 			return nil
 		case <-timeout.C:

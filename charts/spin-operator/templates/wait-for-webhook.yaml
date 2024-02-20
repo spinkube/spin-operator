@@ -13,6 +13,6 @@ spec:
       containers:
       - name: curl
         image: denolehov/curl:latest
-        command: ["curl",  "-kf", "-vvv", "https://spin-operator-webhook-service.spin-operator.svc.cluster.local/webhooks-ready"]
+        command: ["curl",  "-kf", "-vvv", "https://spin-operator-webhook-service.spin-operator.svc.cluster.local/mutate-core-spinoperator-dev-v1-spinappexecutor"]
       restartPolicy: OnFailure
   backoffLimit: 100
