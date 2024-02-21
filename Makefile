@@ -7,8 +7,8 @@ PKG_LDFLAGS           := github.com/prometheus/common/version
 LDFLAGS               := -s -w -X ${PKG_LDFLAGS}.Version=${VERSION} -X ${PKG_LDFLAGS}.Revision=${COMMIT} -X ${PKG_LDFLAGS}.BuildDate=${DATE} -X ${PKG_LDFLAGS}.Branch=${BRANCH}
 
 # Image URL to use all building/pushing image targets
-DEFAULT_IMG_REPO := ghcr.io/spinkube/spin-operator
-IMG ?= $(DEFAULT_IMG_REPO):$(shell git rev-parse --short HEAD)-dev
+IMG_REPO ?= ghcr.io/spinkube/spin-operator
+IMG ?= $(IMG_REPO):$(shell git rev-parse --short HEAD)-dev
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.28.3
@@ -116,17 +116,20 @@ run: manifests generate fmt vet ## Run a controller from your host.
 	go run -ldflags "${LDFLAGS}" ./cmd/main.go
 
 .PHONY: docker-build
+docker-build: GOARCH=$(shell go env GOARCH)
+docker-build: PLATFORMS ?= linux/$(GOARCH)
+docker-build: BUILDX_ACTION ?= --load
 docker-build: ## Build docker image with the manager.
-	$(CONTAINER_TOOL) build --load -t ${IMG} .
+	$(CONTAINER_TOOL) buildx build --platform=$(PLATFORMS) $(BUILDX_ACTION) -t ${IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
 	$(CONTAINER_TOOL) push ${IMG}
 
-PLATFORMS ?= linux/arm64,linux/amd64
 .PHONY: docker-build-and-publish-all
-docker-build-and-publish-all: ## Build the docker image for all supported platforms
-	$(CONTAINER_TOOL) buildx build --push --platform=$(PLATFORMS) --tag ${IMG} .
+docker-build-and-publish-all: PLATFORMS ?= linux/arm64,linux/amd64
+docker-build-and-publish-all: BUILDX_ACTION ?= --push
+docker-build-and-publish-all: docker-build ## Build the docker image for all supported platforms
 
 ##@ Package
 
