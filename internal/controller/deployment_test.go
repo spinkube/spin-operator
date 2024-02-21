@@ -227,7 +227,7 @@ func TestSpinHealthCheckToCoreProbe(t *testing.T) {
 func TestDeploymentLabel(t *testing.T) {
 	scheme := registerAndGetScheme()
 	app := minimalSpinApp()
-	deployment, err := constructDeployment(context.Background(), app, scheme)
+	deployment, err := constructDeployment(context.Background(), app, &spinv1.ExecutorDeploymentConfig{}, scheme)
 
 	require.Nil(t, err)
 	require.NotNil(t, deployment.ObjectMeta.Labels)
