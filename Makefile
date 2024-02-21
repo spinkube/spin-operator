@@ -146,7 +146,7 @@ CRD_DIR     := ./config/crd/bases
 
 .PHONY: helm-generate
 helm-generate: manifests kustomize helmify ## Create/update the Helm chart based on kustomize manifests. (Note: CRDs not included)
-	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir -cert-manager-as-subchart -cert-manager-version v1.13.3 charts/$(CHART_NAME)
+	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir charts/$(CHART_NAME)
 	rm -rf charts/$(CHART_NAME)/crds
 	@# Copy the containerd-shim-spin SpinAppExecutor yaml from its canonical location into the chart
 	cp config/samples/shim-executor.yaml charts/$(CHART_NAME)/templates/containerd-shim-spin-executor.yaml
@@ -216,6 +216,7 @@ helm-install: helm-generate ## Install the Helm chart onto the K8s cluster speci
 	$(HELM) upgrade --install \
 		-n $(HELM_NAMESPACE) \
 		--create-namespace \
+		--wait \
 		--set controllerManager.manager.image.repository=$(IMG_REPO) \
 		--set controllerManager.manager.image.tag=$(IMG_TAG) \
 		$(HELM_RELEASE) charts/$(CHART_NAME)

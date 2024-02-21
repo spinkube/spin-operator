@@ -53,15 +53,7 @@ jobs:
         run: |
           helm repo add kwasm-operator http://kwasm.sh/kwasm-operator
           helm dependency build charts/spin-operator
-          helm install spin-operator \
-            --namespace spin-operator \
-            --create-namespace \
-            --devel \
-            --wait \
-            --set controllerManager.manager.image.repository=rg.fr-par.scw.cloud/dlancshire-public/tmp-spoperator \
-            --set controllerManager.manager.image.tag=20240219-162838-gff68ce4 \
-            --debug \
-            charts/spin-operator
+          IMG=rg.fr-par.scw.cloud/dlancshire-public/tmp-spoperator:20240219-162838-gff68ce4 make helm-install
 
       - name: debug
         if: failure()
