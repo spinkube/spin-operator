@@ -1,0 +1,8 @@
+apiVersion: core.spinoperator.dev/v1
+kind: SpinApp
+metadata:
+  name: simple-spinapp
+spec:
+  image: "rajatjindal/hello-world-spin:v1"
+  replicas: 1
+  executor: spin-in-container

@@ -1,0 +1,5 @@
+apiVersion: core.spinoperator.dev/v1
+kind: SpinAppExecutor
+metadata:
+  name: spin-in-container
+spec:
