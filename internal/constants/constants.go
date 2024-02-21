@@ -19,4 +19,5 @@ type KnownExecutor string
 const (
 	ContainerDShimSpinExecutor = "containerd-shim-spin"
 	CyclotronExecutor          = "cyclotron"
+	SpinInContainer            = "spin-in-container"
 )

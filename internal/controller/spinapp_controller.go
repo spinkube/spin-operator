@@ -124,6 +124,16 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		if err != nil {
 			return ctrl.Result{}, err
 		}
+	case constants.SpinInContainer:
+		err := r.reconcileDeployment(ctx, &spinApp)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+
+		err = r.reconcileService(ctx, &spinApp)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 	default:
 		return ctrl.Result{}, fmt.Errorf("unknown executor %s", spinApp.Spec.Executor)
 	}
@@ -327,6 +337,18 @@ func constructDeployment(ctx context.Context, app *spinv1.SpinApp, scheme *runti
 
 	labels := constructAppLabels(app)
 
+	command := []string{"/"}
+	args := []string{}
+	image := app.Spec.Image
+	runtimeClass := &spinRuntimeClassName
+
+	if app.Spec.Executor == constants.SpinInContainer {
+		command = []string{"/spin"}
+		args = []string{"up", "-f", app.Spec.Image, "--listen", fmt.Sprintf("127.0.0.1:%d", spinapp.DefaultHTTPPort)}
+		image = "docker.io/rajatjindal/spin:2.2.0-1"
+		runtimeClass = nil
+	}
+
 	dep := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Deployment",
@@ -349,12 +371,13 @@ func constructDeployment(ctx context.Context, app *spinv1.SpinApp, scheme *runti
 					Annotations: templateAnnotations,
 				},
 				Spec: corev1.PodSpec{
-					RuntimeClassName: &spinRuntimeClassName,
+					RuntimeClassName: runtimeClass,
 					Containers: []corev1.Container{
 						{
 							Name:    app.Name,
-							Image:   app.Spec.Image,
-							Command: []string{"/"},
+							Image:   image,
+							Command: command,
+							Args:    args,
 							Ports: []corev1.ContainerPort{{
 								Name:          spinapp.HTTPPortName,
 								ContainerPort: spinapp.DefaultHTTPPort,
