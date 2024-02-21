@@ -38,6 +38,27 @@ spec:
             type: object
           spec:
             description: SpinAppExecutorSpec defines the desired state of SpinAppExecutor
+            properties:
+              createDeployment:
+                description: |-
+                  CreateDeployment specifies whether the Executor wants the SpinKube operator
+                  to create a deployment for the application or if it will be realized externally.
+                type: boolean
+              deploymentConfig:
+                description: |-
+                  DeploymentConfig specifies how the deployment should be configured when
+                  createDeployment is true.
+                properties:
+                  runtimeClassName:
+                    description: |-
+                      RuntimeClassName is the runtime class name that should be used by pods created
+                      as part of a deployment.
+                    type: string
+                required:
+                - runtimeClassName
+                type: object
+            required:
+            - createDeployment
             type: object
           status:
             description: SpinAppExecutorStatus defines the observed state of SpinAppExecutor
