@@ -1,50 +1,39 @@
-**Update - Monday 19th February 2024:** 
-The SpinKube documentation has been moved to [the documentation repository](https://github.com/spinkube/documentation/tree/main/content/en/docs) at the surface of the SpinKube GitHub organization. Please ensure that all new content is written in the new location. Content in this repository is currently being moved to the new location. The following README file and content herein is in the process of being migrated to [the new location](https://github.com/spinkube/documentation/tree/main/content/en/docs)
-
----
-
-- [Spin Operator](#spin-operator)
-  - [Getting Started](#getting-started)
-  - [Deploying Spin Operator On Your Cluster](#deploying-spin-operator-on-your-cluster)
-  - [Scaling SpinApps](#scaling-spinapps)
-  - [Feedback](#feedback)
-  - [Contributing](#contributing)
-  - [Official Documentation](#official-documentation)
-
 # Spin Operator
 
-The Spin Operator enables deploying Spin applications to Kubernetes. It watches [SpinApp Custom Resources](./documentation/content/custom-resource-definition-reference.md) and realizes desired state in the Kubernetes cluster. This project was built using the Kubebuilder framework and contains a Spin App CRD and controller. To learn more about the SpinKube organization, visit our [project overivew documentation](./documentation/content/project-overview.md)
+The Spin Operator enables deploying Spin applications to Kubernetes. It watches [SpinApp Custom Resources](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/reference/custom-resource-definition.md) and realizes the desired state in the Kubernetes cluster. This project was built using the Kubebuilder framework and contains a Spin App CRD and controller. 
 
-At this point in the priview, we recommend testing Spin Operator on a local k3d cluster via `make install`. The [quickstart guide](./documentation/content/quickstart.md) will walk you through prequisites and the installation workflow.
+## Documentation
+
+To learn more about the Spin Operator and the SpinKube organization, please visit [the official Spin Operator documentation](https://github.com/spinkube/documentation/tree/main/content/en/docs/spin-operator) which is housed inside the [the official SpinKube documentation](https://github.com/spinkube/documentation/tree/main/content/en/docs).
+
+
+At this point in the preview, we recommend testing Spin Operator on a local k3d cluster via `make install`. The [quickstart guide](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/quickstart/_index.md) will walk you through prequisites and the installation workflow.
 
 > > Spin Operator installation via Helm chart for remote clusters while in private preview is WIP and can tracked [here](https://github.com/spinkube/spin-operator/issues/54). In the meantime, please use the guidance from our quickstart guide.
 
-## Official Documentation
+## Tutorials
 
-Our content is under developement as markdown source files located at the [documentation](./documentation/) section. The following articles are ready for review
+There are a host of tutorials in the [Spin Operator tutorials](https://github.com/spinkube/documentation/tree/main/content/en/docs/spin-operator/tutorials) directory of the documentation. For example:
 
-**Tutorials**
-
-- [Quickstart](./documentation/content/quickstart.md)
-- [Scale Spin Apps with Horizontal Pod Autoscaler](./documentation/content/scaling-spinapp-on-k8s-with-hpa.md)
-- [Scale Spin Apps with Kubernetes Event Driver Autoscaler](./documentation/content/scaling-spinapp-on-k8s-with-keda.md)
-
-**Glossary, Reference, & Misc.**
-
-- [Glossary](./documentation/content/glossary-of-terms.md)
-- [Spin App Custom Resource Definition](./documentation/content/custom-resource-definition-reference.md)
-- [Troubleshooting](./documentation/content/troubleshooting.md)
-
-Remaining articles are under construction. You're welcome to view and [open issues](https://github.com/spinkube/spin-operator/issues/new), but please proceed with caution as they are subject to change.
+- [Quickstart](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/quickstart/_index.md)
+- [Running Locally](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/tutorials/running-locally.md)
+- [Running on a remote (non-local) K8s cluster](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/tutorials/running-on-a-cluster.md)
+- [Deploying on Azure k8s service](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/tutorials/deploy-on-azure-kubernetes-service.md)
+- [Scaling Spin Apps with Horizontal Pod Autoscaler (HPA)](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/tutorials/scaling-with-hpa.md)
+- [Scaling Spin Apps with Kubernetes Event Driver Autoscaler (KEDA)](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/tutorials/scaling-with-keda.md)
 
 ## Feedback
 
-For questions or support, please visit our [Discord channel](https://discord.com/channels/926888690310053918/1200012610196738208). If you would like to file a feature, bug report, or documentation request, please [open a new issue](https://github.com/spinkube/spin-operator/issues/new).
+The remaining articles are under construction. You're welcome to view and open both [Spin Operator](https://github.com/spinkube/spin-operator/issues) and [documentation](https://github.com/spinkube/documentation/issues) issues and feature requests. As this work is under development, please note that current features, functionality and supporting documentation are likely to change as the projects evolve and improvements are made.
 
-## Contributing
+For questions or support, please visit our [Discord channel](https://discord.com/channels/926888690310053918/1200012610196738208). 
 
-Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for a guide on how to contribute to this project.
+## Contributing (Spin Operator)
 
-**NOTE:** Run `make --help` for more information on all potential `make` targets
+If you would like to contribute, please visit this [contributing](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/contributing/_index.md) page.
 
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
+## Contributing (Documentation)
+
+If you would like to contribute to SpinKube and Spin Operator, please visit this [contributing](https://github.com/spinkube/documentation/blob/main/content/en/docs/contribution-guidelines/_index.md) page.
+
+The documentation is written using Hugo (as the static site generator), Docsy (as the technical documentation template) and GitHub pages (for hosting). However, during construction (prior to the website being rendered and publicly available) you are welcome to run a local copy of the documentation using the `hugo server` command. You can do so by following [these instructions](https://github.com/spinkube/documentation/blob/main/content/en/docs/contribution-guidelines/_index.md#previewing-your-changes-locally).
