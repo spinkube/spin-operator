@@ -16,7 +16,10 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .status.readyReplicas
-      name: Ready Replicas
+      name: Ready
+      type: integer
+    - jsonPath: .spec.replicas
+      name: Desired
       type: integer
     - jsonPath: .spec.executor
       name: Executor
