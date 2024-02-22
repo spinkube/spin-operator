@@ -32,7 +32,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
-	"github.com/spinkube/spin-operator/internal/constants"
 	"github.com/spinkube/spin-operator/internal/logging"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
 )
@@ -91,20 +90,6 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// Update the status of the SpinApp
-	err := r.updateStatus(ctx, &spinApp)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	// Spin app has been requested for deletion, child resources will
-	// automatically be deleted.
-	if !spinApp.DeletionTimestamp.IsZero() {
-		return ctrl.Result{}, nil
-	}
-
-	// Reconcile the child resources
-
 	var executor spinv1.SpinAppExecutor
 	if err := r.Client.Get(ctx, types.NamespacedName{
 		// Executors must currently be defined in the same namespace as the app.
@@ -118,6 +103,20 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			fmt.Sprintf("Could not find SpinAppExecutor %s/%s", req.NamespacedName.Namespace, spinApp.Spec.Executor))
 		return ctrl.Result{}, err
 	}
+
+	// Update the status of the SpinApp
+	err := r.updateStatus(ctx, &spinApp, &executor)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// Spin app has been requested for deletion, child resources will
+	// automatically be deleted.
+	if !spinApp.DeletionTimestamp.IsZero() {
+		return ctrl.Result{}, nil
+	}
+
+	// Reconcile the child resources
 
 	if executor.Spec.CreateDeployment {
 		err := r.reconcileDeployment(ctx, &spinApp, executor.Spec.DeploymentConfig)
@@ -142,11 +141,12 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 // updateStatus updates the status of a SpinApp.
-func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1.SpinApp) error {
+func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1.SpinApp, executor *spinv1.SpinAppExecutor) error {
 	log := logging.FromContext(ctx)
 
-	// TODO: Just ignoring the cyclotron case for now
-	if app.Spec.Executor == constants.CyclotronExecutor {
+	// Our only status management is currently based on the resulting deployment
+	// because of this, lets skip status interactions when the deployment is disabled.
+	if !executor.Spec.CreateDeployment {
 		return nil
 	}
 
