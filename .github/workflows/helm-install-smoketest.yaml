@@ -57,8 +57,6 @@ jobs:
 
       - name: helm install spin-operator
         run: |
-          helm repo add kwasm-operator http://kwasm.sh/kwasm-operator
-          helm dependency build charts/spin-operator
           make helm-install IMG=spin-operator:latest
 
       - name: debug
