@@ -44,7 +44,7 @@ type SpinAppSpec struct {
 	Checks HealthChecks `json:"checks,omitempty"`
 
 	// Number of replicas to run.
-	Replicas int32 `json:"replicas"`
+	Replicas int32 `json:"replicas,omitempty"`
 
 	// EnableAutoscaling indicates whether the app is allowed to autoscale. If
 	// true then the operator leaves the replica count of the underlying

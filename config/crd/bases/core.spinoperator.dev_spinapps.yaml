@@ -2117,7 +2117,6 @@ spec:
             required:
             - executor
             - image
-            - replicas
             type: object
           status:
             description: SpinAppStatus defines the observed state of SpinApp
