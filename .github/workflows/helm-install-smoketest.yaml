@@ -27,12 +27,18 @@ jobs:
           name: k3d
           url: https://github.com/k3d-io/k3d/releases/download/v5.6.0/k3d-linux-amd64
 
+      - name: create spin-operator docker image
+        run: make docker-build IMG=spin-operator:latest
+
       - name: start k3d cluster
         run: |
           k3d cluster create wasm-cluster \
           --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.11.0 \
           --port  "8081:80@loadbalancer" \
           --agents 2
+
+      - name: import operator image into k3d cluster
+        run: k3d image import -c wasm-cluster spin-operator:latest
 
       - name: install crd
         run: make install
@@ -53,7 +59,7 @@ jobs:
         run: |
           helm repo add kwasm-operator http://kwasm.sh/kwasm-operator
           helm dependency build charts/spin-operator
-          IMG=rg.fr-par.scw.cloud/dlancshire-public/tmp-spoperator:20240219-162838-gff68ce4 make helm-install
+          make helm-install IMG=spin-operator:latest
 
       - name: debug
         if: failure()

@@ -34,6 +34,7 @@ controllerManager:
     image:
       repository: ghcr.io/spinkube/spin-operator
       tag: latest
+    imagePullPolicy: IfNotPresent
     resources:
       limits:
         cpu: 500m
