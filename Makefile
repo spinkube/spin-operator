@@ -139,8 +139,11 @@ CHART_NAME     := spin-operator
 # they aren't valid/recognized by 'helm install' or 'helm install --devel'.
 # TODO: swap '0.0.0' with '$(shell git describe --tags --abbrev=0 | sed -rn 's/(v)?(.*)/\2/p')' when we have our first tag
 CHART_VERSION  ?= 0.0.0-dev
-APP_VERSION    ?= v$(CHART_VERSION)
 CHART_REGISTRY ?= ghcr.io/fermyon
+
+GIT_COMMIT := $(shell git rev-parse HEAD)
+GIT_DIRTY := $(if $(shell git status --porcelain),+CHANGES)
+APP_VERSION ?= $(GIT_COMMIT)$(GIT_DIRTY)
 
 STAGING_DIR := _dist
 CRD_DIR     := ./config/crd/bases
