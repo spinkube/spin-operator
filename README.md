@@ -1,11 +1,10 @@
 # Spin Operator
 
-The Spin Operator enables deploying Spin applications to Kubernetes. It watches [SpinApp Custom Resources](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/reference/custom-resource-definition.md) and realizes the desired state in the Kubernetes cluster. This project was built using the Kubebuilder framework and contains a Spin App CRD and controller. 
+The Spin Operator enables deploying Spin applications to Kubernetes. It watches [SpinApp Custom Resources](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/reference/custom-resource-definition.md) and realizes the desired state in the Kubernetes cluster. This project was built using the Kubebuilder framework and contains a Spin App CRD and controller.
 
 ## Documentation
 
 To learn more about the Spin Operator and the SpinKube organization, please visit [the official Spin Operator documentation](https://github.com/spinkube/documentation/tree/main/content/en/docs/spin-operator) which is housed inside the [the official SpinKube documentation](https://github.com/spinkube/documentation/tree/main/content/en/docs).
-
 
 At this point in the preview, we recommend testing Spin Operator on a local k3d cluster via `make install`. The [quickstart guide](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/quickstart/_index.md) will walk you through prequisites and the installation workflow.
 
@@ -26,7 +25,7 @@ There are a host of tutorials in the [Spin Operator tutorials](https://github.co
 
 The remaining articles are under construction. You're welcome to view and open both [Spin Operator](https://github.com/spinkube/spin-operator/issues) and [documentation](https://github.com/spinkube/documentation/issues) issues and feature requests. As this work is under development, please note that current features, functionality and supporting documentation are likely to change as the projects evolve and improvements are made.
 
-For questions or support, please visit our [Discord channel](https://discord.com/channels/926888690310053918/1200012610196738208). 
+For questions or support, please visit our [Discord channel](https://discord.com/channels/926888690310053918/1200012610196738208).
 
 ## Contributing (Spin Operator)
 

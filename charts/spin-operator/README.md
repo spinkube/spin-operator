@@ -36,7 +36,6 @@ The spin-operator chart currently includes the following sub-charts:
 
 - [Kwasm Operator](https://github.com/kwasm/kwasm-operator) to install WebAssembly support on Kubernetes nodes
 
-
 ## Installing the chart
 
 The following installs the chart with the release name `spin-operator`:
