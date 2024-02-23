@@ -1,0 +1,81 @@
+name: Helm Install Smoketest
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  helm-install-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+
+      - name: Install helm
+        uses: Azure/setup-helm@v3
+        with:
+          version: v3.14.0
+
+      - name: setup k3d
+        uses: engineerd/configurator@v0.0.10
+        with:
+          name: k3d
+          url: https://github.com/k3d-io/k3d/releases/download/v5.6.0/k3d-linux-amd64
+
+      - name: create spin-operator docker image
+        run: make docker-build IMG=spin-operator:latest
+
+      - name: start k3d cluster
+        run: |
+          k3d cluster create wasm-cluster \
+          --image ghcr.io/deislabs/containerd-wasm-shims/examples/k3d:v0.11.0 \
+          --port  "8081:80@loadbalancer" \
+          --agents 2
+
+      - name: import operator image into k3d cluster
+        run: k3d image import -c wasm-cluster spin-operator:latest
+
+      - name: install crd
+        run: make install
+
+      - name: apply runtime class
+        run: kubectl apply -f spin-runtime-class.yaml
+
+      - name: helm install cert-manager
+        run: |
+          helm repo add jetstack https://charts.jetstack.io
+          helm install cert-manager jetstack/cert-manager \
+            --namespace cert-manager \
+            --create-namespace \
+            --version v1.13.3 \
+            --set installCRDs=true
+
+      - name: helm install spin-operator
+        run: |
+          make helm-install IMG=spin-operator:latest
+
+      - name: debug
+        if: failure()
+        run: |
+          kubectl get pods -A
+          kubectl get pods -n spin-operator
+          kubectl logs -n spin-operator $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}')
+          kubectl describe -n spin-operator pod $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}')
+          kubectl logs -n spin-operator $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}')
+          kubectl describe -n spin-operator pod $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}')
+
+      - name: run spin app
+        run: |
+          kubectl apply -f config/samples/simple.yaml
+          kubectl rollout status deployment simple-spinapp --timeout 90s
+          kubectl get pods -A
+          kubectl port-forward svc/simple-spinapp 8083:80 &
+          timeout 15s bash -c 'until curl -f -vvv http://localhost:8083/hello; do sleep 2; done'
+
+      - name: Verify curl
+        run: curl localhost:8083/hello

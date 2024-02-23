@@ -26,17 +26,16 @@ Prior to installing the chart, you'll need to ensure the following:
   kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml
   ```
 
+## Chart prerequisites
+
+- [Cert Manager](https://github.com/cert-manager/cert-manager) to automatically provision and manage TLS certificates (used by spin-operator's admission webhook system). Cert Manager must be running and the corresponding CRDs must be present on the cluster before installing the spin-operator chart.
+
 ## Chart dependencies
 
 The spin-operator chart currently includes the following sub-charts:
 
 - [Kwasm Operator](https://github.com/kwasm/kwasm-operator) to install WebAssembly support on Kubernetes nodes
-- [Cert Manager](https://github.com/cert-manager/cert-manager) to automatically provision and manage TLS certificates (used by spin-operator's admission webhook system)
-  - If you'd like to manage Cert Manager completely separate from spin-operator, you can disable installation via:
-    `--set certmanager.enabled=false` on `helm install`.
-  - Or, if you'd like to install Cert Manager separate from its CRDs, you can opt-out of installing the CRDs via:
-    `--set certmanager.installCRDs=false` on `helm install`.
-  - In either case, Cert Manager must be running and the corresponding CRDs must be present on the cluster before installing the spin-operator chart.
+
 
 ## Installing the chart
 
