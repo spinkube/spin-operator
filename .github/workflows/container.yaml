@@ -83,3 +83,4 @@ jobs:
           cache-to: type=gha,mode=max
           tags: |
             ghcr.io/spinkube/spin-operator:${{ env.VERSION }}
+            ghcr.io/spinkube/spin-operator:latest
