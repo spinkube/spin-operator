@@ -16,7 +16,10 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .status.readyReplicas
-      name: Ready Replicas
+      name: Ready
+      type: integer
+    - jsonPath: .spec.replicas
+      name: Desired
       type: integer
     - jsonPath: .spec.executor
       name: Executor
@@ -2117,7 +2120,6 @@ spec:
             required:
             - executor
             - image
-            - replicas
             type: object
           status:
             description: SpinAppStatus defines the observed state of SpinApp

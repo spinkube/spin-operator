@@ -4,7 +4,6 @@ import (
 	"context"
 
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
-	"github.com/spinkube/spin-operator/internal/constants"
 	"github.com/spinkube/spin-operator/internal/logging"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -55,13 +54,14 @@ func (v *SpinAppValidator) ValidateDelete(ctx context.Context, obj runtime.Objec
 
 func (v *SpinAppValidator) validateSpinApp(ctx context.Context, spinApp *spinv1.SpinApp) error {
 	var allErrs field.ErrorList
-	if err := validateExecutor(spinApp.Spec, v.executorExists(ctx, spinApp.Namespace)); err != nil {
+	executor, err := validateExecutor(spinApp.Spec, v.fetchExecutor(ctx, spinApp.Namespace))
+	if err != nil {
 		allErrs = append(allErrs, err)
 	}
 	if err := validateReplicas(spinApp.Spec); err != nil {
 		allErrs = append(allErrs, err)
 	}
-	if err := validateAnnotations(spinApp.Spec); err != nil {
+	if err := validateAnnotations(spinApp.Spec, executor); err != nil {
 		allErrs = append(allErrs, err)
 	}
 	if len(allErrs) == 0 {
@@ -73,30 +73,34 @@ func (v *SpinAppValidator) validateSpinApp(ctx context.Context, spinApp *spinv1.
 		spinApp.Name, allErrs)
 }
 
-// executorExists returns a function that checks if an executor exists on the cluster.
+// fetchExecutor returns a function that fetches a named executor in the provided namespace.
 //
 // We assume that the executor must exist in the same namespace as the SpinApp.
-func (v *SpinAppValidator) executorExists(ctx context.Context, spinAppNs string) func(string) bool {
-	return func(name string) bool {
+func (v *SpinAppValidator) fetchExecutor(ctx context.Context, spinAppNs string) func(name string) (*spinv1.SpinAppExecutor, error) {
+	return func(name string) (*spinv1.SpinAppExecutor, error) {
 		var executor spinv1.SpinAppExecutor
 		if err := v.Client.Get(ctx, client.ObjectKey{Name: name, Namespace: spinAppNs}, &executor); err != nil {
-			// TODO: This groups in both not found and client errors. We should ideally separate the two.
-			return false
+			return nil, err
 		}
 
-		return true
+		return &executor, nil
 	}
 }
 
-func validateExecutor(spec spinv1.SpinAppSpec, executorExists func(name string) bool) *field.Error {
+func validateExecutor(spec spinv1.SpinAppSpec, fetchExecutor func(name string) (*spinv1.SpinAppExecutor, error)) (*spinv1.SpinAppExecutor, *field.Error) {
 	if spec.Executor == "" {
-		return field.Invalid(field.NewPath("spec").Child("executor"), spec.Executor, "executor must be set, likely no default executor was set because you have no executors installed")
+		return nil, field.Invalid(
+			field.NewPath("spec").Child("executor"),
+			spec.Executor,
+			"executor must be set, likely no default executor was set because you have no executors installed")
 	}
-	if !executorExists(spec.Executor) {
-		return field.Invalid(field.NewPath("spec").Child("executor"), spec.Executor, "executor does not exist on cluster")
+	executor, err := fetchExecutor(spec.Executor)
+	if err != nil {
+		// Handle errors that are not just "Not Found"
+		return nil, field.Invalid(field.NewPath("spec").Child("executor"), spec.Executor, "executor does not exist on cluster")
 	}
 
-	return nil
+	return executor, nil
 }
 
 func validateReplicas(spec spinv1.SpinAppSpec) *field.Error {
@@ -110,15 +114,25 @@ func validateReplicas(spec spinv1.SpinAppSpec) *field.Error {
 	return nil
 }
 
-func validateAnnotations(spec spinv1.SpinAppSpec) *field.Error {
-	if spec.Executor != constants.CyclotronExecutor {
+func validateAnnotations(spec spinv1.SpinAppSpec, executor *spinv1.SpinAppExecutor) *field.Error {
+	// We can't do any validation if the executor isn't available, but validation
+	// will fail because of earlier errors.
+	if executor == nil {
 		return nil
 	}
+
+	if executor.Spec.CreateDeployment {
+		return nil
+	}
+	// TODO: Make these validations opt in for executors? - Some runtimes may want these regardless.
 	if len(spec.DeploymentAnnotations) != 0 {
-		return field.Invalid(field.NewPath("spec").Child("deploymentAnnotations"), spec.DeploymentAnnotations, "deploymentAnnotations can't be set when runtime is cyclotron")
+		return field.Invalid(
+			field.NewPath("spec").Child("deploymentAnnotations"),
+			spec.DeploymentAnnotations,
+			"deploymentAnnotations can't be set when the executor does not use operator deployments")
 	}
 	if len(spec.PodAnnotations) != 0 {
-		return field.Invalid(field.NewPath("spec").Child("podAnnotations"), spec.PodAnnotations, "podAnnotations can't be set when runtime is cyclotron")
+		return field.Invalid(field.NewPath("spec").Child("podAnnotations"), spec.PodAnnotations, "podAnnotations can't be set when the executor does not use operator deployments")
 	}
 
 	return nil

@@ -73,6 +73,7 @@ spec:
             - --enable-webhooks
           image: ghcr.io/spinkube/spin-operator:latest
           name: manager
+          imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

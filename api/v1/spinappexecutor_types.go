@@ -25,8 +25,19 @@ import (
 
 // SpinAppExecutorSpec defines the desired state of SpinAppExecutor
 type SpinAppExecutorSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// CreateDeployment specifies whether the Executor wants the SpinKube operator
+	// to create a deployment for the application or if it will be realized externally.
+	CreateDeployment bool `json:"createDeployment"`
+
+	// DeploymentConfig specifies how the deployment should be configured when
+	// createDeployment is true.
+	DeploymentConfig *ExecutorDeploymentConfig `json:"deploymentConfig,omitempty"`
+}
+
+type ExecutorDeploymentConfig struct {
+	// RuntimeClassName is the runtime class name that should be used by pods created
+	// as part of a deployment.
+	RuntimeClassName string `json:"runtimeClassName"`
 }
 
 // SpinAppExecutorStatus defines the observed state of SpinAppExecutor

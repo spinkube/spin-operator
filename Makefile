@@ -7,8 +7,8 @@ PKG_LDFLAGS           := github.com/prometheus/common/version
 LDFLAGS               := -s -w -X ${PKG_LDFLAGS}.Version=${VERSION} -X ${PKG_LDFLAGS}.Revision=${COMMIT} -X ${PKG_LDFLAGS}.BuildDate=${DATE} -X ${PKG_LDFLAGS}.Branch=${BRANCH}
 
 # Image URL to use all building/pushing image targets
-DEFAULT_IMG_REPO := ghcr.io/spinkube/spin-operator
-IMG ?= $(DEFAULT_IMG_REPO):$(shell git rev-parse --short HEAD)-dev
+IMG_REPO ?= ghcr.io/spinkube/spin-operator
+IMG ?= $(IMG_REPO):$(shell git rev-parse --short HEAD)-dev
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.28.3
@@ -116,17 +116,20 @@ run: manifests generate fmt vet ## Run a controller from your host.
 	go run -ldflags "${LDFLAGS}" ./cmd/main.go
 
 .PHONY: docker-build
+docker-build: GOARCH=$(shell go env GOARCH)
+docker-build: PLATFORMS ?= linux/$(GOARCH)
+docker-build: BUILDX_ACTION ?= --load
 docker-build: ## Build docker image with the manager.
-	$(CONTAINER_TOOL) build --load -t ${IMG} .
+	$(CONTAINER_TOOL) buildx build --platform=$(PLATFORMS) $(BUILDX_ACTION) -t ${IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
 	$(CONTAINER_TOOL) push ${IMG}
 
-PLATFORMS ?= linux/arm64,linux/amd64
 .PHONY: docker-build-and-publish-all
-docker-build-and-publish-all: ## Build the docker image for all supported platforms
-	$(CONTAINER_TOOL) buildx build --push --platform=$(PLATFORMS) --tag ${IMG} .
+docker-build-and-publish-all: PLATFORMS ?= linux/arm64,linux/amd64
+docker-build-and-publish-all: BUILDX_ACTION ?= --push
+docker-build-and-publish-all: docker-build ## Build the docker image for all supported platforms
 
 ##@ Package
 
@@ -143,7 +146,7 @@ CRD_DIR     := ./config/crd/bases
 
 .PHONY: helm-generate
 helm-generate: manifests kustomize helmify ## Create/update the Helm chart based on kustomize manifests. (Note: CRDs not included)
-	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir -cert-manager-as-subchart -cert-manager-version v1.13.3 charts/$(CHART_NAME)
+	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir charts/$(CHART_NAME)
 	rm -rf charts/$(CHART_NAME)/crds
 	@# Copy the containerd-shim-spin SpinAppExecutor yaml from its canonical location into the chart
 	cp config/samples/shim-executor.yaml charts/$(CHART_NAME)/templates/containerd-shim-spin-executor.yaml
@@ -196,7 +199,7 @@ uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified 
 
 .PHONY: deploy
 deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
-	cd config/manager && $(KUSTOMIZE) edit set image $(DEFAULT_IMG_REPO)=${IMG}
+	cd config/manager && $(KUSTOMIZE) edit set image ghcr.io/spinkube/spin-operator=${IMG}
 	$(KUSTOMIZE) build config/default | $(KUBECTL) apply -f -
 
 .PHONY: undeploy
@@ -213,6 +216,7 @@ helm-install: helm-generate ## Install the Helm chart onto the K8s cluster speci
 	$(HELM) upgrade --install \
 		-n $(HELM_NAMESPACE) \
 		--create-namespace \
+		--wait \
 		--set controllerManager.manager.image.repository=$(IMG_REPO) \
 		--set controllerManager.manager.image.tag=$(IMG_TAG) \
 		$(HELM_RELEASE) charts/$(CHART_NAME)

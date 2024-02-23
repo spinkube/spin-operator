@@ -44,7 +44,7 @@ type SpinAppSpec struct {
 	Checks HealthChecks `json:"checks,omitempty"`
 
 	// Number of replicas to run.
-	Replicas int32 `json:"replicas"`
+	Replicas int32 `json:"replicas,omitempty"`
 
 	// EnableAutoscaling indicates whether the app is allowed to autoscale. If
 	// true then the operator leaves the replica count of the underlying
@@ -102,7 +102,8 @@ type SpinAppStatus struct {
 //
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:JSONPath=".status.readyReplicas",name=Ready Replicas,type=integer
+// +kubebuilder:printcolumn:JSONPath=".status.readyReplicas",name=Ready,type=integer
+// +kubebuilder:printcolumn:JSONPath=".spec.replicas",name=Desired,type=integer
 // +kubebuilder:printcolumn:JSONPath=".spec.executor",name=Executor,type=string
 type SpinApp struct {
 	metav1.TypeMeta   `json:",inline"`
