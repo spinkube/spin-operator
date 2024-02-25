@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint-markdown:
-    name: Lint all markdown files
+    name: lint all markdown files
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
