@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
-	"runtime"
+	goruntime "runtime"
 	"testing"
 	"time"
 
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
 	"github.com/stretchr/testify/require"
-	"k8s.io/client-go/kubernetes/scheme"
+	runtime "k8s.io/apimachinery/pkg/runtime"
+	clientscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -23,6 +24,7 @@ type envTestState struct {
 	cfg       *rest.Config
 	k8sClient client.Client
 	testEnv   *envtest.Environment
+	scheme    *runtime.Scheme
 }
 
 // SetupEnvTest will start a fake kubernetes and client for use when testing
@@ -40,7 +42,7 @@ func SetupEnvTest(t *testing.T) *envTestState {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.28.3-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.28.3-%s-%s", goruntime.GOOS, goruntime.GOARCH)),
 	}
 
 	cfg, err := testEnv.Start()
@@ -51,10 +53,13 @@ func SetupEnvTest(t *testing.T) *envTestState {
 	require.NoError(t, err)
 	require.NotNil(t, cfg)
 
-	err = spinv1.AddToScheme(scheme.Scheme)
+	scheme := runtime.NewScheme()
+	clientscheme.AddToScheme(scheme)
+
+	err = spinv1.AddToScheme(scheme)
 	require.NoError(t, err)
 
-	k8sClient, err := client.New(cfg, client.Options{Scheme: scheme.Scheme})
+	k8sClient, err := client.New(cfg, client.Options{Scheme: scheme})
 	require.NoError(t, err)
 	require.NotNil(t, k8sClient)
 
@@ -67,6 +72,7 @@ func SetupEnvTest(t *testing.T) *envTestState {
 		cfg:       cfg,
 		k8sClient: k8sClient,
 		testEnv:   testEnv,
+		scheme:    scheme,
 	}
 }
 
@@ -75,15 +81,18 @@ func TestReconcile_Integration_StartupShutdown(t *testing.T) {
 
 	envTest := SetupEnvTest(t)
 
-	ctrlr := &SpinAppReconciler{
-		Client: envTest.k8sClient,
-		Scheme: scheme.Scheme,
-	}
-
 	mgr, err := ctrl.NewManager(envTest.cfg, manager.Options{
 		Metrics: metricsserver.Options{BindAddress: "0"},
+		Scheme:  envTest.scheme,
 	})
+
 	require.NoError(t, err)
+
+	ctrlr := &SpinAppReconciler{
+		Client:   envTest.k8sClient,
+		Scheme:   envTest.scheme,
+		Recorder: mgr.GetEventRecorderFor("spinapp-reconciler"),
+	}
 
 	require.NoError(t, ctrlr.SetupWithManager(mgr))
 
