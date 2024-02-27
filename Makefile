@@ -141,6 +141,10 @@ CHART_NAME     := spin-operator
 CHART_VERSION  ?= 0.0.0-dev
 CHART_REGISTRY ?= ghcr.io/fermyon
 
+GIT_COMMIT := $(shell git rev-parse HEAD)
+GIT_DIRTY := $(if $(shell git status --porcelain),+CHANGES)
+APP_VERSION ?= $(GIT_COMMIT)$(GIT_DIRTY)
+
 STAGING_DIR := _dist
 CRD_DIR     := ./config/crd/bases
 
@@ -168,7 +172,7 @@ $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION): helm-generate
 
 $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)
 	sed -r -i.bak -e 's%^version: .*%version: $(CHART_VERSION)%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
-	sed -r -i.bak -e 's%^appVersion: .*%appVersion: "v$(CHART_VERSION)"%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
+	sed -r -i.bak -e 's%^appVersion: .*%appVersion: "$(APP_VERSION)"%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
 	$(HELM) package \
 		--version $(CHART_VERSION) \
 		--destination $(STAGING_DIR) \
