@@ -26,4 +26,4 @@ dependencies:
   - name: kwasm-operator
     version: "0.2.3"
     repository: "http://kwasm.sh/kwasm-operator"
-
+    condition: kwasm-operator.enabled
