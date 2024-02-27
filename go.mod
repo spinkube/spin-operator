@@ -6,7 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/go-logr/logr v1.4.1
-	github.com/prometheus/common v0.47.0
+	github.com/prometheus/common v0.48.0
 	github.com/stretchr/testify v1.8.4
 	k8s.io/api v0.29.2
 	k8s.io/apimachinery v0.29.2
