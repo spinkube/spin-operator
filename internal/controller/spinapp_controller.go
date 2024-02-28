@@ -31,6 +31,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/prometheus/client_golang/prometheus"
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
 	"github.com/spinkube/spin-operator/internal/logging"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
@@ -89,6 +90,13 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// on deleted requests.
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+
+	// record spin_operator_spinapp_info metric
+	spinOperatorSpinAppInfo.With(prometheus.Labels{
+		"name":      spinApp.Name,
+		"namespace": spinApp.Namespace,
+		"executor":  spinApp.Spec.Executor,
+	}).Set(1)
 
 	var executor spinv1.SpinAppExecutor
 	if err := r.Client.Get(ctx, types.NamespacedName{

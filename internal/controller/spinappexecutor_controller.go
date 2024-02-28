@@ -19,12 +19,14 @@ package controller
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
+	"github.com/prometheus/client_golang/prometheus"
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
 	"github.com/spinkube/spin-operator/internal/logging"
 )
@@ -75,6 +77,19 @@ func (r *SpinAppExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		err = r.removeFinalizer(ctx, &executor)
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+
+	runtimeClass := ""
+	if executor.Spec.DeploymentConfig != nil {
+		runtimeClass = executor.Spec.DeploymentConfig.RuntimeClassName
+	}
+
+	// record spin_operator_spinapp_executor_info metric
+	spinOperatorSpinAppExecutorInfo.With(prometheus.Labels{
+		"name":              executor.Name,
+		"namespace":         executor.Namespace,
+		"create_deployment": fmt.Sprintf("%t", executor.Spec.CreateDeployment),
+		"runtimeclass":      runtimeClass,
+	}).Set(1)
 
 	// Make sure the finalizer is present
 	err := r.ensureFinalizer(ctx, &executor)
