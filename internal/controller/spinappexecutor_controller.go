@@ -78,17 +78,17 @@ func (r *SpinAppExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	runtimeClass := ""
+	runtimeClassName := ""
 	if executor.Spec.DeploymentConfig != nil {
-		runtimeClass = executor.Spec.DeploymentConfig.RuntimeClassName
+		runtimeClassName = executor.Spec.DeploymentConfig.RuntimeClassName
 	}
 
 	// record spin_operator_spinapp_executor_info metric
 	spinOperatorSpinAppExecutorInfo.With(prometheus.Labels{
-		"name":              executor.Name,
-		"namespace":         executor.Namespace,
-		"create_deployment": fmt.Sprintf("%t", executor.Spec.CreateDeployment),
-		"runtimeclass":      runtimeClass,
+		"name":               executor.Name,
+		"namespace":          executor.Namespace,
+		"create_deployment":  fmt.Sprintf("%t", executor.Spec.CreateDeployment),
+		"runtime_class_name": runtimeClassName,
 	}).Set(1)
 
 	// Make sure the finalizer is present

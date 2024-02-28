@@ -30,13 +30,13 @@ var (
 	spinOperatorSpinAppExecutorInfo = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "spin_operator_spinapp_executor_info",
-			Help: "info about spinapp executor labeled by name, namespace, create_deployment and runtimeclass",
+			Help: "info about spinapp executor labeled by name, namespace, create_deployment and runtime_class_name",
 		},
 		[]string{
 			"name",
 			"namespace",
 			"create_deployment",
-			"runtimeclass",
+			"runtime_class_name",
 		},
 	)
 )
