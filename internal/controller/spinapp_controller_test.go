@@ -4,17 +4,23 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
-	"runtime"
+	goruntime "runtime"
+	"sync"
 	"testing"
 	"time"
 
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
 	"github.com/stretchr/testify/require"
-	"k8s.io/client-go/kubernetes/scheme"
+	appsv1 "k8s.io/api/apps/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
+	clientscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
@@ -23,6 +29,7 @@ type envTestState struct {
 	cfg       *rest.Config
 	k8sClient client.Client
 	testEnv   *envtest.Environment
+	scheme    *runtime.Scheme
 }
 
 // SetupEnvTest will start a fake kubernetes and client for use when testing
@@ -40,7 +47,7 @@ func SetupEnvTest(t *testing.T) *envTestState {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.28.3-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.28.3-%s-%s", goruntime.GOOS, goruntime.GOARCH)),
 	}
 
 	cfg, err := testEnv.Start()
@@ -51,10 +58,13 @@ func SetupEnvTest(t *testing.T) *envTestState {
 	require.NoError(t, err)
 	require.NotNil(t, cfg)
 
-	err = spinv1.AddToScheme(scheme.Scheme)
+	scheme := runtime.NewScheme()
+	require.NoError(t, clientscheme.AddToScheme(scheme))
+
+	err = spinv1.AddToScheme(scheme)
 	require.NoError(t, err)
 
-	k8sClient, err := client.New(cfg, client.Options{Scheme: scheme.Scheme})
+	k8sClient, err := client.New(cfg, client.Options{Scheme: scheme})
 	require.NoError(t, err)
 	require.NotNil(t, k8sClient)
 
@@ -67,29 +77,113 @@ func SetupEnvTest(t *testing.T) *envTestState {
 		cfg:       cfg,
 		k8sClient: k8sClient,
 		testEnv:   testEnv,
+		scheme:    scheme,
 	}
+}
+
+func setupController(t *testing.T) (*envTestState, ctrl.Manager, *SpinAppReconciler) {
+	t.Helper()
+
+	envTest := SetupEnvTest(t)
+
+	opts := zap.Options{
+		Development: true,
+	}
+	logger := zap.New(zap.UseFlagOptions(&opts))
+
+	mgr, err := ctrl.NewManager(envTest.cfg, manager.Options{
+		Metrics: metricsserver.Options{BindAddress: "0"},
+		Scheme:  envTest.scheme,
+		// Provide a real logger to controllers - this means that when tests fail we
+		// get to see the controller logs that lead to the failure - if we decide this
+		// is too noisy then we can gate this behind an env var like SPINKUBE_TEST_LOGS.
+		Logger: logger,
+	})
+
+	require.NoError(t, err)
+
+	ctrlr := &SpinAppReconciler{
+		Client:   envTest.k8sClient,
+		Scheme:   envTest.scheme,
+		Recorder: mgr.GetEventRecorderFor("spinapp-reconciler"),
+	}
+
+	require.NoError(t, ctrlr.SetupWithManager(mgr))
+
+	return envTest, mgr, ctrlr
 }
 
 func TestReconcile_Integration_StartupShutdown(t *testing.T) {
 	t.Parallel()
 
-	envTest := SetupEnvTest(t)
-
-	ctrlr := &SpinAppReconciler{
-		Client: envTest.k8sClient,
-		Scheme: scheme.Scheme,
-	}
-
-	mgr, err := ctrl.NewManager(envTest.cfg, manager.Options{
-		Metrics: metricsserver.Options{BindAddress: "0"},
-	})
-	require.NoError(t, err)
-
-	require.NoError(t, ctrlr.SetupWithManager(mgr))
+	_, mgr, _ := setupController(t)
 
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelFunc()
 	require.NoError(t, mgr.Start(ctx))
+}
+
+func TestReconcile_Integration_Deployment_Respects_Executor_Config(t *testing.T) {
+	t.Parallel()
+
+	envTest, mgr, _ := setupController(t)
+
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFunc()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		require.NoError(t, mgr.Start(ctx))
+		wg.Done()
+	}()
+
+	// Create an executor that creates a deployment with a given runtimeClassName
+	executor := &spinv1.SpinAppExecutor{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "executor",
+			Namespace: "default",
+		},
+		Spec: spinv1.SpinAppExecutorSpec{
+			CreateDeployment: true,
+			DeploymentConfig: &spinv1.ExecutorDeploymentConfig{
+				RuntimeClassName: "a-runtime-class",
+			},
+		},
+	}
+
+	require.NoError(t, envTest.k8sClient.Create(ctx, executor))
+
+	spinApp := &spinv1.SpinApp{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "app",
+			Namespace: "default",
+		},
+		Spec: spinv1.SpinAppSpec{
+			Executor: "executor",
+			Image:    "ghcr.io/radu-matei/perftest:v1",
+		},
+	}
+
+	// Create an app that uses the executor
+	require.NoError(t, envTest.k8sClient.Create(ctx, spinApp))
+
+	// Wait for the underlying deployment to exist
+	var deployment appsv1.Deployment
+	require.Eventually(t, func() bool {
+		err := envTest.k8sClient.Get(ctx,
+			types.NamespacedName{
+				Namespace: "default",
+				Name:      "app"},
+			&deployment)
+		return err == nil
+	}, 3*time.Second, 100*time.Millisecond)
+
+	require.Equal(t, "a-runtime-class", *deployment.Spec.Template.Spec.RuntimeClassName)
+
+	// Terminate the context to force the manager to shut down.
+	cancelFunc()
+	wg.Wait()
 }
 
 func TestConstructDeployment_MinimalApp(t *testing.T) {
