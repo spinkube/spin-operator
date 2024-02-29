@@ -25,6 +25,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 
 	"github.com/prometheus/client_golang/prometheus"
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
@@ -34,7 +35,9 @@ import (
 // SpinAppExecutorReconciler reconciles a SpinAppExecutor object
 type SpinAppExecutorReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme          *runtime.Scheme
+	MetricsRegistry metrics.RegistererGatherer
+	metrics         *spinAppExecutorMetrics
 }
 
 //+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinappexecutors,verbs=get;list;watch;create;update;patch;delete
@@ -43,6 +46,8 @@ type SpinAppExecutorReconciler struct {
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SpinAppExecutorReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	r.setupMetrics()
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&spinv1.SpinAppExecutor{}).
 		Complete(r)
@@ -84,7 +89,7 @@ func (r *SpinAppExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	}
 
 	// record spin_operator_spinapp_executor_info metric
-	spinOperatorSpinAppExecutorInfo.With(prometheus.Labels{
+	r.metrics.infoGauge.With(prometheus.Labels{
 		"name":               executor.Name,
 		"namespace":          executor.Namespace,
 		"create_deployment":  fmt.Sprintf("%t", executor.Spec.CreateDeployment),

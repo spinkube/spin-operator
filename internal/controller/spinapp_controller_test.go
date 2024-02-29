@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -103,9 +104,10 @@ func setupController(t *testing.T) (*envTestState, ctrl.Manager, *SpinAppReconci
 	require.NoError(t, err)
 
 	ctrlr := &SpinAppReconciler{
-		Client:   envTest.k8sClient,
-		Scheme:   envTest.scheme,
-		Recorder: mgr.GetEventRecorderFor("spinapp-reconciler"),
+		Client:          envTest.k8sClient,
+		Scheme:          envTest.scheme,
+		Recorder:        mgr.GetEventRecorderFor("spinapp-reconciler"),
+		MetricsRegistry: prometheus.NewRegistry(),
 	}
 
 	require.NoError(t, ctrlr.SetupWithManager(mgr))

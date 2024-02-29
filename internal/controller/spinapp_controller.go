@@ -30,6 +30,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 
 	"github.com/prometheus/client_golang/prometheus"
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
@@ -50,9 +51,11 @@ const (
 
 // SpinAppReconciler reconciles a SpinApp object
 type SpinAppReconciler struct {
-	Client   client.Client
-	Scheme   *runtime.Scheme
-	Recorder record.EventRecorder
+	Client          client.Client
+	Scheme          *runtime.Scheme
+	Recorder        record.EventRecorder
+	MetricsRegistry metrics.RegistererGatherer
+	metrics         *spinAppMetrics
 }
 
 //+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinapps,verbs=get;list;watch;create;update;patch;delete
@@ -63,6 +66,8 @@ type SpinAppReconciler struct {
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SpinAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	r.setupMetrics()
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&spinv1.SpinApp{}).
 		// Owns allows watching dependency resources for any changes
@@ -92,7 +97,7 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	// record spin_operator_spinapp_info metric
-	spinOperatorSpinAppInfo.With(prometheus.Labels{
+	r.metrics.infoGauge.With(prometheus.Labels{
 		"name":      spinApp.Name,
 		"namespace": spinApp.Namespace,
 		"executor":  spinApp.Spec.Executor,
