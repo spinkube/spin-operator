@@ -2,5 +2,5 @@ dependencies:
 - name: kwasm-operator
   repository: http://kwasm.sh/kwasm-operator
   version: 0.2.3
-digest: sha256:40d405e4fdf2625d9b164f29f5d777cf6598ed74f155c4cf4259914128318cbd
-generated: "2024-02-20T21:28:07.788307+05:30"
+digest: sha256:6e1bb3a6d08822006f2f9a899b4edba1f2612a9c7117b50a4ede0d4d1db0faf1
+generated: "2024-02-29T11:38:42.924018827-08:00"

@@ -10,6 +10,8 @@ spin-operator is a Kubernetes operator in charge of handling the lifecycle of Sp
 
 Prior to installing the chart, you'll need to ensure the following:
 
+- [Cert Manager](https://github.com/cert-manager/cert-manager) to automatically provision and manage TLS certificates (used by spin-operator's admission webhook system). Cert Manager must be running and the corresponding CRDs must be present on the cluster before installing the spin-operator chart.
+
 - spin-operator CustomResourceDefinition (CRD) resources are installed. This includes the SpinApp CRD representing Spin applications to be scheduled on the cluster.
 
   <!-- TODO: templatize with release version corresponding to chart's appVersion -->
@@ -17,18 +19,6 @@ Prior to installing the chart, you'll need to ensure the following:
   ```console
   $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.crds.yaml
   ```
-
-- A RuntimeClass resource for the `wasmtime-spin-v2` container runtime is installed. This is the runtime that Spin applications use.
-
-  <!-- TODO: templatize with release version corresponding to chart's appVersion -->
-
-  ```console
-  kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml
-  ```
-
-## Chart prerequisites
-
-- [Cert Manager](https://github.com/cert-manager/cert-manager) to automatically provision and manage TLS certificates (used by spin-operator's admission webhook system). Cert Manager must be running and the corresponding CRDs must be present on the cluster before installing the spin-operator chart.
 
 ## Chart dependencies
 
@@ -45,6 +35,26 @@ The following installs the chart with the release name `spin-operator`:
 ```console
 $ helm install spin-operator --namespace spin-operator --create-namespace oci://ghcr.io/spinkube/spin-operator
 ```
+
+## Post-installation
+
+After installing the chart, you'll need to ensure the following:
+
+- An application executor is installed. This is the executor that spin-operator uses to run Spin applications.
+
+  <!-- TODO: templatize with release version corresponding to chart's appVersion -->
+
+  ```console
+  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.shim-executor.yaml
+  ```
+
+- A RuntimeClass resource for the `wasmtime-spin-v2` container runtime is installed. This is the runtime that Spin applications use.
+
+  <!-- TODO: templatize with release version corresponding to chart's appVersion -->
+
+  ```console
+  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml
+  ```
 
 ## Upgrading the chart
 

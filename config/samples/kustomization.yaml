@@ -8,7 +8,7 @@ resources:
 - redis.yaml
 - resources.yaml
 - runtime-config.yaml
-- shim-executor.yaml
+- spin-shim-executor.yaml
 - simple.yaml
 - variables.yaml
 - volume-mount.yaml
