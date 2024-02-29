@@ -6,6 +6,9 @@ import (
 )
 
 type spinAppExecutorMetrics struct {
+	// Record executor metadata as info metric.
+	// This is particularly useful for querying
+	// available executor names for creating dashboards
 	infoGauge *prometheus.GaugeVec
 }
 

@@ -6,6 +6,9 @@ import (
 )
 
 type spinAppMetrics struct {
+	// Record spinapp metadata as info metric.
+	// This is particularly useful for querying
+	// available app names for creating dashboards
 	infoGauge *prometheus.GaugeVec
 }
 
