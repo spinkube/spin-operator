@@ -40,12 +40,6 @@ jobs:
       - name: import operator image into k3d cluster
         run: k3d image import -c wasm-cluster spin-operator:latest
 
-      - name: install crd
-        run: make install
-
-      - name: apply runtime class
-        run: kubectl apply -f spin-runtime-class.yaml
-
       - name: helm install cert-manager
         run: |
           helm repo add jetstack https://charts.jetstack.io
@@ -55,9 +49,18 @@ jobs:
             --version v1.13.3 \
             --set installCRDs=true
 
+      - name: install crds
+        run: make install
+
       - name: helm install spin-operator
         run: |
           make helm-install IMG=spin-operator:latest
+
+      - name: create containerd-shim-spin executor
+        run: kubectl create -f config/samples/spin-shim-executor.yaml
+
+      - name: create runtime class
+        run: kubectl create -f config/samples/spin-runtime-class.yaml
 
       - name: debug
         if: failure()

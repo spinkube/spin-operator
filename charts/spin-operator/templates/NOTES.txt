@@ -10,9 +10,9 @@ To learn more about the release, try:
 Note: spin-operator requires a few additional resources to be present on the
 Kubernetes cluster before it can run the first Spin application.
 
-1. Install the spin-operator CustomResourceDefinition (CRD) resources:
+1. Install the containerd-shim-spin SpinAppExecutor:
 
-  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/{{ .Chart.AppVersion }}/spin-operator.crds.yaml
+  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/{{ .Chart.AppVersion }}/spin-operator.executor.yaml
 
 2. Install the wasmtime-spin-v2 RuntimeClass:
 

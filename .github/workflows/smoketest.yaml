@@ -30,7 +30,7 @@ jobs:
           --agents 2
 
       - name: apply runtime class
-        run: kubectl apply -f spin-runtime-class.yaml
+        run: kubectl apply -f config/samples/spin-runtime-class.yaml
 
       - name: start controller
         timeout-minutes: 5
@@ -44,7 +44,7 @@ jobs:
 
       - name: run spin app
         run: |
-          kubectl apply -f config/samples/shim-executor.yaml
+          kubectl apply -f config/samples/spin-shim-executor.yaml
           kubectl apply -f config/samples/simple.yaml
           kubectl rollout status deployment simple-spinapp --timeout 90s
 

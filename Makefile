@@ -155,7 +155,7 @@ helm-generate: manifests kustomize helmify ## Create/update the Helm chart based
 	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir charts/$(CHART_NAME)
 	rm -rf charts/$(CHART_NAME)/crds
 	@# Copy the containerd-shim-spin SpinAppExecutor yaml from its canonical location into the chart
-	cp config/samples/shim-executor.yaml charts/$(CHART_NAME)/templates/containerd-shim-spin-executor.yaml
+	cp config/samples/spin-shim-executor.yaml charts/$(CHART_NAME)/templates/containerd-shim-spin-executor.yaml
 	$(HELM) dep up charts/$(CHART_NAME)
 
 .PHONY: helm-publish
@@ -181,7 +181,10 @@ $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz: $(STAGING_DIR)/$(CHART_NAME)-
 		$(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)
 
 $(STAGING_DIR)/spin-operator.runtime-class.yaml:
-	cp spin-runtime-class.yaml $(STAGING_DIR)/spin-operator.runtime-class.yaml
+	cp config/samples/spin-runtime-class.yaml $(STAGING_DIR)/spin-operator.runtime-class.yaml
+
+$(STAGING_DIR)/spin-operator.shim-executor.yaml:
+	cp config/samples/spin-shim-executor.yaml $(STAGING_DIR)/spin-operator.shim-executor.yaml
 
 $(STAGING_DIR)/spin-operator.crds.yaml: manifests
 	for file in $$(ls $(CRD_DIR)) ; \
@@ -210,7 +213,7 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 	@echo "==> Applying Configuration"
 	@$(KUSTOMIZE) build config/default | $(KUBECTL) apply -f -
 	@echo -e "\n\nSpin Operator has been deployed - you may now want to:\n\n\tkubectl apply -f spin-runtime-class.yaml"
-	@echo -e "\tkubectl apply -f config/samples/shim-executor.yaml\n\nto install an example runtime class and executor that uses it."
+	@echo -e "\tkubectl apply -f config/samples/spin-shim-executor.yaml\n\nto install an example runtime class and executor that uses it."
 
 .PHONY: undeploy
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
