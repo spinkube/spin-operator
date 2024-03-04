@@ -297,8 +297,8 @@ $(HELMIFY): $(LOCALBIN)
 container-registry-secret: ## Create a secret for the container registry
 	@echo "Creating secret for container registry"
 	@kubectl create ns $(HELM_NAMESPACE) 2>/dev/null || true
-	@kubectl create secret docker-registry $(DEFAULT_REGISTRY_SECRET_NAME) \
-		--docker-server=$(DEFAULT_REGISTRY) \
+	@kubectl create secret docker-registry $(REGISTRY_SECRET_NAME) \
+		--docker-server=$(REGISTRY) \
 		--docker-username=$(REGISTRY_USERNAME) \
 		--docker-password=$(REGISTRY_TOKEN) \
 		--namespace=$(HELM_NAMESPACE) || true
