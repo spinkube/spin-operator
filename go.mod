@@ -6,6 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/go-logr/logr v1.4.1
+	github.com/pelletier/go-toml/v2 v2.1.1
 	github.com/prometheus/common v0.49.0
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/sync v0.5.0

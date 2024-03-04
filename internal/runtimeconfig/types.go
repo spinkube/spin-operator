@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	"github.com/spinkube/spin-operator/pkg/secret"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -26,9 +27,9 @@ type VariablesProvider struct {
 	EnvVariablesProviderOptions
 }
 
-type KeyValueStoreOptions map[string]string
+type KeyValueStoreOptions map[string]secret.String
 
-type SQLiteDatabaseOptions map[string]string
+type SQLiteDatabaseOptions map[string]secret.String
 
 type Spin struct {
 	Variables []VariablesProvider `toml:"config_provider,omitempty"`
@@ -37,7 +38,7 @@ type Spin struct {
 
 	SQLiteDatabases map[string]SQLiteDatabaseOptions `toml:"sqlite_database,omitempty"`
 
-	LLMCompute map[string]string `toml:"llm_compute,omitempty"`
+	LLMCompute map[string]secret.String `toml:"llm_compute,omitempty"`
 }
 
 func (s *Spin) AddKeyValueStore(
@@ -98,9 +99,9 @@ func (s *Spin) AddLLMCompute(computeType, namespace string,
 
 func renderOptionsIntoMap(typeOpt, namespace string,
 	opts []spinv1.RuntimeConfigOption,
-	secrets map[types.NamespacedName]*corev1.Secret, configMaps map[types.NamespacedName]*corev1.ConfigMap) (map[string]string, error) {
-	options := map[string]string{
-		"type": typeOpt,
+	secrets map[types.NamespacedName]*corev1.Secret, configMaps map[types.NamespacedName]*corev1.ConfigMap) (map[string]secret.String, error) {
+	options := map[string]secret.String{
+		"type": secret.String(typeOpt),
 	}
 
 	for _, opt := range opts {
@@ -125,7 +126,7 @@ func renderOptionsIntoMap(typeOpt, namespace string,
 			value = string(sec.Data[secKeyRef.Key])
 		}
 
-		options[opt.Name] = value
+		options[opt.Name] = secret.String(value)
 	}
 
 	return options, nil
