@@ -100,7 +100,7 @@ func (k *K8sBuilder) Build(ctx context.Context, app *spinv1.SpinApp) (rc *Spin, 
 			return
 		}
 
-		logger.Info("built runtime config")
+		logger.Debug("built runtime config")
 	}()
 
 	deps := extractExternalDependencies(app)
@@ -153,7 +153,7 @@ func (k *K8sBuilder) Build(ctx context.Context, app *spinv1.SpinApp) (rc *Spin, 
 		}
 	}
 
-	return nil, nil
+	return rc, nil
 }
 
 // externalDependencies is a horrible hack around extracting all of the required
@@ -219,6 +219,10 @@ func extractExternalDependencies(app *spinv1.SpinApp) *externalDependencies {
 	}
 
 	secretMapper := func(configOption spinv1.RuntimeConfigOption) *corev1.Secret {
+		if configOption.ValueFrom == nil {
+			return nil
+		}
+
 		if configOption.ValueFrom.SecretKeyRef != nil {
 			return &corev1.Secret{
 				TypeMeta: metav1.TypeMeta{
@@ -236,6 +240,10 @@ func extractExternalDependencies(app *spinv1.SpinApp) *externalDependencies {
 	}
 
 	configMapMapper := func(configOption spinv1.RuntimeConfigOption) *corev1.ConfigMap {
+		if configOption.ValueFrom == nil {
+			return nil
+		}
+
 		if configOption.ValueFrom.ConfigMapKeyRef != nil {
 			return &corev1.ConfigMap{
 				TypeMeta: metav1.TypeMeta{

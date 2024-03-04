@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"hash/adler32"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -31,8 +32,10 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/pelletier/go-toml/v2"
 	spinv1 "github.com/spinkube/spin-operator/api/v1"
 	"github.com/spinkube/spin-operator/internal/logging"
+	"github.com/spinkube/spin-operator/internal/runtimeconfig"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
 )
 
@@ -121,6 +124,7 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if executor.Spec.CreateDeployment {
 		err := r.reconcileDeployment(ctx, &spinApp, executor.Spec.DeploymentConfig)
 		if err != nil {
+			log.Error(err, "Failed to Reconcile Deployment")
 			return ctrl.Result{}, err
 		}
 	} else {
@@ -222,10 +226,55 @@ func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1.SpinAp
 func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1.SpinApp, config *spinv1.ExecutorDeploymentConfig) error {
 	log := logging.FromContext(ctx).WithValues("deployment", app.Name)
 
-	desiredDeployment, err := constructDeployment(ctx, app, config, r.Scheme)
+	rcBuilder := runtimeconfig.NewBuilder(r.Client)
+
+	generatedRuntimeConfig, err := rcBuilder.Build(ctx, app)
 	if err != nil {
-		log.Error(err, "Unable to construct Deployment")
-		return err
+		return fmt.Errorf("failed to construct RuntimeConfig: %w", err)
+	}
+
+	var generatedRuntimeConfigSecretName string
+
+	if generatedRuntimeConfig != nil {
+		tomlValue, err := toml.Marshal(generatedRuntimeConfig)
+		if err != nil {
+			return fmt.Errorf("failed to marshal RuntimeConfig: %w", err)
+		}
+
+		// A checksum of the rendered runtimeConfig acts as a unique-enough value to
+		// ensure we don't reschedule apps unless the runtime config has changed.
+		// Adler32 is probably fine here - if we run into collision issues then we
+		// can switch to hashing-and-truncating.
+		generatedRuntimeConfigSecretName = fmt.Sprintf("%s-%x", app.ObjectMeta.Name, adler32.Checksum(tomlValue))
+
+		secret := &corev1.Secret{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Secret",
+				APIVersion: "v1",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: app.ObjectMeta.Namespace,
+				Name:      generatedRuntimeConfigSecretName,
+			},
+			Data: map[string][]byte{
+				"runtime-config.toml": tomlValue,
+			},
+		}
+
+		err = r.Client.Create(ctx, secret)
+		if err != nil {
+			if client.IgnoreAlreadyExists(err) == nil {
+				log.Debug("RuntimeConfig Secret already exists", "runtime_config_secret_name", secret.ObjectMeta.Name)
+			}
+			return fmt.Errorf("failed to create RuntimeConfig secret: %w", err)
+		}
+
+		log.Info("created runtimeconfig secret")
+	}
+
+	desiredDeployment, err := constructDeployment(ctx, app, config, generatedRuntimeConfigSecretName, r.Scheme)
+	if err != nil {
+		return fmt.Errorf("failed to construct Deployment: %w", err)
 	}
 
 	log.Debug("Reconciling Deployment")
@@ -289,7 +338,8 @@ func (r *SpinAppReconciler) deleteDeployment(ctx context.Context, app *spinv1.Sp
 }
 
 // constructDeployment builds an appsv1.Deployment based on the configuration of a SpinApp.
-func constructDeployment(ctx context.Context, app *spinv1.SpinApp, config *spinv1.ExecutorDeploymentConfig, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+func constructDeployment(ctx context.Context, app *spinv1.SpinApp, config *spinv1.ExecutorDeploymentConfig,
+	generatedRuntimeConfigSecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	// TODO: Once we land admission webhooks write some validation to make
 	// replicas and enableAutoscaling mutually exclusive.
 	var replicas *int32
@@ -299,7 +349,7 @@ func constructDeployment(ctx context.Context, app *spinv1.SpinApp, config *spinv
 		replicas = ptr(app.Spec.Replicas)
 	}
 
-	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, "")
+	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, generatedRuntimeConfigSecretName)
 	if err != nil {
 		return nil, err
 	}
