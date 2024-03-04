@@ -11,7 +11,7 @@ IMG_REPO ?= ghcr.io/spinkube/spin-operator
 IMG ?= $(IMG_REPO):$(shell git rev-parse --short HEAD)-dev
 
 # Default registry and secret name for working with private container registries
-DEFAULT_REGISTRY := https://ghcr.io
+REGISTRY ?= $(shell echo "$(IMG)" | cut -d '/' -f 1)
 DEFAULT_REGISTRY_SECRET_NAME := registry-credentials
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
