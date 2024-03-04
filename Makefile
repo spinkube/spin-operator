@@ -154,8 +154,6 @@ CRD_DIR     := ./config/crd/bases
 helm-generate: manifests kustomize helmify ## Create/update the Helm chart based on kustomize manifests. (Note: CRDs not included)
 	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir charts/$(CHART_NAME)
 	rm -rf charts/$(CHART_NAME)/crds
-	@# Copy the containerd-shim-spin SpinAppExecutor yaml from its canonical location into the chart
-	cp config/samples/spin-shim-executor.yaml charts/$(CHART_NAME)/templates/containerd-shim-spin-executor.yaml
 	$(HELM) dep up charts/$(CHART_NAME)
 
 .PHONY: helm-publish
