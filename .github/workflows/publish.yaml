@@ -100,7 +100,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install helm
-        uses: Azure/setup-helm@v3
+        uses: Azure/setup-helm@v4
         with:
           version: v3.14.0
 
