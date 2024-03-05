@@ -2211,6 +2211,8 @@ spec:
                   application deployment.
                 format: int32
                 type: integer
+            required:
+            - readyReplicas
             type: object
         type: object
     served: true

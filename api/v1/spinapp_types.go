@@ -95,7 +95,7 @@ type SpinAppStatus struct {
 	ActiveScheduler string `json:"activeScheduler,omitempty"`
 
 	// Represents the current number of active replicas on the application deployment.
-	ReadyReplicas int32 `json:"readyReplicas,omitempty"`
+	ReadyReplicas int32 `json:"readyReplicas"`
 }
 
 // SpinApp is the Schema for the spinapps API
