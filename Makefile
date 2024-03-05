@@ -154,6 +154,8 @@ CRD_DIR     := ./config/crd/bases
 helm-generate: manifests kustomize helmify ## Create/update the Helm chart based on kustomize manifests. (Note: CRDs not included)
 	$(KUSTOMIZE) build config/default | $(HELMIFY) -crd-dir charts/$(CHART_NAME)
 	rm -rf charts/$(CHART_NAME)/crds
+	@# Swap in a values.yaml that we curate/control
+	cp config/chart/values.yaml charts/$(CHART_NAME)/values.yaml
 	$(HELM) dep up charts/$(CHART_NAME)
 
 .PHONY: helm-publish
