@@ -54,7 +54,7 @@ jobs:
 
       - name: helm install spin-operator
         run: |
-          make helm-install IMG=spin-operator:latest
+          make helm-install IMG=spin-operator:latest HELM_EXTRA_ARGS=--debug
 
       - name: create containerd-shim-spin executor
         run: kubectl create -f config/samples/spin-shim-executor.yaml
@@ -67,10 +67,11 @@ jobs:
         run: |
           kubectl get pods -A
           kubectl get pods -n spin-operator
-          kubectl logs -n spin-operator $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}')
-          kubectl describe -n spin-operator pod $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}')
-          kubectl logs -n spin-operator $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}')
-          kubectl describe -n spin-operator pod $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}')
+          kubectl get certificate -n spin-operator
+          kubectl logs -n spin-operator $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}') || true
+          kubectl describe -n spin-operator pod $(kubectl get pods -n spin-operator | grep spin-operator-controller-manager | awk '{print $1}') || true
+          kubectl logs -n spin-operator $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}') || true
+          kubectl describe -n spin-operator pod $(kubectl get pods -n spin-operator | grep wait-for-webhook-svc | awk '{print $1}') || true
 
       - name: run spin app
         run: |
