@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -13,6 +14,8 @@ import (
 	"sigs.k8s.io/e2e-framework/pkg/envfuncs"
 	"sigs.k8s.io/e2e-framework/support/utils"
 )
+
+const ErrFormat = "%v: %v\n"
 
 var (
 	testEnv                    env.Environment
@@ -44,11 +47,12 @@ func TestMain(m *testing.M) {
 		// build and load spin operator image into cluster
 		func(ctx context.Context, _ *envconf.Config) (context.Context, error) {
 			if p := utils.RunCommand(`bash -c "cd .. && IMG=ghcr.io/spinkube/spin-operator:dev make docker-build"`); p.Err() != nil {
-				return ctx, p.Err()
+
+				return ctx, fmt.Errorf(ErrFormat, p.Err(), p.Out())
 			}
 
 			if p := utils.RunCommand(("k3d image import -c " + cluster.name + " ghcr.io/spinkube/spin-operator:dev")); p.Err() != nil {
-				return ctx, p.Err()
+				return ctx, fmt.Errorf(ErrFormat, p.Err(), p.Out())
 			}
 			return ctx, nil
 		},
@@ -57,20 +61,22 @@ func TestMain(m *testing.M) {
 		func(ctx context.Context, _ *envconf.Config) (context.Context, error) {
 			// install crds
 			if p := utils.RunCommand(`bash -c "cd .. && make install"`); p.Err() != nil {
-				return ctx, p.Err()
+
+				return ctx, fmt.Errorf(ErrFormat, p.Err(), p.Out())
+
 			}
 
 			// install cert-manager
 			if p := utils.RunCommand("kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml"); p.Err() != nil {
-				return ctx, p.Err()
+				return ctx, fmt.Errorf(ErrFormat, p.Err(), p.Out())
 			}
 			// wait for cert-manager to be ready
 			if p := utils.RunCommand("kubectl wait --for=condition=Available --timeout=300s deployment/cert-manager-webhook -n cert-manager"); p.Err() != nil {
-				return ctx, p.Err()
+				return ctx, fmt.Errorf(ErrFormat, p.Err(), p.Out())
 			}
 
 			if p := utils.RunCommand(`bash -c "cd .. && IMG=ghcr.io/spinkube/spin-operator:dev make deploy"`); p.Err() != nil {
-				return ctx, p.Err()
+				return ctx, fmt.Errorf(ErrFormat, p.Err(), p.Out())
 			}
 
 			// wait for the controller deployment to be ready

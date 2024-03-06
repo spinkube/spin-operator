@@ -15,7 +15,7 @@ import (
 	"sigs.k8s.io/e2e-framework/pkg/envconf"
 	"sigs.k8s.io/e2e-framework/pkg/features"
 
-	spinapps_v1 "github.com/spinkube/spin-operator/api/v1"
+	spinapps_v1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 )
 
 var runtimeClassName = "wasmtime-spin-v2"
@@ -33,8 +33,8 @@ func TestDefaultSetup(t *testing.T) {
 
 			client = cfg.Client()
 
-			if err := spinapps_v1.AddToScheme(client.Resources(testNamespace).GetScheme()); err != nil {
-				t.Fatalf("failed to register the spinapps_v1 types with Kuberenets scheme: %s", err)
+			if err := spinapps_v1alpha1.AddToScheme(client.Resources(testNamespace).GetScheme()); err != nil {
+				t.Fatalf("failed to register the spinapps_v1alpha1 types with Kuberenets scheme: %s", err)
 			}
 
 			runtimeClass := &nodev1.RuntimeClass{
@@ -102,13 +102,13 @@ func TestDefaultSetup(t *testing.T) {
 	testEnv.Test(t, defaultTest)
 }
 
-func newSpinAppCR(name, image string) *spinapps_v1.SpinApp {
-	var testSpinApp = &spinapps_v1.SpinApp{
+func newSpinAppCR(name, image string) *spinapps_v1alpha1.SpinApp {
+	var testSpinApp = &spinapps_v1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: testNamespace,
 		},
-		Spec: spinapps_v1.SpinAppSpec{
+		Spec: spinapps_v1alpha1.SpinAppSpec{
 			Replicas: 1,
 			Image:    image,
 			Executor: "containerd-shim-spin",
@@ -119,15 +119,15 @@ func newSpinAppCR(name, image string) *spinapps_v1.SpinApp {
 
 }
 
-func newContainerdShimExecutor(namespace string) *spinapps_v1.SpinAppExecutor {
-	var testSpinAppExecutor = &spinapps_v1.SpinAppExecutor{
+func newContainerdShimExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecutor {
+	var testSpinAppExecutor = &spinapps_v1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "containerd-shim-spin",
 			Namespace: namespace,
 		},
-		Spec: spinapps_v1.SpinAppExecutorSpec{
+		Spec: spinapps_v1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
-			DeploymentConfig: &spinapps_v1.ExecutorDeploymentConfig{
+			DeploymentConfig: &spinapps_v1alpha1.ExecutorDeploymentConfig{
 				RuntimeClassName: runtimeClassName,
 			},
 		},
