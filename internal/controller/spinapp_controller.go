@@ -33,7 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/pelletier/go-toml/v2"
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/logging"
 	"github.com/spinkube/spin-operator/internal/runtimeconfig"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
@@ -67,7 +67,7 @@ type SpinAppReconciler struct {
 // SetupWithManager sets up the controller with the Manager.
 func (r *SpinAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&spinv1.SpinApp{}).
+		For(&spinv1alpha1.SpinApp{}).
 		// Owns allows watching dependency resources for any changes
 		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.Service{}).
@@ -84,7 +84,7 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	log.Debug("Reconciling SpinApp")
 
 	// Check if the SpinApp exists
-	var spinApp spinv1.SpinApp
+	var spinApp spinv1alpha1.SpinApp
 	if err := r.Client.Get(ctx, req.NamespacedName, &spinApp); err != nil {
 		// TODO: This error logging is noisy
 		log.Error(err, "Unable to fetch SpinApp")
@@ -94,7 +94,7 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	var executor spinv1.SpinAppExecutor
+	var executor spinv1alpha1.SpinAppExecutor
 	if err := r.Client.Get(ctx, types.NamespacedName{
 		// Executors must currently be defined in the same namespace as the app.
 		// When we decide if the operator will be global or namespaced we may want
@@ -146,7 +146,7 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 // updateStatus updates the status of a SpinApp.
-func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1.SpinApp, executor *spinv1.SpinAppExecutor) error {
+func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1alpha1.SpinApp, executor *spinv1alpha1.SpinAppExecutor) error {
 	log := logging.FromContext(ctx)
 
 	// Our only status management is currently based on the resulting deployment
@@ -224,7 +224,7 @@ func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1.SpinAp
 }
 
 // reconcileDeployment creates a deployment if one does not exist and reconciles it if it does.
-func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1.SpinApp, config *spinv1.ExecutorDeploymentConfig) error {
+func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config *spinv1alpha1.ExecutorDeploymentConfig) error {
 	log := logging.FromContext(ctx).WithValues("deployment", app.Name)
 
 	rcBuilder := runtimeconfig.NewBuilder(r.Client)
@@ -297,7 +297,7 @@ func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1
 }
 
 // reconcileService creates a service if one does not exist and updates it if it does.
-func (r *SpinAppReconciler) reconcileService(ctx context.Context, app *spinv1.SpinApp) error {
+func (r *SpinAppReconciler) reconcileService(ctx context.Context, app *spinv1alpha1.SpinApp) error {
 	log := logging.FromContext(ctx).WithValues("service", app.Name)
 
 	desiredService := constructService(app)
@@ -324,7 +324,7 @@ func (r *SpinAppReconciler) reconcileService(ctx context.Context, app *spinv1.Sp
 }
 
 // deleteDeployment deletes the deployment for a SpinApp.
-func (r *SpinAppReconciler) deleteDeployment(ctx context.Context, app *spinv1.SpinApp) error {
+func (r *SpinAppReconciler) deleteDeployment(ctx context.Context, app *spinv1alpha1.SpinApp) error {
 	deployment, err := r.findDeploymentForApp(ctx, app)
 	if err != nil {
 		return err
@@ -339,7 +339,7 @@ func (r *SpinAppReconciler) deleteDeployment(ctx context.Context, app *spinv1.Sp
 }
 
 // constructDeployment builds an appsv1.Deployment based on the configuration of a SpinApp.
-func constructDeployment(ctx context.Context, app *spinv1.SpinApp, config *spinv1.ExecutorDeploymentConfig,
+func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config *spinv1alpha1.ExecutorDeploymentConfig,
 	generatedRuntimeConfigSecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	// TODO: Once we land admission webhooks write some validation to make
 	// replicas and enableAutoscaling mutually exclusive.
@@ -446,7 +446,7 @@ func constructDeployment(ctx context.Context, app *spinv1.SpinApp, config *spinv
 }
 
 // findDeploymentForApp finds the deployment for a SpinApp.
-func (r *SpinAppReconciler) findDeploymentForApp(ctx context.Context, app *spinv1.SpinApp) (*appsv1.Deployment, error) {
+func (r *SpinAppReconciler) findDeploymentForApp(ctx context.Context, app *spinv1alpha1.SpinApp) (*appsv1.Deployment, error) {
 	var deployment appsv1.Deployment
 	err := r.Client.Get(ctx, types.NamespacedName{Name: app.Name, Namespace: app.Namespace}, &deployment)
 	if err != nil {

@@ -3,7 +3,7 @@ package runtimeconfig
 import (
 	"testing"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,23 +29,23 @@ func configMapSelector(name string) *corev1.ConfigMapKeySelector {
 func Test_ExtractRuntimeConfigDependencies(t *testing.T) {
 	t.Parallel()
 
-	basicSpec := spinv1.SpinAppSpec{}
+	basicSpec := spinv1alpha1.SpinAppSpec{}
 
 	table := []struct {
 		name               string
-		inputAppSpec       func() spinv1.SpinAppSpec
+		inputAppSpec       func() spinv1alpha1.SpinAppSpec
 		expectedSecrets    []types.NamespacedName
 		expectedConfigMaps []types.NamespacedName
 	}{
 		{
 			name: "only_static_values",
-			inputAppSpec: func() spinv1.SpinAppSpec {
+			inputAppSpec: func() spinv1alpha1.SpinAppSpec {
 				spec := basicSpec
-				spec.RuntimeConfig.KeyValueStores = []spinv1.KeyValueStoreConfig{
+				spec.RuntimeConfig.KeyValueStores = []spinv1alpha1.KeyValueStoreConfig{
 					{
 						Name: "my-kv-store",
 						Type: "magical",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name:  "secret",
 								Value: "i-put-secrets-in-plain-text",
@@ -59,30 +59,30 @@ func Test_ExtractRuntimeConfigDependencies(t *testing.T) {
 		},
 		{
 			name: "unique_configmaps",
-			inputAppSpec: func() spinv1.SpinAppSpec {
+			inputAppSpec: func() spinv1alpha1.SpinAppSpec {
 				spec := basicSpec
-				spec.RuntimeConfig.SqliteDatabases = []spinv1.SqliteDatabaseConfig{
+				spec.RuntimeConfig.SqliteDatabases = []spinv1alpha1.SqliteDatabaseConfig{
 					{
 						Name: "my-turso-db",
 						Type: "libsql",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name: "url",
-								ValueFrom: &spinv1.RuntimeConfigVarSource{
+								ValueFrom: &spinv1alpha1.RuntimeConfigVarSource{
 									ConfigMapKeyRef: configMapSelector("my-cm-b"),
 								},
 							},
 						},
 					},
 				}
-				spec.RuntimeConfig.KeyValueStores = []spinv1.KeyValueStoreConfig{
+				spec.RuntimeConfig.KeyValueStores = []spinv1alpha1.KeyValueStoreConfig{
 					{
 						Name: "my-kv-store",
 						Type: "magical",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name: "secret",
-								ValueFrom: &spinv1.RuntimeConfigVarSource{
+								ValueFrom: &spinv1alpha1.RuntimeConfigVarSource{
 									ConfigMapKeyRef: configMapSelector("my-cm-a"),
 								},
 							},
@@ -105,30 +105,30 @@ func Test_ExtractRuntimeConfigDependencies(t *testing.T) {
 		},
 		{
 			name: "duplicate_config_maps",
-			inputAppSpec: func() spinv1.SpinAppSpec {
+			inputAppSpec: func() spinv1alpha1.SpinAppSpec {
 				spec := basicSpec
-				spec.RuntimeConfig.SqliteDatabases = []spinv1.SqliteDatabaseConfig{
+				spec.RuntimeConfig.SqliteDatabases = []spinv1alpha1.SqliteDatabaseConfig{
 					{
 						Name: "my-turso-db",
 						Type: "libsql",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name: "url",
-								ValueFrom: &spinv1.RuntimeConfigVarSource{
+								ValueFrom: &spinv1alpha1.RuntimeConfigVarSource{
 									ConfigMapKeyRef: configMapSelector("my-cm-a"),
 								},
 							},
 						},
 					},
 				}
-				spec.RuntimeConfig.KeyValueStores = []spinv1.KeyValueStoreConfig{
+				spec.RuntimeConfig.KeyValueStores = []spinv1alpha1.KeyValueStoreConfig{
 					{
 						Name: "my-kv-store",
 						Type: "magical",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name: "secret",
-								ValueFrom: &spinv1.RuntimeConfigVarSource{
+								ValueFrom: &spinv1alpha1.RuntimeConfigVarSource{
 									ConfigMapKeyRef: configMapSelector("my-cm-a"),
 								},
 							},
@@ -147,30 +147,30 @@ func Test_ExtractRuntimeConfigDependencies(t *testing.T) {
 		},
 		{
 			name: "unique_secrets",
-			inputAppSpec: func() spinv1.SpinAppSpec {
+			inputAppSpec: func() spinv1alpha1.SpinAppSpec {
 				spec := basicSpec
-				spec.RuntimeConfig.SqliteDatabases = []spinv1.SqliteDatabaseConfig{
+				spec.RuntimeConfig.SqliteDatabases = []spinv1alpha1.SqliteDatabaseConfig{
 					{
 						Name: "my-turso-db",
 						Type: "libsql",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name: "url",
-								ValueFrom: &spinv1.RuntimeConfigVarSource{
+								ValueFrom: &spinv1alpha1.RuntimeConfigVarSource{
 									SecretKeyRef: secretKeySelector("my-secret-b"),
 								},
 							},
 						},
 					},
 				}
-				spec.RuntimeConfig.KeyValueStores = []spinv1.KeyValueStoreConfig{
+				spec.RuntimeConfig.KeyValueStores = []spinv1alpha1.KeyValueStoreConfig{
 					{
 						Name: "my-kv-store",
 						Type: "magical",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name: "secret",
-								ValueFrom: &spinv1.RuntimeConfigVarSource{
+								ValueFrom: &spinv1alpha1.RuntimeConfigVarSource{
 									SecretKeyRef: secretKeySelector("my-secret-a"),
 								},
 							},
@@ -193,30 +193,30 @@ func Test_ExtractRuntimeConfigDependencies(t *testing.T) {
 		},
 		{
 			name: "duplicate_secrets",
-			inputAppSpec: func() spinv1.SpinAppSpec {
+			inputAppSpec: func() spinv1alpha1.SpinAppSpec {
 				spec := basicSpec
-				spec.RuntimeConfig.SqliteDatabases = []spinv1.SqliteDatabaseConfig{
+				spec.RuntimeConfig.SqliteDatabases = []spinv1alpha1.SqliteDatabaseConfig{
 					{
 						Name: "my-turso-db",
 						Type: "libsql",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name: "url",
-								ValueFrom: &spinv1.RuntimeConfigVarSource{
+								ValueFrom: &spinv1alpha1.RuntimeConfigVarSource{
 									SecretKeyRef: secretKeySelector("my-secret-a"),
 								},
 							},
 						},
 					},
 				}
-				spec.RuntimeConfig.KeyValueStores = []spinv1.KeyValueStoreConfig{
+				spec.RuntimeConfig.KeyValueStores = []spinv1alpha1.KeyValueStoreConfig{
 					{
 						Name: "my-kv-store",
 						Type: "magical",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name: "secret",
-								ValueFrom: &spinv1.RuntimeConfigVarSource{
+								ValueFrom: &spinv1alpha1.RuntimeConfigVarSource{
 									SecretKeyRef: secretKeySelector("my-secret-a"),
 								},
 							},
@@ -237,7 +237,7 @@ func Test_ExtractRuntimeConfigDependencies(t *testing.T) {
 
 	for _, test := range table {
 		t.Run(test.name, func(t *testing.T) {
-			app := &spinv1.SpinApp{
+			app := &spinv1alpha1.SpinApp{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      test.name,
 					Namespace: "test-ns",

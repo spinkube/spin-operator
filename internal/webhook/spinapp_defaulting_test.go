@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/constants"
 	"github.com/stretchr/testify/require"
 )
@@ -14,7 +14,7 @@ func TestDefaultNothingToSet(t *testing.T) {
 
 	defaulter := &SpinAppDefaulter{}
 
-	spinApp := &spinv1.SpinApp{Spec: spinv1.SpinAppSpec{
+	spinApp := &spinv1alpha1.SpinApp{Spec: spinv1alpha1.SpinAppSpec{
 		Executor: constants.CyclotronExecutor,
 		Replicas: 1,
 	}}

@@ -13,7 +13,7 @@ data:
   password: c2VjcmV0X3NhdWNlCg==
 ---
 kind: SpinApp
-apiVersion: core.spinoperator.dev/v1
+apiVersion: core.spinoperator.dev/v1alpha1
 metadata:
   name: variable-explorer
 spec:

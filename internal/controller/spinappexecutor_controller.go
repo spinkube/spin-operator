@@ -25,7 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/logging"
 )
 
@@ -46,16 +46,16 @@ type SpinAppExecutorReconciler struct {
 // SetupWithManager sets up the controller with the Manager.
 func (r *SpinAppExecutorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
-	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &spinv1.SpinApp{}, spinAppExecutorKey, func(rawObj client.Object) []string {
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &spinv1alpha1.SpinApp{}, spinAppExecutorKey, func(rawObj client.Object) []string {
 		// grab the spinapp object, extract the executor...
-		spinapp := rawObj.(*spinv1.SpinApp)
+		spinapp := rawObj.(*spinv1alpha1.SpinApp)
 		return []string{spinapp.Spec.Executor}
 	}); err != nil {
 		return err
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&spinv1.SpinAppExecutor{}).
+		For(&spinv1alpha1.SpinAppExecutor{}).
 		Complete(r)
 }
 
@@ -69,7 +69,7 @@ func (r *SpinAppExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	log.Debug("Reconciling SpinAppExecutor")
 
 	// Check if the SpinAppExecutor exists
-	var executor spinv1.SpinAppExecutor
+	var executor spinv1alpha1.SpinAppExecutor
 	if err := r.Client.Get(ctx, req.NamespacedName, &executor); err != nil {
 		log.Error(err, "Unable to fetch SpinAppExecutor")
 		// we'll ignore not-found errors, since they can't be fixed by an immediate
@@ -96,10 +96,10 @@ func (r *SpinAppExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 // handleDeletion makes sure no SpinApps are dependent on the SpinAppExecutor
 // before allowing it to be deleted.
-func (r *SpinAppExecutorReconciler) handleDeletion(ctx context.Context, executor *spinv1.SpinAppExecutor) error {
+func (r *SpinAppExecutorReconciler) handleDeletion(ctx context.Context, executor *spinv1alpha1.SpinAppExecutor) error {
 	log := logging.FromContext(ctx)
 
-	var spinApps spinv1.SpinAppList
+	var spinApps spinv1alpha1.SpinAppList
 	if err := r.Client.List(ctx, &spinApps, client.MatchingFields{spinAppExecutorKey: executor.Name}); err != nil {
 		log.Error(err, "Unable to list SpinApps")
 		return err
@@ -113,7 +113,7 @@ func (r *SpinAppExecutorReconciler) handleDeletion(ctx context.Context, executor
 }
 
 // removeFinalizer removes the finalizer from a SpinAppExecutor.
-func (r *SpinAppExecutorReconciler) removeFinalizer(ctx context.Context, executor *spinv1.SpinAppExecutor) error {
+func (r *SpinAppExecutorReconciler) removeFinalizer(ctx context.Context, executor *spinv1alpha1.SpinAppExecutor) error {
 	if controllerutil.ContainsFinalizer(executor, SpinOperatorFinalizer) {
 		controllerutil.RemoveFinalizer(executor, SpinOperatorFinalizer)
 		if err := r.Client.Update(ctx, executor); err != nil {
@@ -124,7 +124,7 @@ func (r *SpinAppExecutorReconciler) removeFinalizer(ctx context.Context, executo
 }
 
 // ensureFinalizer ensures the finalizer is present on a SpinAppExecutor.
-func (r *SpinAppExecutorReconciler) ensureFinalizer(ctx context.Context, executor *spinv1.SpinAppExecutor) error {
+func (r *SpinAppExecutorReconciler) ensureFinalizer(ctx context.Context, executor *spinv1alpha1.SpinAppExecutor) error {
 	if !controllerutil.ContainsFinalizer(executor, SpinOperatorFinalizer) {
 		controllerutil.AddFinalizer(executor, SpinOperatorFinalizer)
 		if err := r.Client.Update(ctx, executor); err != nil {

@@ -4,14 +4,14 @@ import (
 	"context"
 	"strings"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/logging"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // nolint:lll
-//+kubebuilder:webhook:path=/mutate-core-spinoperator-dev-v1-spinapp,mutating=true,failurePolicy=fail,sideEffects=None,groups=core.spinoperator.dev,resources=spinapps,verbs=create;update,versions=v1,name=mspinapp.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/mutate-core-spinoperator-dev-v1alpha1-spinapp,mutating=true,failurePolicy=fail,sideEffects=None,groups=core.spinoperator.dev,resources=spinapps,verbs=create;update,versions=v1alpha1,name=mspinapp.kb.io,admissionReviewVersions=v1
 
 // SpinAppDefaulter mutates SpinApps
 type SpinAppDefaulter struct {
@@ -22,7 +22,7 @@ type SpinAppDefaulter struct {
 func (d *SpinAppDefaulter) Default(ctx context.Context, obj runtime.Object) error {
 	log := logging.FromContext(ctx)
 
-	spinApp := obj.(*spinv1.SpinApp)
+	spinApp := obj.(*spinv1alpha1.SpinApp)
 	log.Info("default", "name", spinApp.Name)
 
 	if spinApp.Spec.Executor == "" {
@@ -44,7 +44,7 @@ func (d *SpinAppDefaulter) Default(ctx context.Context, obj runtime.Object) erro
 func (d *SpinAppDefaulter) findDefaultExecutor(ctx context.Context) (string, error) {
 	log := logging.FromContext(ctx)
 
-	var executors spinv1.SpinAppExecutorList
+	var executors spinv1alpha1.SpinAppExecutorList
 	if err := d.Client.List(ctx, &executors); err != nil {
 		log.Error(err, "failed to list SpinAppExecutors")
 		return "", err

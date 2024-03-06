@@ -24,7 +24,7 @@ spec:
     - jsonPath: .spec.executor
       name: Executor
       type: string
-    name: v1
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: SpinApp is the Schema for the spinapps API

@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -88,7 +88,7 @@ func TestSpinAppExecutorReconcile_ContainerDShimSpinExecutorCreate(t *testing.T)
 	}()
 
 	executor := testContainerdShimSpinExecutor()
-	list := &spinv1.SpinAppExecutorList{}
+	list := &spinv1alpha1.SpinAppExecutorList{}
 	require.NoError(t, envTest.k8sClient.List(ctx, list))
 	require.True(t, len(list.Items) == 0)
 	require.NoError(t, envTest.k8sClient.Create(ctx, executor))
@@ -116,7 +116,7 @@ func TestSpinAppExecutorReconcile_ContainerDShimSpinExecutorDelete(t *testing.T)
 		wg.Done()
 	}()
 
-	list := &spinv1.SpinAppExecutorList{}
+	list := &spinv1alpha1.SpinAppExecutorList{}
 	require.NoError(t, envTest.k8sClient.List(ctx, list))
 	require.True(t, len(list.Items) == 1)
 	require.NoError(t, envTest.k8sClient.Delete(ctx, executor))
@@ -124,15 +124,15 @@ func TestSpinAppExecutorReconcile_ContainerDShimSpinExecutorDelete(t *testing.T)
 	require.True(t, len(list.Items) == 0)
 }
 
-func testContainerdShimSpinExecutor() *spinv1.SpinAppExecutor {
-	return &spinv1.SpinAppExecutor{
+func testContainerdShimSpinExecutor() *spinv1alpha1.SpinAppExecutor {
+	return &spinv1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "test-executor",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppExecutorSpec{
+		Spec: spinv1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
-			DeploymentConfig: &spinv1.ExecutorDeploymentConfig{
+			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
 				RuntimeClassName: "test-runtime",
 			},
 		},

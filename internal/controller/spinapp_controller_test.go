@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -62,7 +62,7 @@ func SetupEnvTest(t *testing.T) *envTestState {
 	scheme := runtime.NewScheme()
 	require.NoError(t, clientscheme.AddToScheme(scheme))
 
-	err = spinv1.AddToScheme(scheme)
+	err = spinv1alpha1.AddToScheme(scheme)
 	require.NoError(t, err)
 
 	k8sClient, err := client.New(cfg, client.Options{Scheme: scheme})
@@ -140,14 +140,14 @@ func TestReconcile_Integration_Deployment_Respects_Executor_Config(t *testing.T)
 	}()
 
 	// Create an executor that creates a deployment with a given runtimeClassName
-	executor := &spinv1.SpinAppExecutor{
+	executor := &spinv1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "executor",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppExecutorSpec{
+		Spec: spinv1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
-			DeploymentConfig: &spinv1.ExecutorDeploymentConfig{
+			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
 				RuntimeClassName: "a-runtime-class",
 			},
 		},
@@ -155,12 +155,12 @@ func TestReconcile_Integration_Deployment_Respects_Executor_Config(t *testing.T)
 
 	require.NoError(t, envTest.k8sClient.Create(ctx, executor))
 
-	spinApp := &spinv1.SpinApp{
+	spinApp := &spinv1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "app",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppSpec{
+		Spec: spinv1alpha1.SpinAppSpec{
 			Executor: "executor",
 			Image:    "ghcr.io/radu-matei/perftest:v1",
 		},
@@ -203,14 +203,14 @@ func TestReconcile_Integration_RuntimeConfig(t *testing.T) {
 	}()
 
 	// Create an executor that creates a deployment with a given runtimeClassName
-	executor := &spinv1.SpinAppExecutor{
+	executor := &spinv1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "executor",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppExecutorSpec{
+		Spec: spinv1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
-			DeploymentConfig: &spinv1.ExecutorDeploymentConfig{
+			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
 				RuntimeClassName: "a-runtime-class",
 			},
 		},
@@ -218,20 +218,20 @@ func TestReconcile_Integration_RuntimeConfig(t *testing.T) {
 
 	require.NoError(t, envTest.k8sClient.Create(ctx, executor))
 
-	spinApp := &spinv1.SpinApp{
+	spinApp := &spinv1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "app",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppSpec{
+		Spec: spinv1alpha1.SpinAppSpec{
 			Executor: "executor",
 			Image:    "ghcr.io/radu-matei/perftest:v1",
-			RuntimeConfig: spinv1.RuntimeConfig{
-				KeyValueStores: []spinv1.KeyValueStoreConfig{
+			RuntimeConfig: spinv1alpha1.RuntimeConfig{
+				KeyValueStores: []spinv1alpha1.KeyValueStoreConfig{
 					{
 						Name: "default",
 						Type: "redis",
-						Options: []spinv1.RuntimeConfigOption{
+						Options: []spinv1alpha1.RuntimeConfigOption{
 							{
 								Name:  "url",
 								Value: "redis://localhost:9000",
@@ -291,7 +291,7 @@ func TestConstructDeployment_MinimalApp(t *testing.T) {
 
 	app := minimalSpinApp()
 
-	cfg := &spinv1.ExecutorDeploymentConfig{
+	cfg := &spinv1alpha1.ExecutorDeploymentConfig{
 		RuntimeClassName: "bananarama",
 	}
 	deployment, err := constructDeployment(context.Background(), app, cfg, "", nil)
