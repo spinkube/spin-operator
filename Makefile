@@ -141,7 +141,7 @@ CHART_NAME     := spin-operator
 # they aren't valid/recognized by 'helm install' or 'helm install --devel'.
 # TODO: swap '0.0.0' with '$(shell git describe --tags --abbrev=0 | sed -rn 's/(v)?(.*)/\2/p')' when we have our first tag
 CHART_VERSION  ?= 0.0.0-dev
-CHART_REGISTRY ?= ghcr.io/spinkube
+CHART_REGISTRY ?= ghcr.io/spinkube/charts
 
 GIT_COMMIT := $(shell git rev-parse HEAD)
 GIT_DIRTY := $(if $(shell git status --porcelain),+CHANGES)
