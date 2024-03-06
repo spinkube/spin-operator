@@ -15,7 +15,6 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
       contents: read
       packages: write
     outputs:
@@ -53,33 +52,11 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build and Push PR - Ephemeral
-        uses: docker/build-push-action@v5
-        if: github.event_name == 'pull_request'
-        with:
-          context: .
-          push: true
-          labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: |
-            ttl.sh/spoopy-operator-pr-${{ github.event.pull_request.number }}:24h
-      - uses: mshick/add-pr-comment@v2
-        if: (github.event_name == 'pull_request') && ${{ success() }}
-        with:
-          message: |
-            This PR now has an image available for testing:
-            ```
-              ttl.sh/spoopy-operator-pr-${{ github.event.pull_request.number }}:24h
-            ```
-
       - name: Build and Push
         uses: docker/build-push-action@v5
-        if: github.event_name != 'pull_request'
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
