@@ -29,6 +29,10 @@ import (
 	"github.com/spinkube/spin-operator/internal/logging"
 )
 
+var (
+	spinAppExecutorKey = "spec.executor"
+)
+
 // SpinAppExecutorReconciler reconciles a SpinAppExecutor object
 type SpinAppExecutorReconciler struct {
 	client.Client
@@ -41,6 +45,15 @@ type SpinAppExecutorReconciler struct {
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SpinAppExecutorReconciler) SetupWithManager(mgr ctrl.Manager) error {
+
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &spinv1.SpinApp{}, spinAppExecutorKey, func(rawObj client.Object) []string {
+		// grab the spinapp object, extract the executor...
+		spinapp := rawObj.(*spinv1.SpinApp)
+		return []string{spinapp.Spec.Executor}
+	}); err != nil {
+		return err
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&spinv1.SpinAppExecutor{}).
 		Complete(r)
@@ -84,10 +97,11 @@ func (r *SpinAppExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 // handleDeletion makes sure no SpinApps are dependent on the SpinAppExecutor
 // before allowing it to be deleted.
 func (r *SpinAppExecutorReconciler) handleDeletion(ctx context.Context, executor *spinv1.SpinAppExecutor) error {
+	log := logging.FromContext(ctx)
+
 	var spinApps spinv1.SpinAppList
-	if err := r.Client.List(ctx, &spinApps, client.MatchingFields{"spec.runtime": executor.Name}); err != nil {
-		// TODO: Log this
-		// TODO: Emit k8s event
+	if err := r.Client.List(ctx, &spinApps, client.MatchingFields{spinAppExecutorKey: executor.Name}); err != nil {
+		log.Error(err, "Unable to list SpinApps")
 		return err
 	}
 
