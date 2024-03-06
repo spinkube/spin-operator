@@ -223,6 +223,7 @@ HELM_RELEASE   ?= $(CHART_NAME)
 HELM_NAMESPACE ?= $(CHART_NAME)
 IMG_REPO := $(shell echo "${IMG}" | cut -d ':' -f 1)
 IMG_TAG  := $(shell echo "${IMG}" | cut -d ':' -f 2)
+HELM_EXTRA_ARGS ?=
 
 .PHONY: helm-install
 helm-install: helm-generate ## Install the Helm chart onto the K8s cluster specified in ~/.kube/config.
@@ -230,6 +231,7 @@ helm-install: helm-generate ## Install the Helm chart onto the K8s cluster speci
 		-n $(HELM_NAMESPACE) \
 		--create-namespace \
 		--wait \
+		$(HELM_EXTRA_ARGS) \
 		--set controllerManager.manager.image.repository=$(IMG_REPO) \
 		--set controllerManager.manager.image.tag=$(IMG_TAG) \
 		$(HELM_RELEASE) charts/$(CHART_NAME)
@@ -241,6 +243,7 @@ helm-upgrade: helm-install ## Upgrade the Helm release.
 helm-uninstall: ## Delete the Helm release.
 	$(HELM) delete \
 		-n $(HELM_NAMESPACE) \
+		$(HELM_EXTRA_ARGS) \
 		$(HELM_RELEASE)
 
 ##@ Build Dependencies
