@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
-	"runtime"
+	goruntime "runtime"
 	"testing"
 	"time"
 
@@ -15,7 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/apimachinery/pkg/runtime"
+	clientscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -28,6 +29,7 @@ type envTestState struct {
 	cfg       *rest.Config
 	k8sClient client.Client
 	testEnv   *envtest.Environment
+	scheme    *runtime.Scheme
 }
 
 // setupEnvTest will start a fake kubernetes and client for use when testing
@@ -45,7 +47,7 @@ func setupEnvTest(t *testing.T) *envTestState {
 		// Note that you must have the required binaries setup under the bin directory to perform
 		// the tests directly. When we run make test it will be setup and used automatically.
 		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.28.3-%s-%s", runtime.GOOS, runtime.GOARCH)),
+			fmt.Sprintf("1.28.3-%s-%s", goruntime.GOOS, goruntime.GOARCH)),
 
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
 			Paths: []string{filepath.Join("..", "..", "config", "webhook")},
@@ -60,13 +62,15 @@ func setupEnvTest(t *testing.T) *envTestState {
 	require.NoError(t, err)
 	require.NotNil(t, cfg)
 
-	err = spinv1.AddToScheme(scheme.Scheme)
+	scheme := runtime.NewScheme()
+	require.NoError(t, clientscheme.AddToScheme(scheme))
+	err = spinv1.AddToScheme(scheme)
 	require.NoError(t, err)
 
-	err = admissionv1.AddToScheme(scheme.Scheme)
+	err = admissionv1.AddToScheme(scheme)
 	require.NoError(t, err)
 
-	k8sClient, err := client.New(cfg, client.Options{Scheme: scheme.Scheme})
+	k8sClient, err := client.New(cfg, client.Options{Scheme: scheme})
 	require.NoError(t, err)
 	require.NotNil(t, k8sClient)
 
@@ -74,6 +78,7 @@ func setupEnvTest(t *testing.T) *envTestState {
 		cfg:       cfg,
 		k8sClient: k8sClient,
 		testEnv:   testEnv,
+		scheme:    scheme,
 	}
 }
 
@@ -83,7 +88,7 @@ func startWebhookServer(t *testing.T, envtest *envTestState) {
 	// start webhook server using Manager
 	webhookInstallOptions := &envtest.testEnv.WebhookInstallOptions
 	mgr, err := ctrl.NewManager(envtest.cfg, ctrl.Options{
-		Scheme: scheme.Scheme,
+		Scheme: envtest.scheme,
 		WebhookServer: webhook.NewServer(webhook.Options{
 			Host:    webhookInstallOptions.LocalServingHost,
 			Port:    webhookInstallOptions.LocalServingPort,
