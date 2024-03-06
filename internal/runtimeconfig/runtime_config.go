@@ -103,7 +103,7 @@ func (k *K8sBuilder) Build(ctx context.Context, app *spinv1.SpinApp) (rc *Spin, 
 		logger.Debug("built runtime config")
 	}()
 
-	deps := extractExternalDependencies(app)
+	deps := extractRuntimeConfigDependencies(app)
 	err = deps.fetch(ctx, k.client)
 	if err != nil {
 		return nil, err
@@ -156,16 +156,17 @@ func (k *K8sBuilder) Build(ctx context.Context, app *spinv1.SpinApp) (rc *Spin, 
 	return rc, nil
 }
 
-// externalDependencies is a horrible hack around extracting all of the required
-// secrets and config maps for a given spin application's runtimeConfig and
-// realizing them all with limited concurrency. This should _probably_ be
-// refactored or replaced in the future to be a little less brittle and easier to manage.
-type externalDependencies struct {
+// dependencies encapsulates the dependencies of an apps RuntimeConfig and
+// provides functions for fetching those dependencies before they're required
+// to ensure they exist.
+type dependencies struct {
 	Secrets    map[types.NamespacedName]*corev1.Secret
 	ConfigMaps map[types.NamespacedName]*corev1.ConfigMap
 }
 
-func (e *externalDependencies) fetch(ctx context.Context, client client.Client) error {
+// fetch will iterate over all of the Secrets and ConfigMaps in the dependency
+// list and attempt to fetch them. It will fail on the first error.
+func (e *dependencies) fetch(ctx context.Context, client client.Client) error {
 	logger := logging.FromContext(ctx).WithValues("component", "runtime_config_builder")
 
 	g, ctx := errgroup.WithContext(ctx)
@@ -194,8 +195,8 @@ func (e *externalDependencies) fetch(ctx context.Context, client client.Client) 
 	return g.Wait()
 }
 
-func extractExternalDependencies(app *spinv1.SpinApp) *externalDependencies {
-	result := &externalDependencies{
+func extractRuntimeConfigDependencies(app *spinv1.SpinApp) *dependencies {
+	result := &dependencies{
 		Secrets:    make(map[types.NamespacedName]*corev1.Secret),
 		ConfigMaps: make(map[types.NamespacedName]*corev1.ConfigMap),
 	}
@@ -262,17 +263,19 @@ func extractExternalDependencies(app *spinv1.SpinApp) *externalDependencies {
 
 	// 1. Map lists of config options to secrets or config maps
 	// 2. remove any `nil` entries because our mapper doesn't do that by default
-	// 3. Turn the list into a map of namespaced name: secret/config map
+	// 3. Turn the list into a map of namespaced name: secret/config map - this acts
+	//    as a deduplication layer and ensures we act with a consistent view of a secret/configmap
+	//    while rendering configuration.
 
-	result.Secrets = generics.AssociateBy(slices.DeleteFunc(generics.MapList(configOptions, secretMapper), func(sec *corev1.Secret) bool {
-		return sec == nil
-	}), func(sec *corev1.Secret) types.NamespacedName {
+	secrets := generics.MapList(configOptions, secretMapper)
+	secrets = slices.DeleteFunc(secrets, func(sec *corev1.Secret) bool { return sec == nil })
+	result.Secrets = generics.AssociateBy(secrets, func(sec *corev1.Secret) types.NamespacedName {
 		return types.NamespacedName{Name: sec.ObjectMeta.Name, Namespace: sec.ObjectMeta.Namespace}
 	})
 
-	result.ConfigMaps = generics.AssociateBy(slices.DeleteFunc(generics.MapList(configOptions, configMapMapper), func(cm *corev1.ConfigMap) bool {
-		return cm == nil
-	}), func(cm *corev1.ConfigMap) types.NamespacedName {
+	cms := generics.MapList(configOptions, configMapMapper)
+	cms = slices.DeleteFunc(cms, func(cm *corev1.ConfigMap) bool { return cm == nil })
+	result.ConfigMaps = generics.AssociateBy(cms, func(cm *corev1.ConfigMap) types.NamespacedName {
 		return types.NamespacedName{Name: cm.ObjectMeta.Name, Namespace: cm.ObjectMeta.Namespace}
 	})
 
