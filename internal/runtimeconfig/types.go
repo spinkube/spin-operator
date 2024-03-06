@@ -9,13 +9,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-type VaultVariablesProviderOptions struct {
-	URL    string `toml:"url,omitempty"`
-	Token  string `toml:"token,omitempty"`
-	Mount  string `toml:"mount,omitempty"`
-	Prefix string `toml:"prefix,omitempty"`
-}
-
 type EnvVariablesProviderOptions struct {
 	Prefix     string `toml:"prefix,omitempty"`
 	DotEnvPath string `toml:"dotenv_path,omitempty"`
@@ -23,7 +16,6 @@ type EnvVariablesProviderOptions struct {
 
 type VariablesProvider struct {
 	Type string `toml:"type,omitempty"`
-	VaultVariablesProviderOptions
 	EnvVariablesProviderOptions
 }
 

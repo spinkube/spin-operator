@@ -270,8 +270,16 @@ func TestReconcile_Integration_RuntimeConfig(t *testing.T) {
 		Name:      runtimeConfigVolume.VolumeSource.Secret.SecretName,
 		Namespace: "default"}, &rcSecret))
 
-	require.Equal(t, "[[config_provider]]\ntype = 'env'\n\n[key_value_store]\n[key_value_store.default]\ntype = 'redis'\nurl = 'redis://localhost:9000'\n",
-		string(rcSecret.Data["runtime-config.toml"]))
+	expected := `[[config_provider]]
+type = 'env'
+prefix = 'SPIN_VARIABLE_'
+
+[key_value_store]
+[key_value_store.default]
+type = 'redis'
+url = 'redis://localhost:9000'
+`
+	require.Equal(t, expected, string(rcSecret.Data["runtime-config.toml"]))
 
 	// Terminate the context to force the manager to shut down.
 	cancelFunc()
