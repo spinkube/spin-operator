@@ -75,7 +75,7 @@ jobs:
 
       - name: run spin app
         run: |
-          kubectl apply -f config/samples/simple.yaml
+          kubectl create -f config/samples/simple.yaml
           kubectl rollout status deployment simple-spinapp --timeout 90s
           kubectl get pods -A
           kubectl port-forward svc/simple-spinapp 8083:80 &
