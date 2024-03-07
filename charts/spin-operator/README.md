@@ -17,7 +17,7 @@ Prior to installing the chart, you'll need to ensure the following:
   <!-- TODO: templatize with release version corresponding to chart's appVersion -->
 
   ```console
-  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.crds.yaml
+  $ kubectl create -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.crds.yaml
   ```
 
 ## Chart dependencies
@@ -45,7 +45,7 @@ After installing the chart, you'll need to ensure the following:
   <!-- TODO: templatize with release version corresponding to chart's appVersion -->
 
   ```console
-  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.shim-executor.yaml
+  $ kubectl create -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.shim-executor.yaml
   ```
 
 - A RuntimeClass resource for the `wasmtime-spin-v2` container runtime is installed. This is the runtime that Spin applications use.
@@ -53,7 +53,7 @@ After installing the chart, you'll need to ensure the following:
   <!-- TODO: templatize with release version corresponding to chart's appVersion -->
 
   ```console
-  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml
+  $ kubectl create -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.runtime-class.yaml
   ```
 
 ## Upgrading the chart
