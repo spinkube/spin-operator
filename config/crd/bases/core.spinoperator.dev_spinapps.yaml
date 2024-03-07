@@ -272,12 +272,230 @@ spec:
                 description: RuntimeConfig defines configuration to be applied at
                   runtime for this app.
                 properties:
+                  keyValueStores:
+                    items:
+                      properties:
+                        name:
+                          type: string
+                        options:
+                          items:
+                            properties:
+                              name:
+                                description: Name of the config option.
+                                type: string
+                              value:
+                                description: Value is the static value to bind to
+                                  the variable.
+                                type: string
+                              valueFrom:
+                                description: ValueFrom is a reference to dynamically
+                                  bind the variable to.
+                                properties:
+                                  configMapKeyRef:
+                                    description: Selects a key of a ConfigMap.
+                                    properties:
+                                      key:
+                                        description: The key to select.
+                                        type: string
+                                      name:
+                                        description: |-
+                                          Name of the referent.
+                                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          TODO: Add other useful fields. apiVersion, kind, uid?
+                                        type: string
+                                      optional:
+                                        description: Specify whether the ConfigMap
+                                          or its key must be defined
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                  secretKeyRef:
+                                    description: Selects a key of a secret in the
+                                      apps namespace
+                                    properties:
+                                      key:
+                                        description: The key of the secret to select
+                                          from.  Must be a valid secret key.
+                                        type: string
+                                      name:
+                                        description: |-
+                                          Name of the referent.
+                                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          TODO: Add other useful fields. apiVersion, kind, uid?
+                                        type: string
+                                      optional:
+                                        description: Specify whether the Secret or
+                                          its key must be defined
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                            required:
+                            - name
+                            type: object
+                          type: array
+                        type:
+                          type: string
+                      required:
+                      - name
+                      - type
+                      type: object
+                    type: array
+                  llmCompute:
+                    properties:
+                      options:
+                        items:
+                          properties:
+                            name:
+                              description: Name of the config option.
+                              type: string
+                            value:
+                              description: Value is the static value to bind to the
+                                variable.
+                              type: string
+                            valueFrom:
+                              description: ValueFrom is a reference to dynamically
+                                bind the variable to.
+                              properties:
+                                configMapKeyRef:
+                                  description: Selects a key of a ConfigMap.
+                                  properties:
+                                    key:
+                                      description: The key to select.
+                                      type: string
+                                    name:
+                                      description: |-
+                                        Name of the referent.
+                                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                        TODO: Add other useful fields. apiVersion, kind, uid?
+                                      type: string
+                                    optional:
+                                      description: Specify whether the ConfigMap or
+                                        its key must be defined
+                                      type: boolean
+                                  required:
+                                  - key
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                                secretKeyRef:
+                                  description: Selects a key of a secret in the apps
+                                    namespace
+                                  properties:
+                                    key:
+                                      description: The key of the secret to select
+                                        from.  Must be a valid secret key.
+                                      type: string
+                                    name:
+                                      description: |-
+                                        Name of the referent.
+                                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                        TODO: Add other useful fields. apiVersion, kind, uid?
+                                      type: string
+                                    optional:
+                                      description: Specify whether the Secret or its
+                                        key must be defined
+                                      type: boolean
+                                  required:
+                                  - key
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                              type: object
+                          required:
+                          - name
+                          type: object
+                        type: array
+                      type:
+                        type: string
+                    required:
+                    - type
+                    type: object
                   loadFromSecret:
                     description: |-
                       LoadFromSecret is the name of the secret to load runtime config from. The
                       secret should have a single key named "runtime-config.toml" that contains
-                      the base64 encoded runtime config.
+                      the base64 encoded runtime config. If this is provided all other runtime
+                      config is ignored.
                     type: string
+                  sqliteDatabases:
+                    description: |-
+                      SqliteDatabases provides spin bindings to different SQLite database providers.
+                      e.g on-disk or turso.
+                    items:
+                      properties:
+                        name:
+                          type: string
+                        options:
+                          items:
+                            properties:
+                              name:
+                                description: Name of the config option.
+                                type: string
+                              value:
+                                description: Value is the static value to bind to
+                                  the variable.
+                                type: string
+                              valueFrom:
+                                description: ValueFrom is a reference to dynamically
+                                  bind the variable to.
+                                properties:
+                                  configMapKeyRef:
+                                    description: Selects a key of a ConfigMap.
+                                    properties:
+                                      key:
+                                        description: The key to select.
+                                        type: string
+                                      name:
+                                        description: |-
+                                          Name of the referent.
+                                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          TODO: Add other useful fields. apiVersion, kind, uid?
+                                        type: string
+                                      optional:
+                                        description: Specify whether the ConfigMap
+                                          or its key must be defined
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                  secretKeyRef:
+                                    description: Selects a key of a secret in the
+                                      apps namespace
+                                    properties:
+                                      key:
+                                        description: The key of the secret to select
+                                          from.  Must be a valid secret key.
+                                        type: string
+                                      name:
+                                        description: |-
+                                          Name of the referent.
+                                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                          TODO: Add other useful fields. apiVersion, kind, uid?
+                                        type: string
+                                      optional:
+                                        description: Specify whether the Secret or
+                                          its key must be defined
+                                        type: boolean
+                                    required:
+                                    - key
+                                    type: object
+                                    x-kubernetes-map-type: atomic
+                                type: object
+                            required:
+                            - name
+                            type: object
+                          type: array
+                        type:
+                          type: string
+                      required:
+                      - name
+                      - type
+                      type: object
+                    type: array
                 type: object
               serviceAnnotations:
                 additionalProperties:
