@@ -1,4 +1,4 @@
-apiVersion: spinoperator.dev/v1
+apiVersion: spinoperator.dev/v1alpha1
 kind: SpinApp
 metadata:
   name: healthchecks-spinapp

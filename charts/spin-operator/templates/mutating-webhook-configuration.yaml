@@ -13,14 +13,14 @@ webhooks:
     service:
       name: '{{ include "spin-operator.fullname" . }}-webhook-service'
       namespace: '{{ .Release.Namespace }}'
-      path: /mutate-core-spinoperator-dev-v1-spinapp
+      path: /mutate-core-spinoperator-dev-v1alpha1-spinapp
   failurePolicy: Fail
   name: mspinapp.kb.io
   rules:
   - apiGroups:
     - core.spinoperator.dev
     apiVersions:
-    - v1
+    - v1alpha1
     operations:
     - CREATE
     - UPDATE
@@ -33,14 +33,14 @@ webhooks:
     service:
       name: '{{ include "spin-operator.fullname" . }}-webhook-service'
       namespace: '{{ .Release.Namespace }}'
-      path: /mutate-core-spinoperator-dev-v1-spinappexecutor
+      path: /mutate-core-spinoperator-dev-v1alpha1-spinappexecutor
   failurePolicy: Fail
   name: mspinappexecutor.kb.io
   rules:
   - apiGroups:
     - core.spinoperator.dev
     apiVersions:
-    - v1
+    - v1alpha1
     operations:
     - CREATE
     - UPDATE

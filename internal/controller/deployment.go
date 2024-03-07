@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/generics"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
 	corev1 "k8s.io/api/core/v1"
@@ -43,7 +43,7 @@ func constructRuntimeConfigSecretMount(_ctx context.Context, secretName string) 
 // any required volume mounts. A generated runtime secret is mutually
 // exclusive with a user-provided secret - this is to require _either_ a
 // manual runtime-config or a generated one from the crd.
-func ConstructVolumeMountsForApp(ctx context.Context, app *spinv1.SpinApp, generatedRuntimeSecret string) ([]corev1.Volume, []corev1.VolumeMount, error) {
+func ConstructVolumeMountsForApp(ctx context.Context, app *spinv1alpha1.SpinApp, generatedRuntimeSecret string) ([]corev1.Volume, []corev1.VolumeMount, error) {
 	volumes := []corev1.Volume{}
 	volumeMounts := []corev1.VolumeMount{}
 
@@ -72,7 +72,7 @@ func ConstructVolumeMountsForApp(ctx context.Context, app *spinv1.SpinApp, gener
 
 // ConstructEnvForApp constructs the env for a spin app that runs as a k8s pod.
 // Variables are not guaranteed to stay backed by ENV.
-func ConstructEnvForApp(ctx context.Context, app *spinv1.SpinApp) []corev1.EnvVar {
+func ConstructEnvForApp(ctx context.Context, app *spinv1alpha1.SpinApp) []corev1.EnvVar {
 	if len(app.Spec.Variables) == 0 {
 		return nil
 	}
@@ -93,7 +93,7 @@ func ConstructEnvForApp(ctx context.Context, app *spinv1.SpinApp) []corev1.EnvVa
 	return envs
 }
 
-func SpinHealthCheckToCoreProbe(probe *spinv1.HealthProbe) (*corev1.Probe, error) {
+func SpinHealthCheckToCoreProbe(probe *spinv1alpha1.HealthProbe) (*corev1.Probe, error) {
 	if probe == nil {
 		return nil, nil
 	}
@@ -110,7 +110,7 @@ func SpinHealthCheckToCoreProbe(probe *spinv1.HealthProbe) (*corev1.Probe, error
 			HTTPGet: &corev1.HTTPGetAction{
 				Path: probe.HTTPGet.Path,
 				Port: intstr.FromInt(spinapp.DefaultHTTPPort),
-				HTTPHeaders: generics.MapList(probe.HTTPGet.HTTPHeaders, func(h spinv1.HTTPHealthProbeHeader) corev1.HTTPHeader {
+				HTTPHeaders: generics.MapList(probe.HTTPGet.HTTPHeaders, func(h spinv1alpha1.HTTPHealthProbeHeader) corev1.HTTPHeader {
 					return corev1.HTTPHeader{
 						Name:  h.Name,
 						Value: h.Value,
@@ -126,7 +126,7 @@ func SpinHealthCheckToCoreProbe(probe *spinv1.HealthProbe) (*corev1.Probe, error
 	}, nil
 }
 
-func ConstructPodHealthChecks(app *spinv1.SpinApp) (readiness *corev1.Probe, liveness *corev1.Probe, err error) {
+func ConstructPodHealthChecks(app *spinv1alpha1.SpinApp) (readiness *corev1.Probe, liveness *corev1.Probe, err error) {
 	if app.Spec.Checks.Readiness == nil && app.Spec.Checks.Liveness == nil {
 		return nil, nil, nil
 	}

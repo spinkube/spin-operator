@@ -65,7 +65,7 @@ import (
 	"context"
 	"slices"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/generics"
 	"github.com/spinkube/spin-operator/internal/logging"
 	"golang.org/x/sync/errgroup"
@@ -79,7 +79,7 @@ type Builder interface {
 	// Build takes a spin app and attempts to fetch any dependent secrets and build
 	// a Spin-compatible representation of the configuration that can be rendered into
 	// a new Secret.
-	Build(ctx context.Context, app *spinv1.SpinApp) (*Spin, error)
+	Build(ctx context.Context, app *spinv1alpha1.SpinApp) (*Spin, error)
 }
 
 func NewBuilder(client client.Client) *K8sBuilder {
@@ -92,7 +92,7 @@ type K8sBuilder struct {
 	client client.Client
 }
 
-func (k *K8sBuilder) Build(ctx context.Context, app *spinv1.SpinApp) (rc *Spin, err error) {
+func (k *K8sBuilder) Build(ctx context.Context, app *spinv1alpha1.SpinApp) (rc *Spin, err error) {
 	logger := logging.FromContext(ctx).WithValues("component", "runtime_config_builder")
 	defer func() {
 		if err != nil {
@@ -195,7 +195,7 @@ func (e *dependencies) fetch(ctx context.Context, client client.Client) error {
 	return g.Wait()
 }
 
-func extractRuntimeConfigDependencies(app *spinv1.SpinApp) *dependencies {
+func extractRuntimeConfigDependencies(app *spinv1alpha1.SpinApp) *dependencies {
 	result := &dependencies{
 		Secrets:    make(map[types.NamespacedName]*corev1.Secret),
 		ConfigMaps: make(map[types.NamespacedName]*corev1.ConfigMap),
@@ -207,7 +207,7 @@ func extractRuntimeConfigDependencies(app *spinv1.SpinApp) *dependencies {
 		return result
 	}
 
-	var configOptions []spinv1.RuntimeConfigOption
+	var configOptions []spinv1alpha1.RuntimeConfigOption
 
 	if runtimeConfig.LLMCompute != nil {
 		configOptions = append(configOptions, runtimeConfig.LLMCompute.Options...)
@@ -219,7 +219,7 @@ func extractRuntimeConfigDependencies(app *spinv1.SpinApp) *dependencies {
 		configOptions = append(configOptions, sqlDB.Options...)
 	}
 
-	secretMapper := func(configOption spinv1.RuntimeConfigOption) *corev1.Secret {
+	secretMapper := func(configOption spinv1alpha1.RuntimeConfigOption) *corev1.Secret {
 		if configOption.ValueFrom == nil {
 			return nil
 		}
@@ -240,7 +240,7 @@ func extractRuntimeConfigDependencies(app *spinv1.SpinApp) *dependencies {
 		return nil
 	}
 
-	configMapMapper := func(configOption spinv1.RuntimeConfigOption) *corev1.ConfigMap {
+	configMapMapper := func(configOption spinv1alpha1.RuntimeConfigOption) *corev1.ConfigMap {
 		if configOption.ValueFrom == nil {
 			return nil
 		}

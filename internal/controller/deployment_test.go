@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -15,13 +15,13 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 )
 
-func minimalSpinApp() *spinv1.SpinApp {
-	return &spinv1.SpinApp{
+func minimalSpinApp() *spinv1alpha1.SpinApp {
+	return &spinv1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "my-app",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppSpec{
+		Spec: spinv1alpha1.SpinAppSpec{
 			Executor: "containerd-shim-spin",
 			Image:    "fakereg.dev/noapp:latest",
 			Replicas: 1,
@@ -133,7 +133,7 @@ func TestConstructEnvForApp(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			app := minimalSpinApp()
-			app.Spec.Variables = []spinv1.SpinVar{
+			app.Spec.Variables = []spinv1alpha1.SpinVar{
 				{
 					Name:      test.varName,
 					Value:     test.value,
@@ -155,7 +155,7 @@ func TestSpinHealthCheckToCoreProbe(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		probe         *spinv1.HealthProbe
+		probe         *spinv1alpha1.HealthProbe
 		expectedProbe *corev1.Probe
 		expectedErr   string
 	}{
@@ -166,16 +166,16 @@ func TestSpinHealthCheckToCoreProbe(t *testing.T) {
 		},
 		{
 			name:          "probe_missing_httpGet_spec",
-			probe:         &spinv1.HealthProbe{},
+			probe:         &spinv1alpha1.HealthProbe{},
 			expectedProbe: nil,
 			expectedErr:   "probe exists but with unknown configuration",
 		},
 		{
 			name: "probe_full",
-			probe: &spinv1.HealthProbe{
-				HTTPGet: &spinv1.HTTPHealthProbe{
+			probe: &spinv1alpha1.HealthProbe{
+				HTTPGet: &spinv1alpha1.HTTPHealthProbe{
 					Path: "/var",
-					HTTPHeaders: []spinv1.HTTPHealthProbeHeader{
+					HTTPHeaders: []spinv1alpha1.HTTPHealthProbeHeader{
 						{
 							Name:  "header",
 							Value: "value",
@@ -227,7 +227,7 @@ func TestSpinHealthCheckToCoreProbe(t *testing.T) {
 func TestDeploymentLabel(t *testing.T) {
 	scheme := registerAndGetScheme()
 	app := minimalSpinApp()
-	deployment, err := constructDeployment(context.Background(), app, &spinv1.ExecutorDeploymentConfig{}, "", scheme)
+	deployment, err := constructDeployment(context.Background(), app, &spinv1alpha1.ExecutorDeploymentConfig{}, "", scheme)
 
 	require.Nil(t, err)
 	require.NotNil(t, deployment.ObjectMeta.Labels)
@@ -237,7 +237,7 @@ func TestDeploymentLabel(t *testing.T) {
 func registerAndGetScheme() *runtime.Scheme {
 	scheme := runtime.NewScheme()
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	utilruntime.Must(spinv1.AddToScheme(scheme))
+	utilruntime.Must(spinv1alpha1.AddToScheme(scheme))
 
 	return scheme
 }

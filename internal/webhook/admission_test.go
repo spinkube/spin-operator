@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/constants"
 	"github.com/stretchr/testify/require"
 	admissionv1 "k8s.io/api/admission/v1"
@@ -64,7 +64,7 @@ func setupEnvTest(t *testing.T) *envTestState {
 
 	scheme := runtime.NewScheme()
 	require.NoError(t, clientscheme.AddToScheme(scheme))
-	err = spinv1.AddToScheme(scheme)
+	err = spinv1alpha1.AddToScheme(scheme)
 	require.NoError(t, err)
 
 	err = admissionv1.AddToScheme(scheme)
@@ -142,12 +142,12 @@ func TestCreateSpinAppWithNoExecutor(t *testing.T) {
 	envtest := setupEnvTest(t)
 	startWebhookServer(t, envtest)
 
-	err := envtest.k8sClient.Create(context.Background(), &spinv1.SpinApp{
+	err := envtest.k8sClient.Create(context.Background(), &spinv1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "spinapp",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppSpec{
+		Spec: spinv1alpha1.SpinAppSpec{
 			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
 			Replicas: 2,
 		},
@@ -162,7 +162,7 @@ func TestCreateSpinAppWithSingleExecutor(t *testing.T) {
 	envtest := setupEnvTest(t)
 	startWebhookServer(t, envtest)
 
-	err := envtest.k8sClient.Create(context.Background(), &spinv1.SpinAppExecutor{
+	err := envtest.k8sClient.Create(context.Background(), &spinv1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "cyclotron",
 			Namespace: "default",
@@ -170,19 +170,19 @@ func TestCreateSpinAppWithSingleExecutor(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = envtest.k8sClient.Create(context.Background(), &spinv1.SpinApp{
+	err = envtest.k8sClient.Create(context.Background(), &spinv1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "spinapp",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppSpec{
+		Spec: spinv1alpha1.SpinAppSpec{
 			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
 			Replicas: 2,
 		},
 	})
 	require.NoError(t, err)
 
-	spinapp := &spinv1.SpinApp{}
+	spinapp := &spinv1alpha1.SpinApp{}
 	err = envtest.k8sClient.Get(context.Background(), client.ObjectKey{
 		Name:      "spinapp",
 		Namespace: "default",
@@ -198,7 +198,7 @@ func TestCreateSpinAppWithMultipleExecutors(t *testing.T) {
 	envtest := setupEnvTest(t)
 	startWebhookServer(t, envtest)
 
-	err := envtest.k8sClient.Create(context.Background(), &spinv1.SpinAppExecutor{
+	err := envtest.k8sClient.Create(context.Background(), &spinv1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "containerd-shim-spin",
 			Namespace: "default",
@@ -206,7 +206,7 @@ func TestCreateSpinAppWithMultipleExecutors(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = envtest.k8sClient.Create(context.Background(), &spinv1.SpinAppExecutor{
+	err = envtest.k8sClient.Create(context.Background(), &spinv1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "cyclotron",
 			Namespace: "default",
@@ -214,19 +214,19 @@ func TestCreateSpinAppWithMultipleExecutors(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = envtest.k8sClient.Create(context.Background(), &spinv1.SpinApp{
+	err = envtest.k8sClient.Create(context.Background(), &spinv1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "spinapp",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppSpec{
+		Spec: spinv1alpha1.SpinAppSpec{
 			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
 			Replicas: 2,
 		},
 	})
 	require.NoError(t, err)
 
-	spinapp := &spinv1.SpinApp{}
+	spinapp := &spinv1alpha1.SpinApp{}
 	err = envtest.k8sClient.Get(context.Background(), client.ObjectKey{
 		Name:      "spinapp",
 		Namespace: "default",
@@ -243,7 +243,7 @@ func TestCreateInvalidSpinApp(t *testing.T) {
 	envtest := setupEnvTest(t)
 	startWebhookServer(t, envtest)
 
-	err := envtest.k8sClient.Create(context.Background(), &spinv1.SpinAppExecutor{
+	err := envtest.k8sClient.Create(context.Background(), &spinv1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "containerd-shim-spin",
 			Namespace: "default",
@@ -251,12 +251,12 @@ func TestCreateInvalidSpinApp(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	err = envtest.k8sClient.Create(context.Background(), &spinv1.SpinApp{
+	err = envtest.k8sClient.Create(context.Background(), &spinv1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "spinapp",
 			Namespace: "default",
 		},
-		Spec: spinv1.SpinAppSpec{
+		Spec: spinv1alpha1.SpinAppSpec{
 			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
 			Replicas: -1,
 		},

@@ -3,7 +3,7 @@ package webhook
 import (
 	"context"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/logging"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -15,7 +15,7 @@ import (
 )
 
 // nolint:lll
-//+kubebuilder:webhook:path=/validate-core-spinoperator-dev-v1-spinapp,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.spinoperator.dev,resources=spinapps,verbs=create;update,versions=v1,name=vspinapp.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/validate-core-spinoperator-dev-v1alpha1-spinapp,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.spinoperator.dev,resources=spinapps,verbs=create;update,versions=v1alpha1,name=vspinapp.kb.io,admissionReviewVersions=v1
 
 // SpinAppValidator validates SpinApps
 type SpinAppValidator struct {
@@ -26,7 +26,7 @@ type SpinAppValidator struct {
 func (v *SpinAppValidator) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	log := logging.FromContext(ctx)
 
-	spinApp := obj.(*spinv1.SpinApp)
+	spinApp := obj.(*spinv1alpha1.SpinApp)
 	log.Info("validate create", "name", spinApp.Name)
 
 	return nil, v.validateSpinApp(ctx, spinApp)
@@ -36,7 +36,7 @@ func (v *SpinAppValidator) ValidateCreate(ctx context.Context, obj runtime.Objec
 func (v *SpinAppValidator) ValidateUpdate(ctx context.Context, oldObj, newObj runtime.Object) (admission.Warnings, error) {
 	log := logging.FromContext(ctx)
 
-	spinApp := newObj.(*spinv1.SpinApp)
+	spinApp := newObj.(*spinv1alpha1.SpinApp)
 	log.Info("validate update", "name", spinApp.Name)
 
 	return nil, v.validateSpinApp(ctx, spinApp)
@@ -46,13 +46,13 @@ func (v *SpinAppValidator) ValidateUpdate(ctx context.Context, oldObj, newObj ru
 func (v *SpinAppValidator) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	log := logging.FromContext(ctx)
 
-	spinApp := obj.(*spinv1.SpinApp)
+	spinApp := obj.(*spinv1alpha1.SpinApp)
 	log.Info("validate delete", "name", spinApp.Name)
 
 	return nil, nil
 }
 
-func (v *SpinAppValidator) validateSpinApp(ctx context.Context, spinApp *spinv1.SpinApp) error {
+func (v *SpinAppValidator) validateSpinApp(ctx context.Context, spinApp *spinv1alpha1.SpinApp) error {
 	var allErrs field.ErrorList
 	executor, err := validateExecutor(spinApp.Spec, v.fetchExecutor(ctx, spinApp.Namespace))
 	if err != nil {
@@ -76,9 +76,9 @@ func (v *SpinAppValidator) validateSpinApp(ctx context.Context, spinApp *spinv1.
 // fetchExecutor returns a function that fetches a named executor in the provided namespace.
 //
 // We assume that the executor must exist in the same namespace as the SpinApp.
-func (v *SpinAppValidator) fetchExecutor(ctx context.Context, spinAppNs string) func(name string) (*spinv1.SpinAppExecutor, error) {
-	return func(name string) (*spinv1.SpinAppExecutor, error) {
-		var executor spinv1.SpinAppExecutor
+func (v *SpinAppValidator) fetchExecutor(ctx context.Context, spinAppNs string) func(name string) (*spinv1alpha1.SpinAppExecutor, error) {
+	return func(name string) (*spinv1alpha1.SpinAppExecutor, error) {
+		var executor spinv1alpha1.SpinAppExecutor
 		if err := v.Client.Get(ctx, client.ObjectKey{Name: name, Namespace: spinAppNs}, &executor); err != nil {
 			return nil, err
 		}
@@ -87,7 +87,7 @@ func (v *SpinAppValidator) fetchExecutor(ctx context.Context, spinAppNs string) 
 	}
 }
 
-func validateExecutor(spec spinv1.SpinAppSpec, fetchExecutor func(name string) (*spinv1.SpinAppExecutor, error)) (*spinv1.SpinAppExecutor, *field.Error) {
+func validateExecutor(spec spinv1alpha1.SpinAppSpec, fetchExecutor func(name string) (*spinv1alpha1.SpinAppExecutor, error)) (*spinv1alpha1.SpinAppExecutor, *field.Error) {
 	if spec.Executor == "" {
 		return nil, field.Invalid(
 			field.NewPath("spec").Child("executor"),
@@ -103,7 +103,7 @@ func validateExecutor(spec spinv1.SpinAppSpec, fetchExecutor func(name string) (
 	return executor, nil
 }
 
-func validateReplicas(spec spinv1.SpinAppSpec) *field.Error {
+func validateReplicas(spec spinv1alpha1.SpinAppSpec) *field.Error {
 	if spec.EnableAutoscaling && spec.Replicas != 0 {
 		return field.Invalid(field.NewPath("spec").Child("replicas"), spec.Replicas, "replicas cannot be set when autoscaling is enabled")
 	}
@@ -114,7 +114,7 @@ func validateReplicas(spec spinv1.SpinAppSpec) *field.Error {
 	return nil
 }
 
-func validateAnnotations(spec spinv1.SpinAppSpec, executor *spinv1.SpinAppExecutor) *field.Error {
+func validateAnnotations(spec spinv1alpha1.SpinAppSpec, executor *spinv1alpha1.SpinAppExecutor) *field.Error {
 	// We can't do any validation if the executor isn't available, but validation
 	// will fail because of earlier errors.
 	if executor == nil {

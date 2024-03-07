@@ -3,7 +3,7 @@ package runtimeconfig
 import (
 	"fmt"
 
-	spinv1 "github.com/spinkube/spin-operator/api/v1"
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/pkg/secret"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -37,7 +37,7 @@ func (s *Spin) AddKeyValueStore(
 	name, storeType, namespace string,
 	secrets map[types.NamespacedName]*corev1.Secret,
 	configMaps map[types.NamespacedName]*corev1.ConfigMap,
-	opts []spinv1.RuntimeConfigOption) error {
+	opts []spinv1alpha1.RuntimeConfigOption) error {
 	if s.KeyValueStores == nil {
 		s.KeyValueStores = make(map[string]KeyValueStoreOptions)
 	}
@@ -59,7 +59,7 @@ func (s *Spin) AddSQLiteDatabase(
 	name, storeType, namespace string,
 	secrets map[types.NamespacedName]*corev1.Secret,
 	configMaps map[types.NamespacedName]*corev1.ConfigMap,
-	opts []spinv1.RuntimeConfigOption) error {
+	opts []spinv1alpha1.RuntimeConfigOption) error {
 	if s.SQLiteDatabases == nil {
 		s.SQLiteDatabases = make(map[string]SQLiteDatabaseOptions)
 	}
@@ -79,7 +79,7 @@ func (s *Spin) AddSQLiteDatabase(
 func (s *Spin) AddLLMCompute(computeType, namespace string,
 	secrets map[types.NamespacedName]*corev1.Secret,
 	configMaps map[types.NamespacedName]*corev1.ConfigMap,
-	opts []spinv1.RuntimeConfigOption) error {
+	opts []spinv1alpha1.RuntimeConfigOption) error {
 	computeOpts, err := renderOptionsIntoMap(computeType, namespace, opts, secrets, configMaps)
 	if err != nil {
 		return err
@@ -90,7 +90,7 @@ func (s *Spin) AddLLMCompute(computeType, namespace string,
 }
 
 func renderOptionsIntoMap(typeOpt, namespace string,
-	opts []spinv1.RuntimeConfigOption,
+	opts []spinv1alpha1.RuntimeConfigOption,
 	secrets map[types.NamespacedName]*corev1.Secret, configMaps map[types.NamespacedName]*corev1.ConfigMap) (map[string]secret.String, error) {
 	options := map[string]secret.String{
 		"type": secret.String(typeOpt),
