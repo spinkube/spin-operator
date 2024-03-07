@@ -4,6 +4,8 @@ The Spin Operator enables deploying Spin applications to Kubernetes. It watches 
 
 To get started, check out the [Spin Operator quickstart](http://spinkube.dev/docs/spin-operator/quickstart/)
 
+![Conceptual Overview Diagram of Spin Operator](/static/image/spin-operator-diagram.png)
+
 ## Documentation
 
 To learn more about the Spin Operator and the SpinKube organization, please visit [the official SpinKube documentation](https://spinkube.dev). 
