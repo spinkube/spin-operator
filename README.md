@@ -2,6 +2,8 @@
 
 The Spin Operator enables deploying Spin applications to Kubernetes. It watches [SpinApp Custom Resources](https://github.com/spinkube/documentation/blob/main/content/en/docs/spin-operator/reference/custom-resource-definition.md) and realizes the desired state in the Kubernetes cluster. This project was built using the Kubebuilder framework and contains a Spin App CRD and controller.
 
+![spin-operator diagram](https://github.com/spinkube/spin-operator/assets/686194/bf07365f-1d07-421a-864f-d77c0a27a764)
+
 ## Documentation
 
 To learn more about the Spin Operator and the SpinKube organization, please visit [the official Spin Operator documentation](https://github.com/spinkube/documentation/tree/main/content/en/docs/spin-operator) which is housed inside the [the official SpinKube documentation](https://github.com/spinkube/documentation/tree/main/content/en/docs).
