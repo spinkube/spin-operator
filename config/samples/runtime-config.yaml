@@ -7,13 +7,13 @@ spec:
   replicas: 1
   executor: containerd-shim-spin
   runtimeConfig:
-    sqliteDatabase:
+    sqliteDatabases:
       - name: "default"
         type: "libsql"
         options:
-          - key: "url"
+          - name: "url"
             value: "https://sensational-penguin-ahacker.libsql.example.com"
-          - key: "token"
+          - name: "token"
             valueFrom:
               secretKeyRef:
                 name: "my-super-secret"
@@ -22,9 +22,9 @@ spec:
     llmCompute:
       type: "remote_http"
       options:
-        - key: "url"
+        - name: "url"
           value: "https://llm-app.fermyon.app"
-        - key: "token"
+        - name: "token"
           valueFrom:
             secretKeyRef:
               name: "my-super-secret"
@@ -34,7 +34,7 @@ spec:
       - name: "default"
         type: "redis"
         options:
-          - key: "url"
+          - name: "url"
             valueFrom:
               secretKeyRef:
                 name: "my-super-secret"
