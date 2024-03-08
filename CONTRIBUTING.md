@@ -4,8 +4,8 @@ We are delighted that you are interested in making spin-operator better! Thank y
 making your first contribution to the project. We welcome and appreciate contributions of all types - opening issues,
 fixing typos, adding examples, one-liner code fixes, tests, or complete features.
 
-First, any contribution and interaction on any Fermyon project MUST follow our [Code of
-Conduct](https://www.fermyon.com/code-of-conduct). Thank you for being part of an inclusive and open community!
+First, any contribution and interaction on any SpinKube project MUST follow our [Code of
+Conduct](https://github.com/spinkube/governance/blob/main/CODE_OF_CONDUCT.md). Thank you for being part of an inclusive and open community!
 
 If you plan on contributing anything complex, please go through the [open
 issues](https://github.com/spinkube/spin-operator/issues) and [PR queue](https://github.com/spinkube/spin-operator/pulls)
@@ -18,10 +18,10 @@ the maintainers before you start working on your feature.
 The following guide is intended to make sure your contribution can get merged as soon as possible. First, make sure you
 have the following prerequisites configured:
 
-- `go` version v1.20.0+
-- `docker` version 17.03+.
-- `kubectl` version v1.11.3+.
-- Access to a Kubernetes v1.11.3+ cluster (This project is being developed using [`k3d`](https://k3d.io/v5.6.0/))
+- `go` version v1.22.0+
+- `docker` version 17.03+
+- `kubectl` version v1.28.0+
+- Access to a Kubernetes v1.28.0+ cluster
 - `make`
 - please ensure you [configure adding a GPG signature to your
   commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification)
