@@ -166,7 +166,7 @@ helm-publish: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz ## Publish the h
 
 .PHONY: dist
 ## Assemble Helm chart and manifests into $(STAGING_DIR) for distribution/release
-dist: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz $(STAGING_DIR)/spin-operator.runtime-class.yaml $(STAGING_DIR)/spin-operator.crds.yaml
+dist: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz $(STAGING_DIR)/spin-operator.runtime-class.yaml $(STAGING_DIR)/spin-operator.crds.yaml $(STAGING_DIR)/spin-operator.shim-executor.yaml
 
 $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION): helm-generate
 	mkdir -p $(STAGING_DIR)
