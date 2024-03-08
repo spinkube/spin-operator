@@ -264,13 +264,11 @@ func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1
 
 		err = r.Client.Create(ctx, secret)
 		if err != nil {
-			if client.IgnoreAlreadyExists(err) == nil {
-				log.Debug("RuntimeConfig Secret already exists", "runtime_config_secret_name", secret.ObjectMeta.Name)
+			if client.IgnoreAlreadyExists(err) != nil {
+				return fmt.Errorf("failed to create RuntimeConfig secret: %w", err)
 			}
-			return fmt.Errorf("failed to create RuntimeConfig secret: %w", err)
+			log.Debug("RuntimeConfig Secret already exists", "runtime_config_secret_name", secret.ObjectMeta.Name)
 		}
-
-		log.Info("created runtimeconfig secret")
 	}
 
 	desiredDeployment, err := constructDeployment(ctx, app, config, generatedRuntimeConfigSecretName, r.Scheme)

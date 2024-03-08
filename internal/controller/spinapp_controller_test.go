@@ -286,6 +286,114 @@ url = 'redis://localhost:9000'
 	wg.Wait()
 }
 
+func TestReconcile_Integration_RuntimeConfig_SecretAlreadyExists(t *testing.T) {
+	t.Parallel()
+
+	envTest, mgr, _ := setupController(t)
+
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFunc()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		require.NoError(t, mgr.Start(ctx))
+		wg.Done()
+	}()
+
+	// Create an executor that creates a deployment with a given runtimeClassName
+	executor := &spinv1alpha1.SpinAppExecutor{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "executor",
+			Namespace: "default",
+		},
+		Spec: spinv1alpha1.SpinAppExecutorSpec{
+			CreateDeployment: true,
+			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
+				RuntimeClassName: "a-runtime-class",
+			},
+		},
+	}
+
+	require.NoError(t, envTest.k8sClient.Create(ctx, executor))
+
+	spinApp := &spinv1alpha1.SpinApp{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "app",
+			Namespace: "default",
+		},
+		Spec: spinv1alpha1.SpinAppSpec{
+			Executor: "executor",
+			Image:    "ghcr.io/radu-matei/perftest:v1",
+			RuntimeConfig: spinv1alpha1.RuntimeConfig{
+				KeyValueStores: []spinv1alpha1.KeyValueStoreConfig{
+					{
+						Name: "default",
+						Type: "redis",
+						Options: []spinv1alpha1.RuntimeConfigOption{
+							{
+								Name:  "url",
+								Value: "redis://localhost:9000",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Create an app that uses the executor
+	require.NoError(t, envTest.k8sClient.Create(ctx, spinApp))
+
+	// Wait for the underlying deployment to exist
+	var deployment appsv1.Deployment
+	require.Eventually(t, func() bool {
+		err := envTest.k8sClient.Get(ctx,
+			types.NamespacedName{
+				Namespace: "default",
+				Name:      "app"},
+			&deployment)
+		return err == nil
+	}, 3*time.Second, 100*time.Millisecond)
+
+	var runtimeConfigVolume corev1.Volume
+	for _, volume := range deployment.Spec.Template.Spec.Volumes {
+		if volume.Name == "spin-runtime-config" {
+			runtimeConfigVolume = volume
+		}
+	}
+	require.NotNil(t, runtimeConfigVolume.VolumeSource.Secret, "expected the deployment to have a runtime config")
+
+	var rcSecret corev1.Secret
+	require.NoError(t, envTest.k8sClient.Get(ctx, types.NamespacedName{
+		Name:      runtimeConfigVolume.VolumeSource.Secret.SecretName,
+		Namespace: "default"}, &rcSecret))
+
+	//update the spinapp
+	require.NoError(t, envTest.k8sClient.Get(ctx,
+		types.NamespacedName{
+			Namespace: "default",
+			Name:      "app"},
+		spinApp), "fetch spinapp to update")
+
+	spinApp.Spec.Image = "ghcr.io/radu-matei/updated-image:v2"
+	require.NoError(t, envTest.k8sClient.Update(ctx, spinApp))
+
+	// Wait for the underlying deployment to exist and have updated image
+	require.Eventually(t, func() bool {
+		err := envTest.k8sClient.Get(ctx,
+			types.NamespacedName{
+				Namespace: "default",
+				Name:      "app"},
+			&deployment)
+		return err == nil && deployment.Spec.Template.Spec.Containers[0].Image == "ghcr.io/radu-matei/updated-image:v2"
+	}, 3*time.Second, 100*time.Millisecond)
+
+	// Terminate the context to force the manager to shut down.
+	cancelFunc()
+	wg.Wait()
+}
+
 func TestConstructDeployment_MinimalApp(t *testing.T) {
 	t.Parallel()
 
