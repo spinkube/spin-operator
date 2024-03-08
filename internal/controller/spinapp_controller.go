@@ -31,6 +31,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	"github.com/pelletier/go-toml/v2"
 	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
@@ -71,6 +72,7 @@ func (r *SpinAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		// Owns allows watching dependency resources for any changes
 		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.Service{}).
+		Owns(&corev1.Secret{}).
 		Complete(r)
 }
 
@@ -247,7 +249,6 @@ func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1
 		// Adler32 is probably fine here - if we run into collision issues then we
 		// can switch to hashing-and-truncating.
 		generatedRuntimeConfigSecretName = fmt.Sprintf("%s-%x", app.ObjectMeta.Name, adler32.Checksum(tomlValue))
-
 		secret := &corev1.Secret{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Secret",
@@ -256,10 +257,17 @@ func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: app.ObjectMeta.Namespace,
 				Name:      generatedRuntimeConfigSecretName,
+				Labels: map[string]string{
+					spinapp.NameLabelKey: app.ObjectMeta.Name,
+				},
 			},
 			Data: map[string][]byte{
 				"runtime-config.toml": tomlValue,
 			},
+		}
+		err = controllerutil.SetOwnerReference(app, secret, r.Scheme)
+		if err != nil {
+			return fmt.Errorf("failed to set runtimeconfig owner reference: %w", err)
 		}
 
 		err = r.Client.Create(ctx, secret)
