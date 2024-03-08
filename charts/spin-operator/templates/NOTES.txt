@@ -8,15 +8,16 @@ To learn more about the release, try:
   $ helm --namespace {{ .Release.Namespace }} get all {{ .Release.Name }}
 
 Note: spin-operator requires a few additional resources to be present on the
-Kubernetes cluster before it can run the first Spin application.
+Kubernetes cluster before it can run the first Spin application. If you haven't
+already done so, please ensure the following:
 
 1. Install the containerd-shim-spin SpinAppExecutor:
 
-  $ kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/{{ .Chart.AppVersion }}/config/samples/spin-shim-executor.yaml
+  $ kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/main/config/samples/spin-shim-executor.yaml
 
 2. Install the wasmtime-spin-v2 RuntimeClass:
 
-  $ kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/{{ .Chart.AppVersion }}/config/samples/spin-runtime-class.yaml
+  $ kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/main/config/samples/spin-runtime-class.yaml
 
 You are now ready to deploy your first Spin app!
 

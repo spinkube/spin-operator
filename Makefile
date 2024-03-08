@@ -172,8 +172,7 @@ $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION): helm-generate
 	cp -r charts/$(CHART_NAME) $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)
 
 $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)
-	sed -r -i.bak -e 's%^version: .*%version: $(CHART_VERSION)%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
-	sed -r -i.bak -e 's%^appVersion: .*%appVersion: "$(APP_VERSION)"%g' $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION)/Chart.yaml
+	CHART_NAME=$(CHART_NAME) CHART_VERSION=$(CHART_VERSION) APP_VERSION=$(APP_VERSION) STAGING_DIR=$(STAGING_DIR) ./scripts/update-chart-versions.sh
 	$(HELM) package \
 		--version $(CHART_VERSION) \
 		--destination $(STAGING_DIR) \
