@@ -291,3 +291,7 @@ $(ENVTEST): $(LOCALBIN)
 helmify: $(HELMIFY) ## Download helmify locally if necessary.
 $(HELMIFY): $(LOCALBIN)
 	@test -s $(LOCALBIN)/helmify || GOBIN=$(LOCALBIN) go install github.com/arttor/helmify/cmd/helmify@$(HELMIFY_VESRION)
+
+.PHONY: e2e
+e2e: ## Run e2e tests
+	go test -v ./e2e/...
