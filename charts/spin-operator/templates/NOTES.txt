@@ -18,12 +18,6 @@ Kubernetes cluster before it can run the first Spin application.
 
   $ kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/{{ .Chart.AppVersion }}/config/samples/spin-runtime-class.yaml
 
-3. Finally, install the containerd wasm shim on at least one node. This shim is
-necessary for running Spin application workloads. We use the Kwasm Operator
-to handle this installation, via node annotations.
-
-  $ kubectl annotate node <node> kwasm.sh/kwasm-node=true
-
 You are now ready to deploy your first Spin app!
 
 For further details, see this chart's README:

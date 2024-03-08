@@ -12,6 +12,8 @@ Prior to installing the chart, you'll need to ensure the following:
 
 - [Cert Manager](https://github.com/cert-manager/cert-manager) to automatically provision and manage TLS certificates (used by spin-operator's admission webhook system). Cert Manager must be running and the corresponding CRDs must be present on the cluster before installing the spin-operator chart.
 
+- [Kwasm Operator](https://github.com/kwasm/kwasm-operator) to install WebAssembly support on Kubernetes nodes. See the [project README.md](https://github.com/KWasm/kwasm-operator/blob/main/README.md) for installation and configuration steps, including annotating nodes to run Spin/wasm workloads.
+
 - spin-operator CustomResourceDefinition (CRD) resources are installed. This includes the SpinApp CRD representing Spin applications to be scheduled on the cluster.
 
   <!-- TODO: templatize with release version corresponding to chart's appVersion -->
@@ -19,12 +21,6 @@ Prior to installing the chart, you'll need to ensure the following:
   ```console
   $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0-rc.1/spin-operator.crds.yaml
   ```
-
-## Chart dependencies
-
-The spin-operator chart currently includes the following sub-charts:
-
-- [Kwasm Operator](https://github.com/kwasm/kwasm-operator) to install WebAssembly support on Kubernetes nodes
 
 ## Installing the chart
 

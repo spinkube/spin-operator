@@ -1,6 +1,0 @@
-dependencies:
-- name: kwasm-operator
-  repository: http://kwasm.sh/kwasm-operator
-  version: 0.2.3
-digest: sha256:6e1bb3a6d08822006f2f9a899b4edba1f2612a9c7117b50a4ede0d4d1db0faf1
-generated: "2024-02-29T11:38:42.924018827-08:00"

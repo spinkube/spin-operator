@@ -156,7 +156,6 @@ helm-generate: manifests kustomize helmify ## Create/update the Helm chart based
 	rm -rf charts/$(CHART_NAME)/crds
 	@# Swap in a values.yaml that we curate/control
 	cp config/chart/values.yaml charts/$(CHART_NAME)/values.yaml
-	$(HELM) dep up charts/$(CHART_NAME)
 
 .PHONY: helm-publish
 helm-publish: $(STAGING_DIR)/$(CHART_NAME)-$(CHART_VERSION).tgz ## Publish the helm chart to an OCI registry
