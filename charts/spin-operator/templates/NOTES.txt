@@ -12,11 +12,11 @@ Kubernetes cluster before it can run the first Spin application.
 
 1. Install the containerd-shim-spin SpinAppExecutor:
 
-  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/{{ .Chart.AppVersion }}/spin-operator.executor.yaml
+  $ kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/{{ .Chart.AppVersion }}/config/samples/spin-shim-executor.yaml
 
 2. Install the wasmtime-spin-v2 RuntimeClass:
 
-  $ kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/{{ .Chart.AppVersion }}/spin-operator.runtime-class.yaml
+  $ kubectl apply -f https://raw.githubusercontent.com/spinkube/spin-operator/{{ .Chart.AppVersion }}/config/samples/spin-runtime-class.yaml
 
 3. Finally, install the containerd wasm shim on at least one node. This shim is
 necessary for running Spin application workloads. We use the Kwasm Operator
