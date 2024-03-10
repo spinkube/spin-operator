@@ -99,9 +99,3 @@ webhookService:
     protocol: TCP
     targetPort: 9443
   type: ClusterIP
-
-## Sub-chart(s) configuration
-
-## kwasm-operator configuration overrides can be added below.
-## See https://github.com/KWasm/kwasm-operator/blob/main/charts/kwasm-operator/values.yaml
-# kwasm-operator:
