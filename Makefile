@@ -211,7 +211,7 @@ deploy: manifests kustomize ## Deploy controller to the K8s cluster specified in
 	@cd config/manager && $(KUSTOMIZE) edit set image ghcr.io/spinkube/spin-operator=${IMG}
 	@echo "==> Applying Configuration"
 	@$(KUSTOMIZE) build config/default | $(KUBECTL) apply -f -
-	@echo -e "\n\nSpin Operator has been deployed - you may now want to:\n\n\tkubectl apply -f spin-runtime-class.yaml"
+	@echo -e "\n\nSpin Operator has been deployed - you may now want to:\n\n\tkubectl apply -f config/samples/spin-runtime-class.yaml"
 	@echo -e "\tkubectl apply -f config/samples/spin-shim-executor.yaml\n\nto install an example runtime class and executor that uses it."
 
 .PHONY: undeploy
