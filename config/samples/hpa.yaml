@@ -3,8 +3,7 @@ kind: SpinApp
 metadata:
   name: hpa-spinapp
 spec:
-  # TODO: Depend on a ghcr.io version of this image
-  image: "ttl.sh/cpu-load-gen:1h"
+  image: ghcr.io/spinkube/spin-operator/cpu-load-gen:20240311-163328-g1121986
   executor: containerd-shim-spin
   enableAutoscaling: true
   resources:
