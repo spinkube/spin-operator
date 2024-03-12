@@ -76,6 +76,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Fetching all history as we may use the latest tag for versioning
+          # Unfortunately, just using 'fetch-tags: true' on the actions/checkout configuration
+          # above doesn't get what we need; see https://github.com/actions/checkout/issues/1471
+          fetch-depth: 0
 
       - name: Install helm
         uses: Azure/setup-helm@v4
@@ -97,8 +102,8 @@ jobs:
             # NOTE: We remove the leading 'v' to comply with helm's versioning requirements
             echo "CHART_VERSION=$(echo -n ${{ github.ref_name }} | sed -rn 's/(v)?(.*)/\2/p')" >> $GITHUB_ENV
           else
-            # TODO: swap '0.0.0' with '$(git describe --tags --abbrev=0 | sed -rn 's/(v)?(.*)/\2/p')' when we have our first tag
-            echo "CHART_VERSION=0.0.0-${{ env.APP_VERSION }}" >> $GITHUB_ENV
+            # NOTE: 'git describe --tags --abbrev=0' always seems to return a commit; hence approach used below
+            echo "CHART_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1) | sed -rn 's/(v)?(.*)/\2/p')-${{ env.APP_VERSION }}" >> $GITHUB_ENV
           fi
 
       - name: Log into registry ${{ env.REGISTRY }}
