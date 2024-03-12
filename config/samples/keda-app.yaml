@@ -6,7 +6,6 @@ spec:
   image: ghcr.io/spinkube/spin-operator/cpu-load-gen:20240311-163328-g1121986
   executor: containerd-shim-spin
   enableAutoscaling: true
-  replicas: 1
   resources:
     limits:
       cpu: 500m
