@@ -129,6 +129,13 @@ jobs:
       - name: Publish chart
         run: make helm-publish
 
+      - name: Artifact summary - ${{ env.RELEASE_VERSION }}
+        run: |
+          echo '### Spin Operator artifacts published:' >> $GITHUB_STEP_SUMMARY
+          echo '- `Docker image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.APP_VERSION }}`' >> $GITHUB_STEP_SUMMARY
+          echo '- `Helm chart reference: ${{ env.CHART_REGISTRY }}/spin-operator`' >> $GITHUB_STEP_SUMMARY
+          echo '- `Helm chart version: ${{ env.CHART_VERSION }}`' >> $GITHUB_STEP_SUMMARY
+
   release:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
