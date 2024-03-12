@@ -38,5 +38,5 @@ jobs:
             registry: ${{ env.REGISTRY }}
             registry_username: ${{ github.actor }}
             registry_password: ${{ secrets.GITHUB_TOKEN }}
-            registry_reference: "ghcr.io/spinkube/spin-operator/${{ matrix.app }}:${{ env.RELEASE_VERSION }}"
+            registry_reference: "ghcr.io/${{ github.repository_owner }}/spin-operator/${{ matrix.app }}:${{ env.RELEASE_VERSION }}"
             manifest_file: apps/${{ matrix.app }}/spin.toml
