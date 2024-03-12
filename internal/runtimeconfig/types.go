@@ -100,22 +100,24 @@ func renderOptionsIntoMap(typeOpt, namespace string,
 		var value string
 		if opt.Value != "" {
 			value = opt.Value
-		} else if cmKeyRef := opt.ValueFrom.ConfigMapKeyRef; cmKeyRef != nil {
-			cm, ok := configMaps[types.NamespacedName{Name: cmKeyRef.Name, Namespace: namespace}]
-			if !ok {
-				// This error shouldn't happen - we validate dependencies ahead of time, add this as a fallback error
-				return nil, fmt.Errorf("unmet dependency while building config: configmap (%s/%s) not found", namespace, cmKeyRef.Name)
-			}
+		} else if valueFrom := opt.ValueFrom; valueFrom != nil {
+			if cmKeyRef := valueFrom.ConfigMapKeyRef; cmKeyRef != nil {
+				cm, ok := configMaps[types.NamespacedName{Name: cmKeyRef.Name, Namespace: namespace}]
+				if !ok {
+					// This error shouldn't happen - we validate dependencies ahead of time, add this as a fallback error
+					return nil, fmt.Errorf("unmet dependency while building config: configmap (%s/%s) not found", namespace, cmKeyRef.Name)
+				}
 
-			value = cm.Data[cmKeyRef.Key]
-		} else if secKeyRef := opt.ValueFrom.SecretKeyRef; secKeyRef != nil {
-			sec, ok := secrets[types.NamespacedName{Name: secKeyRef.Name, Namespace: namespace}]
-			if !ok {
-				// This error shouldn't happen - we validate dependencies ahead of time, add this as a fallback error
-				return nil, fmt.Errorf("unmet dependency while building config: secret (%s/%s) not found", namespace, secKeyRef.Name)
-			}
+				value = cm.Data[cmKeyRef.Key]
+			} else if secKeyRef := valueFrom.SecretKeyRef; secKeyRef != nil {
+				sec, ok := secrets[types.NamespacedName{Name: secKeyRef.Name, Namespace: namespace}]
+				if !ok {
+					// This error shouldn't happen - we validate dependencies ahead of time, add this as a fallback error
+					return nil, fmt.Errorf("unmet dependency while building config: secret (%s/%s) not found", namespace, secKeyRef.Name)
+				}
 
-			value = string(sec.Data[secKeyRef.Key])
+				value = string(sec.Data[secKeyRef.Key])
+			}
 		}
 
 		options[opt.Name] = secret.String(value)
