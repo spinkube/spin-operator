@@ -148,7 +148,7 @@ func TestCreateSpinAppWithNoExecutor(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: spinv1alpha1.SpinAppSpec{
-			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
+			Image:    "ghcr.io/spinkube/containerd-shim-spin/examples/spin-rust-hello:v0.13.0",
 			Replicas: 2,
 		},
 	})
@@ -176,7 +176,7 @@ func TestCreateSpinAppWithSingleExecutor(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: spinv1alpha1.SpinAppSpec{
-			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
+			Image:    "ghcr.io/spinkube/containerd-shim-spin/examples/spin-rust-hello:v0.13.0",
 			Replicas: 2,
 		},
 	})
@@ -220,7 +220,7 @@ func TestCreateSpinAppWithMultipleExecutors(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: spinv1alpha1.SpinAppSpec{
-			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
+			Image:    "ghcr.io/spinkube/containerd-shim-spin/examples/spin-rust-hello:v0.13.0",
 			Replicas: 2,
 		},
 	})
@@ -257,7 +257,7 @@ func TestCreateInvalidSpinApp(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: spinv1alpha1.SpinAppSpec{
-			Image:    "ghcr.io/deislabs/containerd-wasm-shims/examples/spin-rust-hello:v0.10.0",
+			Image:    "ghcr.io/spinkube/containerd-shim-spin/examples/spin-rust-hello:v0.13.0",
 			Replicas: -1,
 		},
 	})
