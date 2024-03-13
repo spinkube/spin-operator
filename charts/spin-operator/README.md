@@ -30,7 +30,7 @@ $ helm install spin-operator \
   --namespace spin-operator \
   --create-namespace \
   --version {{ CHART_VERSION }} \
-  oci://ghcr.io/spinkube/spin-operator
+  oci://ghcr.io/spinkube/charts/spin-operator
 ```
 
 ## Post-installation
@@ -64,7 +64,7 @@ To upgrade the `spin-operator` release, run the following:
 $ helm upgrade spin-operator \
   --namespace spin-operator \
   --version {{ CHART_VERSION }} \
-  oci://ghcr.io/spinkube/spin-operator
+  oci://ghcr.io/spinkube/charts/spin-operator
 ```
 
 ## Uninstalling the chart
