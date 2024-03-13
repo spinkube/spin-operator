@@ -1,7 +1,6 @@
 ## Append samples of your project ##
 resources:
 - annotations.yaml
-- cyclotron.yaml
 - hpa.yaml
 - private-image.yaml
 - probes.yaml
