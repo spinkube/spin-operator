@@ -23,4 +23,4 @@ You are now ready to deploy your first Spin app!
 
 For further details, see this chart's README:
 
-  $ helm show readme oci://ghcr.io/spinkube/spin-operator
+  $ helm show readme oci://ghcr.io/spinkube/charts/spin-operator
