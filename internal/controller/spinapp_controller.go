@@ -279,7 +279,10 @@ func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1
 		}
 	}
 
-	desiredDeployment, err := constructDeployment(ctx, app, config, generatedRuntimeConfigSecretName, r.Scheme)
+	// TODO: make this configurable
+	caSecretName := "spin-ca"
+
+	desiredDeployment, err := constructDeployment(ctx, app, config, generatedRuntimeConfigSecretName, caSecretName, r.Scheme)
 	if err != nil {
 		return fmt.Errorf("failed to construct Deployment: %w", err)
 	}
@@ -346,7 +349,7 @@ func (r *SpinAppReconciler) deleteDeployment(ctx context.Context, app *spinv1alp
 
 // constructDeployment builds an appsv1.Deployment based on the configuration of a SpinApp.
 func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config *spinv1alpha1.ExecutorDeploymentConfig,
-	generatedRuntimeConfigSecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+	generatedRuntimeConfigSecretName string, caSecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	// TODO: Once we land admission webhooks write some validation to make
 	// replicas and enableAutoscaling mutually exclusive.
 	var replicas *int32
@@ -356,7 +359,7 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 		replicas = ptr(app.Spec.Replicas)
 	}
 
-	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, generatedRuntimeConfigSecretName)
+	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, generatedRuntimeConfigSecretName, caSecretName)
 	if err != nil {
 		return nil, err
 	}
