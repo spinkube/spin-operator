@@ -52,14 +52,14 @@ func TestConstructVolumeMountsForApp_Contract(t *testing.T) {
 	// places.
 	app := minimalSpinApp()
 	app.Spec.RuntimeConfig.LoadFromSecret = "a-secret"
-	_, _, err := ConstructVolumeMountsForApp(context.Background(), app, "a-generated-secret")
+	_, _, err := ConstructVolumeMountsForApp(context.Background(), app, "a-generated-secret", "a-ca-secret")
 	require.Error(t, err)
 	require.ErrorContains(t, err, "cannot specify both a user-provided runtime secret and a generated one")
 
 	// No runtime secret at all is ok
 	app = minimalSpinApp()
 	app.Spec.RuntimeConfig.LoadFromSecret = ""
-	volumes, mounts, err := ConstructVolumeMountsForApp(context.Background(), app, "")
+	volumes, mounts, err := ConstructVolumeMountsForApp(context.Background(), app, "", "")
 	require.NoError(t, err)
 	require.Empty(t, volumes)
 	require.Empty(t, mounts)
@@ -67,7 +67,7 @@ func TestConstructVolumeMountsForApp_Contract(t *testing.T) {
 	// User provided runtime secret is ok
 	app = minimalSpinApp()
 	app.Spec.RuntimeConfig.LoadFromSecret = "foo-secret-v1"
-	volumes, mounts, err = ConstructVolumeMountsForApp(context.Background(), app, "")
+	volumes, mounts, err = ConstructVolumeMountsForApp(context.Background(), app, "", "")
 	require.NoError(t, err)
 	require.Len(t, volumes, 1)
 	require.Len(t, mounts, 1)
@@ -76,7 +76,7 @@ func TestConstructVolumeMountsForApp_Contract(t *testing.T) {
 	// Generated runtime secret is ok
 	app = minimalSpinApp()
 	app.Spec.RuntimeConfig.LoadFromSecret = ""
-	volumes, mounts, err = ConstructVolumeMountsForApp(context.Background(), app, "gen-secret")
+	volumes, mounts, err = ConstructVolumeMountsForApp(context.Background(), app, "gen-secret", "spin-ca")
 	require.NoError(t, err)
 	require.Len(t, volumes, 1)
 	require.Len(t, mounts, 1)
@@ -227,7 +227,7 @@ func TestSpinHealthCheckToCoreProbe(t *testing.T) {
 func TestDeploymentLabel(t *testing.T) {
 	scheme := registerAndGetScheme()
 	app := minimalSpinApp()
-	deployment, err := constructDeployment(context.Background(), app, &spinv1alpha1.ExecutorDeploymentConfig{}, "", scheme)
+	deployment, err := constructDeployment(context.Background(), app, &spinv1alpha1.ExecutorDeploymentConfig{}, "", "", scheme)
 
 	require.Nil(t, err)
 	require.NotNil(t, deployment.ObjectMeta.Labels)
