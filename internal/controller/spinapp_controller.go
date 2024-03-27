@@ -417,9 +417,10 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 					RuntimeClassName: &config.RuntimeClassName,
 					Containers: []corev1.Container{
 						{
-							Name:    app.Name,
-							Image:   app.Spec.Image,
-							Command: []string{"/"},
+							Name:            app.Name,
+							Image:           app.Spec.Image,
+							ImagePullPolicy: app.Spec.ImagePullPolicy,
+							Command:         []string{"/"},
 							Ports: []corev1.ContainerPort{{
 								Name:          spinapp.HTTPPortName,
 								ContainerPort: spinapp.DefaultHTTPPort,

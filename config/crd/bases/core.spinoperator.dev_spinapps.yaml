@@ -214,6 +214,9 @@ spec:
               image:
                 description: Image is the source for this app.
                 type: string
+              imagePullPolicy:
+                description: ImagePullPolicy is the policy for pulling the image.
+                type: string
               imagePullSecrets:
                 description: ImagePullSecrets is a list of references to secrets in
                   the same namespace to use for pulling the image.
