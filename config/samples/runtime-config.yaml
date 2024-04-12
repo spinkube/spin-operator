@@ -24,7 +24,7 @@ spec:
       options:
         - name: "url"
           value: "https://llm-app.fermyon.app"
-        - name: "token"
+        - name: "auth_token"
           valueFrom:
             secretKeyRef:
               name: "my-super-secret"
