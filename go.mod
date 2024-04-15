@@ -9,7 +9,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.1
 	github.com/prometheus/common v0.52.3
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/sync v0.6.0
+	golang.org/x/sync v0.7.0
 	k8s.io/api v0.29.3
 	k8s.io/apiextensions-apiserver v0.29.3
 	k8s.io/apimachinery v0.29.3
