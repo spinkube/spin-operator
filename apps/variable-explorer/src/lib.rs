@@ -15,6 +15,6 @@ fn handle_variable_explorer(_req: Request) -> anyhow::Result<impl IntoResponse> 
     Ok(Response::builder()
         .status(200)
         .header("content-type", "text/plain")
-        .body(format!("Hell from {}", platform_name))
+        .body(format!("Hello from {}", platform_name))
         .build())
 }
