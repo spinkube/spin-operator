@@ -237,6 +237,12 @@ spec:
                 description: PodAnnotations defines annotations to be applied to the
                   underlying pods.
                 type: object
+              podLabels:
+                additionalProperties:
+                  type: string
+                description: PodLabels defines labels to be applied to the underlying
+                  pods.
+                type: object
               replicas:
                 description: Number of replicas to run.
                 format: int32

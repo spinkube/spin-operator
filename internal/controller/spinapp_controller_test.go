@@ -411,3 +411,23 @@ func TestConstructDeployment_MinimalApp(t *testing.T) {
 	require.Equal(t, app.Spec.Image, deployment.Spec.Template.Spec.Containers[0].Image)
 	require.Equal(t, ptr("bananarama"), deployment.Spec.Template.Spec.RuntimeClassName)
 }
+
+func TestConstructDeployment_WithPodLabels(t *testing.T) {
+	t.Parallel()
+
+	key, value := "dev.spinkube.tests", "foo"
+	app := spinAppWithLabels(map[string]string{
+		key: value,
+	})
+
+	cfg := &spinv1alpha1.ExecutorDeploymentConfig{
+		RuntimeClassName: "bananarama",
+	}
+	deployment, err := constructDeployment(context.Background(), app, cfg, "", nil)
+	require.NoError(t, err)
+	require.NotNil(t, deployment)
+
+	require.Equal(t, ptr(int32(1)), deployment.Spec.Replicas)
+	require.Len(t, deployment.Spec.Template.Labels, 3)
+	require.Equal(t, deployment.Spec.Template.Labels[key], value)
+}

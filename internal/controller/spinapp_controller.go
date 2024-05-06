@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"hash/adler32"
+	"maps"
 
 	"github.com/pelletier/go-toml/v2"
 	appsv1 "k8s.io/api/apps/v1"
@@ -408,6 +409,12 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 		statusKey:            statusValue,
 	}
 
+	templateLabels := app.Spec.PodLabels
+	if templateLabels == nil {
+		templateLabels = map[string]string{}
+	}
+	maps.Copy(templateLabels, readyLabels)
+
 	// TODO: Once we land admission webhooks write some validation for this e.g.
 	// don't allow setting memory limit with cyclotron runtime.
 	resources := corev1.ResourceRequirements{
@@ -442,7 +449,7 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels:      readyLabels,
+					Labels:      templateLabels,
 					Annotations: templateAnnotations,
 				},
 				Spec: corev1.PodSpec{
