@@ -241,3 +241,18 @@ func registerAndGetScheme() *runtime.Scheme {
 
 	return scheme
 }
+
+func spinAppWithPodServiceAccountName(name string) *spinv1alpha1.SpinApp {
+	return &spinv1alpha1.SpinApp{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "my-app",
+			Namespace: "default",
+		},
+		Spec: spinv1alpha1.SpinAppSpec{
+			Executor:              "containerd-shim-spin",
+			Image:                 "fakereg.dev/noapp:latest",
+			Replicas:              1,
+			PodServiceAccountName: name,
+		},
+	}
+}

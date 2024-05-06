@@ -237,6 +237,9 @@ spec:
                 description: PodAnnotations defines annotations to be applied to the
                   underlying pods.
                 type: object
+              podServiceAccountName:
+                description: ServiceAccountName for the underlying Pod.
+                type: string
               replicas:
                 description: Number of replicas to run.
                 format: int32

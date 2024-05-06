@@ -414,7 +414,8 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 					Annotations: templateAnnotations,
 				},
 				Spec: corev1.PodSpec{
-					RuntimeClassName: &config.RuntimeClassName,
+					RuntimeClassName:   &config.RuntimeClassName,
+					ServiceAccountName: app.Spec.PodServiceAccountName,
 					Containers: []corev1.Container{
 						{
 							Name:    app.Name,

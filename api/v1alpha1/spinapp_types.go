@@ -77,6 +77,9 @@ type SpinAppSpec struct {
 
 	// Resources defines the resource requirements for this app.
 	Resources Resources `json:"resources,omitempty"`
+
+	// ServiceAccountName for the underlying Pod.
+	PodServiceAccountName string `json:"podServiceAccountName,omitempty"`
 }
 
 // SpinAppStatus defines the observed state of SpinApp
