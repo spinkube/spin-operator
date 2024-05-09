@@ -49,6 +49,18 @@ spec:
                   DeploymentConfig specifies how the deployment should be configured when
                   createDeployment is true.
                 properties:
+                  caCertSecret:
+                    description: |-
+                      CACertSecret specifies the name of the secret containing the CA
+                      certificates to be mounted to the deployment.
+                    type: string
+                  installDefaultCACerts:
+                    description: |-
+                      InstallDefaultCACerts specifies whether the default CA
+                      certificate bundle should be generated. When set a new secret
+                      will be created containing the certificates. If no secret name is
+                      defined in `CACertSecret` the secret name will be `spin-ca`.
+                    type: boolean
                   runtimeClassName:
                     description: |-
                       RuntimeClassName is the runtime class name that should be used by pods created

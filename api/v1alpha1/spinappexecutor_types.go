@@ -38,6 +38,16 @@ type ExecutorDeploymentConfig struct {
 	// RuntimeClassName is the runtime class name that should be used by pods created
 	// as part of a deployment.
 	RuntimeClassName string `json:"runtimeClassName"`
+
+	// CACertSecret specifies the name of the secret containing the CA
+	// certificates to be mounted to the deployment.
+	CACertSecret string `json:"caCertSecret,omitempty"`
+
+	// InstallDefaultCACerts specifies whether the default CA
+	// certificate bundle should be generated. When set a new secret
+	// will be created containing the certificates. If no secret name is
+	// defined in `CACertSecret` the secret name will be `spin-ca`.
+	InstallDefaultCACerts bool `json:"installDefaultCACerts,omitempty"`
 }
 
 // SpinAppExecutorStatus defines the observed state of SpinAppExecutor
