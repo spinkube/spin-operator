@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"strings"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
+
 	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/generics"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func constructRuntimeConfigSecretMount(_ctx context.Context, secretName string) (corev1.Volume, corev1.VolumeMount) {
@@ -39,11 +40,35 @@ func constructRuntimeConfigSecretMount(_ctx context.Context, secretName string) 
 	return volume, volumeMount
 }
 
+func constructCASecretMount(_ context.Context, caSecretName string) (corev1.Volume, corev1.VolumeMount) {
+	volume := corev1.Volume{
+		Name: "spin-ca",
+		VolumeSource: corev1.VolumeSource{
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: caSecretName,
+				Optional:   ptr(true),
+				Items: []corev1.KeyToPath{{
+					Key:  "ca-certificates.crt",
+					Path: "ca-certificates.crt",
+				}},
+			},
+		},
+	}
+	volumeMount := corev1.VolumeMount{
+		Name:      "spin-ca",
+		ReadOnly:  true,
+		MountPath: "/etc/ssl/certs/ca-certificates.crt",
+		SubPath:   "ca-certificates.crt",
+	}
+
+	return volume, volumeMount
+}
+
 // ConstructVolumeMountsForApp introspects the application and generates
 // any required volume mounts. A generated runtime secret is mutually
 // exclusive with a user-provided secret - this is to require _either_ a
 // manual runtime-config or a generated one from the crd.
-func ConstructVolumeMountsForApp(ctx context.Context, app *spinv1alpha1.SpinApp, generatedRuntimeSecret string) ([]corev1.Volume, []corev1.VolumeMount, error) {
+func ConstructVolumeMountsForApp(ctx context.Context, app *spinv1alpha1.SpinApp, generatedRuntimeSecret, caSecretName string) ([]corev1.Volume, []corev1.VolumeMount, error) {
 	volumes := []corev1.Volume{}
 	volumeMounts := []corev1.VolumeMount{}
 
@@ -66,6 +91,12 @@ func ConstructVolumeMountsForApp(ctx context.Context, app *spinv1alpha1.SpinApp,
 	// TODO: Once #49 lands validate that volumes don't start with `spin-` prefix in admission webhook.
 	volumes = append(volumes, app.Spec.Volumes...)
 	volumeMounts = append(volumeMounts, app.Spec.VolumeMounts...)
+
+	if caSecretName != "" {
+		caVolume, caVolumeMount := constructCASecretMount(ctx, caSecretName)
+		volumes = append(volumes, caVolume)
+		volumeMounts = append(volumeMounts, caVolumeMount)
+	}
 
 	return volumes, volumeMounts, nil
 }

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"hash/adler32"
 
+	"github.com/pelletier/go-toml/v2"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -33,8 +34,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	"github.com/pelletier/go-toml/v2"
 	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
+	"github.com/spinkube/spin-operator/internal/cacerts"
 	"github.com/spinkube/spin-operator/internal/logging"
 	"github.com/spinkube/spin-operator/internal/runtimeconfig"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
@@ -225,6 +226,27 @@ func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1alpha1.
 	return nil
 }
 
+const defaultCASecretName = "spin-ca"
+
+// ensureDefaultCASecret creates the default ca certificate bundle in the
+// namespace of the app. Only one is required per namespace. The secret can be
+// overridden by the cluster operator.
+func (r *SpinAppReconciler) ensureDefaultCASecret(ctx context.Context, namespace string) error {
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      defaultCASecretName,
+			Namespace: namespace,
+		},
+		StringData: map[string]string{"ca-certificates.crt": cacerts.CACertificates()},
+	}
+
+	err := r.Client.Get(ctx, types.NamespacedName{Name: defaultCASecretName, Namespace: namespace}, secret)
+	if !apierrors.IsNotFound(err) { // secret is not not found
+		return nil
+	}
+	return r.Client.Create(ctx, secret)
+}
+
 // reconcileDeployment creates a deployment if one does not exist and reconciles it if it does.
 func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config *spinv1alpha1.ExecutorDeploymentConfig) error {
 	log := logging.FromContext(ctx).WithValues("deployment", app.Name)
@@ -279,7 +301,17 @@ func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1
 		}
 	}
 
-	desiredDeployment, err := constructDeployment(ctx, app, config, generatedRuntimeConfigSecretName, r.Scheme)
+	var caSecretName string
+	if config.CACertSecret != "" {
+		caSecretName = config.CACertSecret
+	} else if config.InstallDefaultCACerts {
+		caSecretName = defaultCASecretName
+		if err := r.ensureDefaultCASecret(ctx, app.Namespace); err != nil {
+			return fmt.Errorf("unable to create default ca-certificate secret: %w", err)
+		}
+	}
+
+	desiredDeployment, err := constructDeployment(ctx, app, config, generatedRuntimeConfigSecretName, caSecretName, r.Scheme)
 	if err != nil {
 		return fmt.Errorf("failed to construct Deployment: %w", err)
 	}
@@ -346,7 +378,7 @@ func (r *SpinAppReconciler) deleteDeployment(ctx context.Context, app *spinv1alp
 
 // constructDeployment builds an appsv1.Deployment based on the configuration of a SpinApp.
 func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config *spinv1alpha1.ExecutorDeploymentConfig,
-	generatedRuntimeConfigSecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
+	generatedRuntimeConfigSecretName, caSecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	// TODO: Once we land admission webhooks write some validation to make
 	// replicas and enableAutoscaling mutually exclusive.
 	var replicas *int32
@@ -356,7 +388,7 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 		replicas = ptr(app.Spec.Replicas)
 	}
 
-	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, generatedRuntimeConfigSecretName)
+	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, generatedRuntimeConfigSecretName, caSecretName)
 	if err != nil {
 		return nil, err
 	}

@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
-	"github.com/spinkube/spin-operator/pkg/spinapp"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -13,6 +11,9 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+
+	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
+	"github.com/spinkube/spin-operator/pkg/spinapp"
 )
 
 func minimalSpinApp() *spinv1alpha1.SpinApp {
@@ -52,22 +53,22 @@ func TestConstructVolumeMountsForApp_Contract(t *testing.T) {
 	// places.
 	app := minimalSpinApp()
 	app.Spec.RuntimeConfig.LoadFromSecret = "a-secret"
-	_, _, err := ConstructVolumeMountsForApp(context.Background(), app, "a-generated-secret")
+	_, _, err := ConstructVolumeMountsForApp(context.Background(), app, "a-generated-secret", "a-ca-secret")
 	require.Error(t, err)
 	require.ErrorContains(t, err, "cannot specify both a user-provided runtime secret and a generated one")
 
 	// No runtime secret at all is ok
 	app = minimalSpinApp()
 	app.Spec.RuntimeConfig.LoadFromSecret = ""
-	volumes, mounts, err := ConstructVolumeMountsForApp(context.Background(), app, "")
+	volumes, mounts, err := ConstructVolumeMountsForApp(context.Background(), app, "", "")
 	require.NoError(t, err)
-	require.Empty(t, volumes)
-	require.Empty(t, mounts)
+	require.Len(t, volumes, 0)
+	require.Len(t, mounts, 0)
 
 	// User provided runtime secret is ok
 	app = minimalSpinApp()
 	app.Spec.RuntimeConfig.LoadFromSecret = "foo-secret-v1"
-	volumes, mounts, err = ConstructVolumeMountsForApp(context.Background(), app, "")
+	volumes, mounts, err = ConstructVolumeMountsForApp(context.Background(), app, "", "")
 	require.NoError(t, err)
 	require.Len(t, volumes, 1)
 	require.Len(t, mounts, 1)
@@ -76,10 +77,10 @@ func TestConstructVolumeMountsForApp_Contract(t *testing.T) {
 	// Generated runtime secret is ok
 	app = minimalSpinApp()
 	app.Spec.RuntimeConfig.LoadFromSecret = ""
-	volumes, mounts, err = ConstructVolumeMountsForApp(context.Background(), app, "gen-secret")
+	volumes, mounts, err = ConstructVolumeMountsForApp(context.Background(), app, "gen-secret", "spin-ca")
 	require.NoError(t, err)
-	require.Len(t, volumes, 1)
-	require.Len(t, mounts, 1)
+	require.Len(t, volumes, 2)
+	require.Len(t, mounts, 2)
 	require.Equal(t, "gen-secret", volumes[0].VolumeSource.Secret.SecretName)
 }
 
@@ -227,7 +228,7 @@ func TestSpinHealthCheckToCoreProbe(t *testing.T) {
 func TestDeploymentLabel(t *testing.T) {
 	scheme := registerAndGetScheme()
 	app := minimalSpinApp()
-	deployment, err := constructDeployment(context.Background(), app, &spinv1alpha1.ExecutorDeploymentConfig{}, "", scheme)
+	deployment, err := constructDeployment(context.Background(), app, &spinv1alpha1.ExecutorDeploymentConfig{}, "", "", scheme)
 
 	require.Nil(t, err)
 	require.NotNil(t, deployment.ObjectMeta.Labels)

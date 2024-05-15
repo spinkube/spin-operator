@@ -6,3 +6,4 @@ spec:
   createDeployment: true
   deploymentConfig:
     runtimeClassName: wasmtime-spin-v2
+    installDefaultCACerts: true

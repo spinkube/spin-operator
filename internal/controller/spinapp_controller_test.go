@@ -402,7 +402,7 @@ func TestConstructDeployment_MinimalApp(t *testing.T) {
 	cfg := &spinv1alpha1.ExecutorDeploymentConfig{
 		RuntimeClassName: "bananarama",
 	}
-	deployment, err := constructDeployment(context.Background(), app, cfg, "", nil)
+	deployment, err := constructDeployment(context.Background(), app, cfg, "", "", nil)
 	require.NoError(t, err)
 	require.NotNil(t, deployment)
 
