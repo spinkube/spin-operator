@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-          app: [cpu-load-gen, hello-world]
+          app: [cpu-load-gen, hello-world, outbound-http]
     env:
       IMAGE_NAME: ${{ github.repository }}
 
