@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	nodev1 "k8s.io/api/node/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/e2e-framework/klient/wait"
 	"sigs.k8s.io/e2e-framework/klient/wait/conditions"
 	"sigs.k8s.io/e2e-framework/pkg/env"
@@ -91,6 +93,19 @@ func TestMain(m *testing.M) {
 			}
 
 			return ctx, nil
+		},
+		// deploy runtime class
+		func(ctx context.Context, c *envconf.Config) (context.Context, error) {
+			client := cfg.Client()
+			runtimeClass := &nodev1.RuntimeClass{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: runtimeClassName,
+				},
+				Handler: "spin",
+			}
+
+			err := client.Resources().Create(ctx, runtimeClass)
+			return ctx, err
 		},
 	)
 
