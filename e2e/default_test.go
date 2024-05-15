@@ -5,11 +5,13 @@ import (
 	"testing"
 	"time"
 
+	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	nodev1 "k8s.io/api/node/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/e2e-framework/klient"
 	"sigs.k8s.io/e2e-framework/klient/k8s"
+	"sigs.k8s.io/e2e-framework/klient/k8s/resources"
 	"sigs.k8s.io/e2e-framework/klient/wait"
 	"sigs.k8s.io/e2e-framework/klient/wait/conditions"
 	"sigs.k8s.io/e2e-framework/pkg/envconf"
@@ -19,6 +21,11 @@ import (
 )
 
 var runtimeClassName = "wasmtime-spin-v2"
+
+const (
+	testPodLabelName  = "core.spinoperator.dev/test"
+	testPodLabelValue = "foobar"
+)
 
 // TestDefaultSetup is a test that checks that the minimal setup works
 // with the containerd wasm shim runtime as the default runtime.
@@ -89,6 +96,18 @@ func TestDefaultSetup(t *testing.T) {
 					{ObjectMeta: metav1.ObjectMeta{Name: testSpinAppName, Namespace: testNamespace}},
 				},
 			}
+			res, err := resources.New(client.RESTConfig())
+			if err != nil {
+				t.Fatalf("Could not create controller runtime client: %s", err)
+			}
+			var deploy appsv1.Deployment
+			if err = res.Get(ctx, testSpinAppName, testNamespace, &deploy); err != nil {
+				t.Fatalf("Could not find deployment: %s", err)
+			}
+			v, ok := deploy.Spec.Template.Labels[testPodLabelName]
+			if !ok || v != testPodLabelValue {
+				t.Fatal("PodLabels were not passed from the SpinApp to the underlying Pod")
+			}
 
 			if err := wait.For(
 				conditions.New(client.Resources()).ResourcesFound(svc),
@@ -109,9 +128,10 @@ func newSpinAppCR(name, image string) *spinapps_v1alpha1.SpinApp {
 			Namespace: testNamespace,
 		},
 		Spec: spinapps_v1alpha1.SpinAppSpec{
-			Replicas: 1,
-			Image:    image,
-			Executor: "containerd-shim-spin",
+			Replicas:  1,
+			Image:     image,
+			Executor:  "containerd-shim-spin",
+			PodLabels: map[string]string{testPodLabelName: testPodLabelValue},
 		},
 	}
 
