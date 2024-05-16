@@ -411,3 +411,18 @@ func TestConstructDeployment_MinimalApp(t *testing.T) {
 	require.Equal(t, app.Spec.Image, deployment.Spec.Template.Spec.Containers[0].Image)
 	require.Equal(t, ptr("bananarama"), deployment.Spec.Template.Spec.RuntimeClassName)
 }
+
+func TestConstructDeployment_AppWithPodServiceAccountName(t *testing.T) {
+	t.Parallel()
+
+	app := spinAppWithPodServiceAccountName("test")
+
+	cfg := &spinv1alpha1.ExecutorDeploymentConfig{
+		RuntimeClassName: "bananarama",
+	}
+	deployment, err := constructDeployment(context.Background(), app, cfg, "", nil)
+	require.NoError(t, err)
+	require.NotNil(t, deployment)
+
+	require.Equal(t, deployment.Spec.Template.Spec.ServiceAccountName, "test")
+}
