@@ -65,7 +65,7 @@ func TestPodLabels(t *testing.T) {
 			if err := wait.For(
 				conditions.New(client.Resources()).DeploymentAvailable(testSpinAppName, testNamespace),
 				wait.WithTimeout(3*time.Minute),
-				wait.WithInterval(30*time.Second),
+				wait.WithInterval(5*time.Second),
 			); err != nil {
 				t.Fatal(err)
 			}
