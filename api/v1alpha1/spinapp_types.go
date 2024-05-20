@@ -75,6 +75,9 @@ type SpinAppSpec struct {
 	// PodAnnotations defines annotations to be applied to the underlying pods.
 	PodAnnotations map[string]string `json:"podAnnotations,omitempty"`
 
+	// PodLabels defines labels to be applied to the underlying pods.
+	PodLabels map[string]string `json:"podLabels,omitempty"`
+
 	// Resources defines the resource requirements for this app.
 	Resources Resources `json:"resources,omitempty"`
 }

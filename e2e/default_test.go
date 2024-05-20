@@ -6,7 +6,6 @@ import (
 	"time"
 
 	v1 "k8s.io/api/core/v1"
-	nodev1 "k8s.io/api/node/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/e2e-framework/klient"
 	"sigs.k8s.io/e2e-framework/klient/k8s"
@@ -35,17 +34,6 @@ func TestDefaultSetup(t *testing.T) {
 
 			if err := spinapps_v1alpha1.AddToScheme(client.Resources(testNamespace).GetScheme()); err != nil {
 				t.Fatalf("failed to register the spinapps_v1alpha1 types with Kuberenets scheme: %s", err)
-			}
-
-			runtimeClass := &nodev1.RuntimeClass{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: runtimeClassName,
-				},
-				Handler: "spin",
-			}
-
-			if err := client.Resources().Create(ctx, runtimeClass); err != nil {
-				t.Fatalf("Failed to create runtimeclass: %s", err)
 			}
 
 			return ctx
@@ -98,7 +86,8 @@ func TestDefaultSetup(t *testing.T) {
 				t.Fatal(err)
 			}
 			return ctx
-		}).Feature()
+		}).
+		Feature()
 	testEnv.Test(t, defaultTest)
 }
 
@@ -114,9 +103,7 @@ func newSpinAppCR(name, image string) *spinapps_v1alpha1.SpinApp {
 			Executor: "containerd-shim-spin",
 		},
 	}
-
 	return testSpinApp
-
 }
 
 func newContainerdShimExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecutor {
