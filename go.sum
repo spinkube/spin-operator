@@ -197,8 +197,8 @@ k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 h1:BZqlfIlq5YbRMFko6/PM7F
 k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340/go.mod h1:yD4MZYeKMBwQKVht279WycxKyM84kkAx2DPrTXaeb98=
 k8s.io/utils v0.0.0-20230726121419-3b25d923346b h1:sgn3ZU783SCgtaSJjpcVVlRqd6GSnlTLKgpAAttJvpI=
 k8s.io/utils v0.0.0-20230726121419-3b25d923346b/go.mod h1:OLgZIPagt7ERELqWJFomSt595RzquPNLL48iOWgYOg0=
-sigs.k8s.io/controller-runtime v0.18.2 h1:RqVW6Kpeaji67CY5nPEfRz6ZfFMk0lWQlNrLqlNpx+Q=
-sigs.k8s.io/controller-runtime v0.18.2/go.mod h1:tuAt1+wbVsXIT8lPtk5RURxqAnq7xkpv2Mhttslg7Hw=
+sigs.k8s.io/controller-runtime v0.18.3 h1:B5Wmmo8WMWK7izei+2LlXLVDGzMwAHBNLX68lwtlSR4=
+sigs.k8s.io/controller-runtime v0.18.3/go.mod h1:TVoGrfdpbA9VRFaRnKgk9P5/atA0pMwq+f+msb9M8Sg=
 sigs.k8s.io/e2e-framework v0.3.0 h1:eqQALBtPCth8+ulTs6lcPK7ytV5rZSSHJzQHZph4O7U=
 sigs.k8s.io/e2e-framework v0.3.0/go.mod h1:C+ef37/D90Dc7Xq1jQnNbJYscrUGpxrWog9bx2KIa+c=
 sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd h1:EDPBXCAspyGV4jQlpZSudPeMmr1bNJefnuqLsRAsHZo=
