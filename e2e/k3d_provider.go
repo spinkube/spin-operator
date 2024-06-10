@@ -26,7 +26,7 @@ type Cluster struct {
 
 func (c *Cluster) Create(context.Context, string) (string, error) {
 	if err := findOrInstallK3d(); err != nil {
-		panic(err)
+		return "", fmt.Errorf("k3d: failed to find or install k3d: %w", err)
 	}
 
 	if _, ok := clusterExists(c.name); ok {
@@ -107,7 +107,7 @@ func (c *Cluster) initKubernetesAccessClients() error {
 }
 
 func findOrInstallK3d() error {
-	_, err := utils.FindOrInstallGoBasedProvider(k3dBin, k3dBin, "github.com/k3d-io/k3d", "v5.6.0")
+	_, err := utils.FindOrInstallGoBasedProvider(k3dBin, k3dBin, "github.com/k3d-io/k3d/v5", "v5.6.0")
 	return err
 }
 
