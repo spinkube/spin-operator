@@ -107,7 +107,7 @@ func (c *Cluster) initKubernetesAccessClients() error {
 }
 
 func findOrInstallK3d() error {
-	_, err := utils.FindOrInstallGoBasedProvider(k3dBin, k3dBin, "github.com/k3d-io/k3d/v5", "v5.6.0")
+	_, err := utils.FindOrInstallGoBasedProvider(k3dBin, k3dBin, "github.com/k3d-io/k3d/v5", "v5.6.3")
 	return err
 }
 
