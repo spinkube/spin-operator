@@ -21,6 +21,7 @@ import (
 	"errors"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -36,12 +37,14 @@ var (
 // SpinAppExecutorReconciler reconciles a SpinAppExecutor object
 type SpinAppExecutorReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinappexecutors,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinappexecutors/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinappexecutors/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core,resources=events,verbs=create;patch
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SpinAppExecutorReconciler) SetupWithManager(mgr ctrl.Manager) error {
@@ -106,6 +109,7 @@ func (r *SpinAppExecutorReconciler) handleDeletion(ctx context.Context, executor
 	}
 
 	if len(spinApps.Items) > 0 {
+		r.Recorder.Event(executor, "Warning", "DeletionBlocked", "Cannot delete SpinAppExecutor with dependent SpinApps")
 		return errors.New("cannot delete SpinAppExecutor with dependent SpinApps")
 	}
 

@@ -47,6 +47,13 @@ rules:
   verbs:
   - get
 - apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
   - core.spinoperator.dev
   resources:
   - spinappexecutors

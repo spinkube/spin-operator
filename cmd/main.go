@@ -110,8 +110,9 @@ func main() {
 		os.Exit(1)
 	}
 	if err = (&controller.SpinAppExecutorReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("spinappexecutor-reconciler"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SpinAppExecutor")
 		os.Exit(1)
