@@ -22,6 +22,7 @@ const ErrFormat = "%v: %v\n"
 var (
 	testEnv                    env.Environment
 	testNamespace              string
+	testCACertSecret           = "test-spin-ca"
 	spinOperatorDeploymentName = "spin-operator-controller-manager"
 	spinOperatorNamespace      = "spin-operator"
 	cluster                    = &Cluster{}
