@@ -230,19 +230,19 @@ func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1alpha1.
 
 const defaultCASecretName = "spin-ca"
 
-// ensureDefaultCASecret creates the default ca certificate bundle in the
+// ensureCASecret creates the ca certificate bundle in the
 // namespace of the app. Only one is required per namespace. The secret can be
 // overridden by the cluster operator.
-func (r *SpinAppReconciler) ensureDefaultCASecret(ctx context.Context, namespace string) error {
+func (r *SpinAppReconciler) ensureCASecret(ctx context.Context, caSecretName, namespace string) error {
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      defaultCASecretName,
+			Name:      caSecretName,
 			Namespace: namespace,
 		},
 		StringData: map[string]string{"ca-certificates.crt": cacerts.CACertificates()},
 	}
 
-	err := r.Client.Get(ctx, types.NamespacedName{Name: defaultCASecretName, Namespace: namespace}, secret)
+	err := r.Client.Get(ctx, types.NamespacedName{Name: caSecretName, Namespace: namespace}, secret)
 	if !apierrors.IsNotFound(err) { // secret is not not found
 		return nil
 	}
@@ -303,12 +303,12 @@ func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1
 		}
 	}
 
-	var caSecretName string
-	if config.CACertSecret != "" {
-		caSecretName = config.CACertSecret
-	} else if config.InstallDefaultCACerts {
-		caSecretName = defaultCASecretName
-		if err := r.ensureDefaultCASecret(ctx, app.Namespace); err != nil {
+	caSecretName := config.CACertSecret
+	if config.InstallDefaultCACerts {
+		if caSecretName == "" {
+			caSecretName = defaultCASecretName
+		}
+		if err := r.ensureCASecret(ctx, caSecretName, app.Namespace); err != nil {
 			return fmt.Errorf("unable to create default ca-certificate secret: %w", err)
 		}
 	}
