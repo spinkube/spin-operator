@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"hash/adler32"
 	"maps"
+	"strings"
 
 	"github.com/pelletier/go-toml/v2"
 	appsv1 "k8s.io/api/apps/v1"
@@ -187,6 +188,8 @@ func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1alpha1.
 				Reason:  "DeploymentNotFound",
 				Message: "Deployment not found",
 			})
+
+		app.Status.Selector = ""
 		app.Status.ReadyReplicas = 0
 	} else {
 		deploymentConditions := deployment.Status.Conditions
@@ -212,6 +215,13 @@ func (r *SpinAppReconciler) updateStatus(ctx context.Context, app *spinv1alpha1.
 					})
 			}
 		}
+
+		var selectorStringArray []string
+		for key, value := range deployment.Spec.Selector.MatchLabels {
+			selectorStringArray = append(selectorStringArray, key+"="+value)
+		}
+
+		app.Status.Selector = strings.Join(selectorStringArray, ",")
 		app.Status.ReadyReplicas = deployment.Status.ReadyReplicas
 	}
 
@@ -383,12 +393,7 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 	generatedRuntimeConfigSecretName, caSecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	// TODO: Once we land admission webhooks write some validation to make
 	// replicas and enableAutoscaling mutually exclusive.
-	var replicas *int32
-	if app.Spec.EnableAutoscaling {
-		replicas = nil
-	} else {
-		replicas = ptr(app.Spec.Replicas)
-	}
+	replicas := ptr(app.Spec.Replicas)
 
 	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, generatedRuntimeConfigSecretName, caSecretName)
 	if err != nil {

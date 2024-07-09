@@ -194,14 +194,6 @@ spec:
                 description: DeploymentAnnotations defines annotations to be applied
                   to the underlying deployment.
                 type: object
-              enableAutoscaling:
-                default: false
-                description: |-
-                  EnableAutoscaling indicates whether the app is allowed to autoscale. If
-                  true then the operator leaves the replica count of the underlying
-                  deployment to be managed by an external autoscaler (HPA/KEDA). Replicas
-                  cannot be defined if this is enabled. By default EnableAutoscaling is false.
-                type: boolean
               executor:
                 description: |-
                   Executor controls how this app is executed in the cluster.
@@ -2577,11 +2569,18 @@ spec:
                   application deployment.
                 format: int32
                 type: integer
+              selector:
+                type: string
             required:
             - readyReplicas
+            - selector
             type: object
         type: object
     served: true
     storage: true
     subresources:
+      scale:
+        labelSelectorPath: .status.selector
+        specReplicasPath: .spec.replicas
+        statusReplicasPath: .status.replicas
       status: {}

@@ -104,10 +104,7 @@ func validateExecutor(spec spinv1alpha1.SpinAppSpec, fetchExecutor func(name str
 }
 
 func validateReplicas(spec spinv1alpha1.SpinAppSpec) *field.Error {
-	if spec.EnableAutoscaling && spec.Replicas != 0 {
-		return field.Invalid(field.NewPath("spec").Child("replicas"), spec.Replicas, "replicas cannot be set when autoscaling is enabled")
-	}
-	if !spec.EnableAutoscaling && spec.Replicas < 1 {
+	if spec.Replicas < 1 {
 		return field.Invalid(field.NewPath("spec").Child("replicas"), spec.Replicas, "replicas must be > 0")
 	}
 
