@@ -47,7 +47,7 @@ const (
 	HTTPAppPortName = "http-app"
 
 	// SpinOperatorFinalizer is the finalizer used by the spin operator
-	SpinOperatorFinalizer = "core.spinoperator.dev/finalizer"
+	SpinOperatorFinalizer = "core.spinkube.dev/finalizer"
 
 	// FieldManger is used to declare that the spin operator owns specific fields on child resources
 	FieldManager = "spin-operator"
@@ -60,8 +60,8 @@ type SpinAppReconciler struct {
 	Recorder record.EventRecorder
 }
 
-//+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinapps,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinapps/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.spinkube.dev,resources=spinapps,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core.spinkube.dev,resources=spinapps/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=apps,resources=deployments/status,verbs=get
 //+kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete

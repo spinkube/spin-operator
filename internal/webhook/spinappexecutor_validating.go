@@ -12,7 +12,7 @@ import (
 )
 
 // nolint:lll
-//+kubebuilder:webhook:path=/validate-core-spinoperator-dev-v1alpha1-spinappexecutor,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.spinoperator.dev,resources=spinappexecutors,verbs=create;update,versions=v1alpha1,name=vspinappexecutor.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/validate-core-spinoperator-dev-v1alpha1-spinappexecutor,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.spinkube.dev,resources=spinappexecutors,verbs=create;update,versions=v1alpha1,name=vspinappexecutor.kb.io,admissionReviewVersions=v1
 
 // SpinAppExecutorValidator validates SpinApps
 type SpinAppExecutorValidator struct {

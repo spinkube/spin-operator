@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	testPodLabelName  = "core.spinoperator.dev/test"
+	testPodLabelName  = "core.spinkube.dev/test"
 	testPodLabelValue = "foobar"
 )
 
