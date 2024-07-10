@@ -501,9 +501,9 @@ func TestReconcile_Integration_AnnotationAndLabelPropagataion(t *testing.T) {
 	require.Equal(t, "a-runtime-class", *deployment.Spec.Template.Spec.RuntimeClassName)
 	require.Equal(t,
 		map[string]string{
-			"core.spinoperator.dev/app-name":       "app",
-			"core.spinoperator.dev/app.app.status": "ready",
-			"my.pod.label":                         "value",
+			"core.spinkube.dev/app-name":       "app",
+			"core.spinkube.dev/app.app.status": "ready",
+			"my.pod.label":                     "value",
 		},
 		deployment.Spec.Template.ObjectMeta.Labels)
 	require.Equal(t, map[string]string{"my.pod.annotation": "value"}, deployment.Spec.Template.ObjectMeta.Annotations)
