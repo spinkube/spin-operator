@@ -391,9 +391,7 @@ func (r *SpinAppReconciler) deleteDeployment(ctx context.Context, app *spinv1alp
 // constructDeployment builds an appsv1.Deployment based on the configuration of a SpinApp.
 func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config *spinv1alpha1.ExecutorDeploymentConfig,
 	generatedRuntimeConfigSecretName, caSecretName string, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
-	// TODO: Once we land admission webhooks write some validation to make
-	// replicas and enableAutoscaling mutually exclusive.
-	replicas := ptr(app.Spec.Replicas)
+	replicas := app.Spec.Replicas
 
 	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, generatedRuntimeConfigSecretName, caSecretName)
 	if err != nil {
@@ -449,7 +447,7 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 			Annotations: annotations,
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: replicas,
+			Replicas: &replicas,
 			Selector: &metav1.LabelSelector{
 				MatchLabels: readyLabels,
 			},
