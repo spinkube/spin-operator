@@ -2570,6 +2570,7 @@ spec:
                 format: int32
                 type: integer
               selector:
+                description: Selector for the underlying pods
                 type: string
             required:
             - readyReplicas
