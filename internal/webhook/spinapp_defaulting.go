@@ -11,7 +11,7 @@ import (
 )
 
 // nolint:lll
-//+kubebuilder:webhook:path=/mutate-core-spinoperator-dev-v1alpha1-spinapp,mutating=true,failurePolicy=fail,sideEffects=None,groups=core.spinkube.dev,resources=spinapps,verbs=create;update,versions=v1alpha1,name=mspinapp.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/mutate-core-spinkube-dev-v1alpha1-spinapp,mutating=true,failurePolicy=fail,sideEffects=None,groups=core.spinkube.dev,resources=spinapps,verbs=create;update,versions=v1alpha1,name=mspinapp.kb.io,admissionReviewVersions=v1
 
 // SpinAppDefaulter mutates SpinApps
 type SpinAppDefaulter struct {

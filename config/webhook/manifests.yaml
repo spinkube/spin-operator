@@ -10,7 +10,7 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-core-spinoperator-dev-v1alpha1-spinapp
+      path: /mutate-core-spinkube-dev-v1alpha1-spinapp
   failurePolicy: Fail
   name: mspinapp.kb.io
   rules:
@@ -30,7 +30,7 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-core-spinoperator-dev-v1alpha1-spinappexecutor
+      path: /mutate-core-spinkube-dev-v1alpha1-spinappexecutor
   failurePolicy: Fail
   name: mspinappexecutor.kb.io
   rules:
@@ -56,7 +56,7 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /validate-core-spinoperator-dev-v1alpha1-spinapp
+      path: /validate-core-spinkube-dev-v1alpha1-spinapp
   failurePolicy: Fail
   name: vspinapp.kb.io
   rules:
@@ -76,7 +76,7 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /validate-core-spinoperator-dev-v1alpha1-spinappexecutor
+      path: /validate-core-spinkube-dev-v1alpha1-spinappexecutor
   failurePolicy: Fail
   name: vspinappexecutor.kb.io
   rules:

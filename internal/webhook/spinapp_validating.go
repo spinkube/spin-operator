@@ -15,7 +15,7 @@ import (
 )
 
 // nolint:lll
-//+kubebuilder:webhook:path=/validate-core-spinoperator-dev-v1alpha1-spinapp,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.spinkube.dev,resources=spinapps,verbs=create;update,versions=v1alpha1,name=vspinapp.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/validate-core-spinkube-dev-v1alpha1-spinapp,mutating=false,failurePolicy=fail,sideEffects=None,groups=core.spinkube.dev,resources=spinapps,verbs=create;update,versions=v1alpha1,name=vspinapp.kb.io,admissionReviewVersions=v1
 
 // SpinAppValidator validates SpinApps
 type SpinAppValidator struct {
