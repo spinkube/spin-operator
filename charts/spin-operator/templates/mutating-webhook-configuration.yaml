@@ -13,8 +13,7 @@ webhooks:
     service:
       name: '{{ include "spin-operator.fullname" . }}-webhook-service'
       namespace: '{{ .Release.Namespace }}'
-      # TODO @asteurer: Should this filepath be updated?
-      path: /mutate-core-spinoperator-dev-v1alpha1-spinapp
+      path: /mutate-core-spinkube-dev-v1alpha1-spinapp
   failurePolicy: Fail
   name: mspinapp.kb.io
   rules:
@@ -34,7 +33,7 @@ webhooks:
     service:
       name: '{{ include "spin-operator.fullname" . }}-webhook-service'
       namespace: '{{ .Release.Namespace }}'
-      path: /mutate-core-spinoperator-dev-v1alpha1-spinappexecutor
+      path: /mutate-core-spinkube-dev-v1alpha1-spinappexecutor
   failurePolicy: Fail
   name: mspinappexecutor.kb.io
   rules:
