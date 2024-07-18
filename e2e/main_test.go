@@ -144,7 +144,7 @@ func newContainerdShimExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecu
 		Spec: spinapps_v1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
 			DeploymentConfig: &spinapps_v1alpha1.ExecutorDeploymentConfig{
-				RuntimeClassName:      runtimeClassName,
+				RuntimeClassName:      &runtimeClassName,
 				InstallDefaultCACerts: true,
 				CACertSecret:          testCACertSecret,
 			},

@@ -30,7 +30,7 @@ func TestDefaultSetup(t *testing.T) {
 		Setup(func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			client = cfg.Client()
 
-			testSpinApp := newSpinAppCR(testSpinAppName, helloWorldImage)
+			testSpinApp := newSpinAppCR(testSpinAppName, helloWorldImage, "containerd-shim-spin")
 			if err := client.Resources().Create(ctx, testSpinApp); err != nil {
 				t.Fatalf("Failed to create spinapp: %s", err)
 			}
@@ -69,7 +69,7 @@ func TestDefaultSetup(t *testing.T) {
 	testEnv.Test(t, defaultTest)
 }
 
-func newSpinAppCR(name, image string) *spinapps_v1alpha1.SpinApp {
+func newSpinAppCR(name, image, executor string) *spinapps_v1alpha1.SpinApp {
 	return &spinapps_v1alpha1.SpinApp{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -78,7 +78,7 @@ func newSpinAppCR(name, image string) *spinapps_v1alpha1.SpinApp {
 		Spec: spinapps_v1alpha1.SpinAppSpec{
 			Replicas: 1,
 			Image:    image,
-			Executor: "containerd-shim-spin",
+			Executor: executor,
 		},
 	}
 }

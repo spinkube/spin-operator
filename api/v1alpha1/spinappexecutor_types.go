@@ -36,8 +36,15 @@ type SpinAppExecutorSpec struct {
 
 type ExecutorDeploymentConfig struct {
 	// RuntimeClassName is the runtime class name that should be used by pods created
-	// as part of a deployment.
-	RuntimeClassName string `json:"runtimeClassName"`
+	// as part of a deployment. This should only be defined when SpintainerImage is not defined.
+	RuntimeClassName *string `json:"runtimeClassName,omitempty"`
+
+	// SpinImage points to an image that will run Spin in a container to execute
+	// your SpinApp. This is an alternative to using the shim to execute your
+	// SpinApp. This should only be defined when RuntimeClassName is not
+	// defined. When specified, application images must be available without
+	// authentication.
+	SpinImage *string `json:"spinImage,omitempty"`
 
 	// CACertSecret specifies the name of the secret containing the CA
 	// certificates to be mounted to the deployment.

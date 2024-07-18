@@ -1,0 +1,9 @@
+apiVersion: core.spinoperator.dev/v1alpha1
+kind: SpinAppExecutor
+metadata:
+  name: spintainer
+spec:
+  createDeployment: true
+  deploymentConfig:
+    installDefaultCACerts: true
+    spinImage: ghcr.io/fermyon/spin:v2.7.0

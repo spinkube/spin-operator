@@ -23,6 +23,7 @@ import (
 	"time"
 
 	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
+	"github.com/spinkube/spin-operator/internal/generics"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -134,7 +135,7 @@ func testContainerdShimSpinExecutor() *spinv1alpha1.SpinAppExecutor {
 		Spec: spinv1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
 			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
-				RuntimeClassName: "test-runtime",
+				RuntimeClassName: generics.Ptr("test-runtime"),
 			},
 		},
 	}

@@ -84,10 +84,16 @@ spec:
                   runtimeClassName:
                     description: |-
                       RuntimeClassName is the runtime class name that should be used by pods created
-                      as part of a deployment.
+                      as part of a deployment. This should only be defined when SpintainerImage is not defined.
                     type: string
-                required:
-                - runtimeClassName
+                  spinImage:
+                    description: |-
+                      SpinImage points to an image that will run Spin in a container to execute
+                      your SpinApp. This is an alternative to using the shim to execute your
+                      SpinApp. This should only be defined when RuntimeClassName is not
+                      defined. When specified, application images must be available without
+                      authentication.
+                    type: string
                 type: object
             required:
             - createDeployment

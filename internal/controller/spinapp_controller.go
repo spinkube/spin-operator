@@ -18,6 +18,7 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"hash/adler32"
 	"maps"
@@ -37,6 +38,7 @@ import (
 
 	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/cacerts"
+	"github.com/spinkube/spin-operator/internal/generics"
 	"github.com/spinkube/spin-operator/internal/logging"
 	"github.com/spinkube/spin-operator/internal/runtimeconfig"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
@@ -326,7 +328,7 @@ func (r *SpinAppReconciler) reconcileDeployment(ctx context.Context, app *spinv1
 	// We want to use server-side apply https://kubernetes.io/docs/reference/using-api/server-side-apply
 	patchMethod := client.Apply
 	patchOptions := &client.PatchOptions{
-		Force:        ptr(true), // Force b/c any fields we are setting need to be owned by the spin-operator
+		Force:        generics.Ptr(true), // Force b/c any fields we are setting need to be owned by the spin-operator
 		FieldManager: FieldManager,
 	}
 
@@ -354,7 +356,7 @@ func (r *SpinAppReconciler) reconcileService(ctx context.Context, app *spinv1alp
 	// We want to use server-side apply https://kubernetes.io/docs/reference/using-api/server-side-apply
 	patchMethod := client.Apply
 	patchOptions := &client.PatchOptions{
-		Force:        ptr(true), // Force b/c any fields we are setting need to be owned by the spin-operator
+		Force:        generics.Ptr(true), // Force b/c any fields we are setting need to be owned by the spin-operator
 		FieldManager: FieldManager,
 	}
 	// Note that we reconcile even if the service is in a good state. We rely on controller-runtime to rate limit us.
@@ -390,7 +392,7 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 	if app.Spec.EnableAutoscaling {
 		replicas = nil
 	} else {
-		replicas = ptr(app.Spec.Replicas)
+		replicas = generics.Ptr(app.Spec.Replicas)
 	}
 
 	volumes, volumeMounts, err := ConstructVolumeMountsForApp(ctx, app, generatedRuntimeConfigSecretName, caSecretName)
@@ -435,6 +437,41 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 
 	labels := constructAppLabels(app)
 
+	var container corev1.Container
+	if config.RuntimeClassName != nil {
+		container = corev1.Container{
+			Name:    app.Name,
+			Image:   app.Spec.Image,
+			Command: []string{"/"},
+			Ports: []corev1.ContainerPort{{
+				Name:          spinapp.HTTPPortName,
+				ContainerPort: spinapp.DefaultHTTPPort,
+			}},
+			Env:            env,
+			VolumeMounts:   volumeMounts,
+			Resources:      resources,
+			LivenessProbe:  livenessProbe,
+			ReadinessProbe: readinessProbe,
+		}
+	} else if config.SpinImage != nil {
+		container = corev1.Container{
+			Name:  app.Name,
+			Image: *config.SpinImage,
+			Args:  []string{"up", "--listen", fmt.Sprintf("0.0.0.0:%d", spinapp.DefaultHTTPPort), "-f", app.Spec.Image},
+			Ports: []corev1.ContainerPort{{
+				Name:          spinapp.HTTPPortName,
+				ContainerPort: spinapp.DefaultHTTPPort,
+			}},
+			Env:            env,
+			VolumeMounts:   volumeMounts,
+			Resources:      resources,
+			LivenessProbe:  livenessProbe,
+			ReadinessProbe: readinessProbe,
+		}
+	} else {
+		return nil, errors.New("must specify either runtimeClassName or spinImage")
+	}
+
 	dep := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Deployment",
@@ -457,23 +494,8 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 					Annotations: templateAnnotations,
 				},
 				Spec: corev1.PodSpec{
-					RuntimeClassName: &config.RuntimeClassName,
-					Containers: []corev1.Container{
-						{
-							Name:    app.Name,
-							Image:   app.Spec.Image,
-							Command: []string{"/"},
-							Ports: []corev1.ContainerPort{{
-								Name:          spinapp.HTTPPortName,
-								ContainerPort: spinapp.DefaultHTTPPort,
-							}},
-							Env:            env,
-							VolumeMounts:   volumeMounts,
-							Resources:      resources,
-							LivenessProbe:  livenessProbe,
-							ReadinessProbe: readinessProbe,
-						},
-					},
+					RuntimeClassName: config.RuntimeClassName,
+					Containers:       []corev1.Container{container},
 					ImagePullSecrets: app.Spec.ImagePullSecrets,
 					Volumes:          volumes,
 				},
@@ -502,8 +524,4 @@ func (r *SpinAppReconciler) findDeploymentForApp(ctx context.Context, app *spinv
 		return nil, err
 	}
 	return &deployment, nil
-}
-
-func ptr[T any](v T) *T {
-	return &v
 }

@@ -23,3 +23,7 @@ func AssociateBy[A ~[]X, X any, Y comparable](input A, assocBy func(X) Y) map[Y]
 	}
 	return result
 }
+
+func Ptr[T any](v T) *T {
+	return &v
+}
