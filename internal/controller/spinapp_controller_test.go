@@ -10,6 +10,7 @@ import (
 	"time"
 
 	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
+	"github.com/spinkube/spin-operator/internal/generics"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -148,7 +149,7 @@ func TestReconcile_Integration_Deployment_Respects_Executor_Config(t *testing.T)
 		Spec: spinv1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
 			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
-				RuntimeClassName: "a-runtime-class",
+				RuntimeClassName: generics.Ptr("a-runtime-class"),
 			},
 		},
 	}
@@ -211,7 +212,7 @@ func TestReconcile_Integration_RuntimeConfig(t *testing.T) {
 		Spec: spinv1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
 			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
-				RuntimeClassName: "a-runtime-class",
+				RuntimeClassName: generics.Ptr("a-runtime-class"),
 			},
 		},
 	}
@@ -310,7 +311,7 @@ func TestReconcile_Integration_RuntimeConfig_SecretAlreadyExists(t *testing.T) {
 		Spec: spinv1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
 			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
-				RuntimeClassName: "a-runtime-class",
+				RuntimeClassName: generics.Ptr("a-runtime-class"),
 			},
 		},
 	}
@@ -400,16 +401,16 @@ func TestConstructDeployment_MinimalApp(t *testing.T) {
 	app := minimalSpinApp()
 
 	cfg := &spinv1alpha1.ExecutorDeploymentConfig{
-		RuntimeClassName: "bananarama",
+		RuntimeClassName: generics.Ptr("bananarama"),
 	}
 	deployment, err := constructDeployment(context.Background(), app, cfg, "", "", nil)
 	require.NoError(t, err)
 	require.NotNil(t, deployment)
 
-	require.Equal(t, ptr(int32(1)), deployment.Spec.Replicas)
+	require.Equal(t, generics.Ptr(int32(1)), deployment.Spec.Replicas)
 	require.Len(t, deployment.Spec.Template.Spec.Containers, 1)
 	require.Equal(t, app.Spec.Image, deployment.Spec.Template.Spec.Containers[0].Image)
-	require.Equal(t, ptr("bananarama"), deployment.Spec.Template.Spec.RuntimeClassName)
+	require.Equal(t, generics.Ptr("bananarama"), deployment.Spec.Template.Spec.RuntimeClassName)
 }
 
 func TestConstructDeployment_WithPodLabels(t *testing.T) {
@@ -421,13 +422,13 @@ func TestConstructDeployment_WithPodLabels(t *testing.T) {
 	})
 
 	cfg := &spinv1alpha1.ExecutorDeploymentConfig{
-		RuntimeClassName: "bananarama",
+		RuntimeClassName: generics.Ptr("bananarama"),
 	}
 	deployment, err := constructDeployment(context.Background(), app, cfg, "", "", nil)
 	require.NoError(t, err)
 	require.NotNil(t, deployment)
 
-	require.Equal(t, ptr(int32(1)), deployment.Spec.Replicas)
+	require.Equal(t, generics.Ptr(int32(1)), deployment.Spec.Replicas)
 	require.Len(t, deployment.Spec.Template.Labels, 3)
 	require.Equal(t, deployment.Spec.Template.Labels[key], value)
 }

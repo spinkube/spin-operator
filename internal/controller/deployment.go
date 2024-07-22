@@ -20,7 +20,7 @@ func constructRuntimeConfigSecretMount(_ctx context.Context, secretName string) 
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName: secretName,
-				Optional:   ptr(true),
+				Optional:   generics.Ptr(true),
 				Items: []corev1.KeyToPath{
 					{
 						Key:  "runtime-config.toml",
@@ -46,7 +46,7 @@ func constructCASecretMount(_ context.Context, caSecretName string) (corev1.Volu
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName: caSecretName,
-				Optional:   ptr(true),
+				Optional:   generics.Ptr(true),
 				Items: []corev1.KeyToPath{{
 					Key:  "ca-certificates.crt",
 					Path: "ca-certificates.crt",

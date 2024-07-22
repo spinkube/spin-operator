@@ -14,7 +14,7 @@ func TestCRDInstalled(t *testing.T) {
 		Assess("spinapp crd installed", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			client := cfg.Client()
 			if err := apiextensionsV1.AddToScheme(client.Resources().GetScheme()); err != nil {
-				t.Fatalf("failed to register the v1 API extension types with Kuberenets scheme: %s", err)
+				t.Fatalf("failed to register the v1 API extension types with Kubernetes scheme: %s", err)
 			}
 			name := "spinapps.core.spinoperator.dev"
 			var crd apiextensionsV1.CustomResourceDefinition
@@ -31,7 +31,7 @@ func TestCRDInstalled(t *testing.T) {
 		Assess("spinappexecutor crd installed", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			client := cfg.Client()
 			if err := apiextensionsV1.AddToScheme(client.Resources().GetScheme()); err != nil {
-				t.Fatalf("failed to register the v1 API extension types with Kuberenets scheme: %s", err)
+				t.Fatalf("failed to register the v1 API extension types with Kubernetes scheme: %s", err)
 			}
 
 			name := "spinappexecutors.core.spinoperator.dev"

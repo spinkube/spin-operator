@@ -18,14 +18,12 @@ import (
 	"github.com/spinkube/spin-operator/internal/generics"
 )
 
-var runtimeClassName = "wasmtime-spin-v2"
-
-// TestDefaultSetup is a test that checks that the minimal setup works
-// with the containerd wasm shim runtime as the default runtime.
-func TestDefaultSetup(t *testing.T) {
+// TestSpintainer is a test that checks that the minimal setup works
+// with the spintainer executor
+func TestSpintainer(t *testing.T) {
 	var client klient.Client
 
-	helloWorldImage := "ghcr.io/spinkube/containerd-shim-spin/examples/spin-rust-hello:v0.13.0"
+	helloWorldImage := "ghcr.io/spinkube/spin-operator/hello-world:20240708-130250-gfefd2b1"
 	testSpinAppName := "test-spinapp"
 
 	defaultTest := features.New("default and most minimal setup").
@@ -40,9 +38,9 @@ func TestDefaultSetup(t *testing.T) {
 			return ctx
 		}).
 		Assess("spin app custom resource is created", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
-			testSpinApp := newSpinAppCR(testSpinAppName, helloWorldImage, "containerd-shim-spin")
+			testSpinApp := newSpinAppCR(testSpinAppName, helloWorldImage, "spintainer")
 
-			if err := client.Resources().Create(ctx, newContainerdShimExecutor(testNamespace)); err != nil {
+			if err := client.Resources().Create(ctx, newSpintainerExecutor(testNamespace)); err != nil {
 				t.Fatalf("Failed to create spinappexecutor: %s", err)
 			}
 
@@ -91,31 +89,16 @@ func TestDefaultSetup(t *testing.T) {
 	testEnv.Test(t, defaultTest)
 }
 
-func newSpinAppCR(name, image, executor string) *spinapps_v1alpha1.SpinApp {
-	var testSpinApp = &spinapps_v1alpha1.SpinApp{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: testNamespace,
-		},
-		Spec: spinapps_v1alpha1.SpinAppSpec{
-			Replicas: 1,
-			Image:    image,
-			Executor: executor,
-		},
-	}
-	return testSpinApp
-}
-
-func newContainerdShimExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecutor {
+func newSpintainerExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecutor {
 	var testSpinAppExecutor = &spinapps_v1alpha1.SpinAppExecutor{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "containerd-shim-spin",
+			Name:      "spintainer",
 			Namespace: namespace,
 		},
 		Spec: spinapps_v1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
 			DeploymentConfig: &spinapps_v1alpha1.ExecutorDeploymentConfig{
-				RuntimeClassName: generics.Ptr(runtimeClassName),
+				SpinImage: generics.Ptr("ttl.sh/spintainer:24h"),
 			},
 		},
 	}

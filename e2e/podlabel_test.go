@@ -37,7 +37,7 @@ func TestPodLabels(t *testing.T) {
 			client = cfg.Client()
 
 			if err := spinapps_v1alpha1.AddToScheme(client.Resources(testNamespace).GetScheme()); err != nil {
-				t.Fatalf("failed to register the spinapps_v1alpha1 types with Kuberenets scheme: %s", err)
+				t.Fatalf("failed to register the spinapps_v1alpha1 types with Kubernetes scheme: %s", err)
 			}
 
 			return ctx
