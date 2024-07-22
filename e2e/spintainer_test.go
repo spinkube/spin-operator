@@ -98,7 +98,7 @@ func newSpintainerExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecutor 
 		Spec: spinapps_v1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
 			DeploymentConfig: &spinapps_v1alpha1.ExecutorDeploymentConfig{
-				SpinImage: generics.Ptr("ttl.sh/spintainer:24h"),
+				SpinImage: generics.Ptr("ghcr.io/spinkube/spintainer:v2.6.0"),
 			},
 		},
 	}

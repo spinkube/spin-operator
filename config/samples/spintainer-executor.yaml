@@ -6,4 +6,4 @@ spec:
   createDeployment: true
   deploymentConfig:
     installDefaultCACerts: true
-    spinImage: ttl.sh/spintainer:24h
+    spinImage: ghcr.io/spinkube/spintainer:v2.6.0
