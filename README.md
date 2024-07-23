@@ -4,7 +4,7 @@ The Spin Operator enables deploying Spin applications to Kubernetes. It watches 
 
 ## Documentation
 
-To learn more about the Spin Operator and the SpinKube organization, please visit [the official Spin Operator documentation](https://www.spinkube.dev/docs/spin-operator/) which is housed inside the [the official SpinKube documentation](https://www.spinkube.dev/docs/).
+To learn more about the Spin Operator and the SpinKube organization, please visit [the official SpinKube documentation](https://www.spinkube.dev/docs/).
 
 At this point in the preview, we recommend testing Spin Operator on a local k3d cluster via `make install`. The [quickstart guide](https://www.spinkube.dev/docs/spin-operator/quickstart/) will walk you through prequisites and the installation workflow.
 
@@ -12,14 +12,14 @@ At this point in the preview, we recommend testing Spin Operator on a local k3d 
 
 ## Tutorials
 
-There are a host of tutorials in the [Spin Operator tutorials](https://www.spinkube.dev/docs/spin-operator/tutorials/) directory of the documentation. For example:
+There are a host of tutorials in the [SpinKube documentation](https://www.spinkube.dev/docs/install/). For example:
 
-- [Quickstart](https://www.spinkube.dev/docs/spin-operator/quickstart/)
-- [Running Locally](https://www.spinkube.dev/docs/spin-operator/tutorials/running-locally/)
-- [Running on a remote (non-local) K8s cluster](https://www.spinkube.dev/docs/spin-operator/tutorials/running-on-a-cluster/)
-- [Deploying on Azure k8s service](https://www.spinkube.dev/docs/spin-operator/tutorials/deploy-on-azure-kubernetes-service/)
-- [Scaling Spin Apps with Horizontal Pod Autoscaler (HPA)](https://www.spinkube.dev/docs/spin-operator/tutorials/scaling-with-hpa/)
-- [Scaling Spin Apps with Kubernetes Event Driver Autoscaler (KEDA)](https://www.spinkube.dev/docs/spin-operator/tutorials/scaling-with-keda/)
+- [Quickstart](https://www.spinkube.dev/docs/install/quickstart/)
+- [Deploying on Azure k8s service](https://www.spinkube.dev/docs/install/azure-kubernetes-service/)
+- [Scaling Spin Apps with Horizontal Pod Autoscaler (HPA)](https://www.spinkube.dev/docs/topics/autoscaling/scaling-with-hpa/)
+- [Scaling Spin Apps with Kubernetes Event Driver Autoscaler (KEDA)](https://www.spinkube.dev/docs/topics/autoscaling/scaling-with-keda/)
+- [Running spin-operator locally](https://www.spinkube.dev/docs/contrib/running-locally/)
+- [Running on a remote (non-local) K8s cluster](https://www.spinkube.dev/docs/contrib/running-on-a-cluster/)
 
 ## Feedback
 
@@ -29,10 +29,10 @@ For questions or support, please visit our [Discord channel](https://discord.com
 
 ## Contributing (Spin Operator)
 
-If you would like to contribute, please visit this [contributing](https://www.spinkube.dev/docs/spin-operator/contributing/) page.
+If you would like to contribute, please visit this [contributing](https://www.spinkube.dev/docs/contrib/) page.
 
 ## Contributing (Documentation)
 
-If you would like to contribute to SpinKube and Spin Operator, please visit this [contributing](https://www.spinkube.dev/docs/contribution-guidelines/) page.
+If you would like to contribute to SpinKube and Spin Operator, please visit this [contributing](https://www.spinkube.dev/docs/contrib/) page.
 
-The documentation is written using Hugo (as the static site generator), Docsy (as the technical documentation template) and GitHub pages (for hosting). However, during construction (prior to the website being rendered and publicly available) you are welcome to run a local copy of the documentation using the `hugo server` command. You can do so by following [these instructions](https://www.spinkube.dev/docs/contribution-guidelines/#previewing-your-changes-locally).
+The documentation is written using Hugo (as the static site generator), Docsy (as the technical documentation template) and GitHub pages (for hosting). However, during construction (prior to the website being rendered and publicly available) you are welcome to run a local copy of the documentation using the `hugo server` command. You can do so by following [these instructions](https://www.spinkube.dev/docs/contrib/#previewing-your-changes-locally).
