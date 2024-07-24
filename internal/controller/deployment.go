@@ -103,12 +103,9 @@ func ConstructVolumeMountsForApp(ctx context.Context, app *spinv1alpha1.SpinApp,
 
 // ConstructEnvForApp constructs the env for a spin app that runs as a k8s pod.
 // Variables are not guaranteed to stay backed by ENV.
-func ConstructEnvForApp(ctx context.Context, app *spinv1alpha1.SpinApp) []corev1.EnvVar {
-	if len(app.Spec.Variables) == 0 {
-		return nil
-	}
-
+func ConstructEnvForApp(ctx context.Context, app *spinv1alpha1.SpinApp, otel *spinv1alpha1.OtelConfig) []corev1.EnvVar {
 	envs := make([]corev1.EnvVar, len(app.Spec.Variables))
+	// Adding the Spin Variables
 	for idx, variable := range app.Spec.Variables {
 		env := corev1.EnvVar{
 			// Spin Variables only allow lowercase ascii characters, `_`, and numbers.
@@ -119,6 +116,11 @@ func ConstructEnvForApp(ctx context.Context, app *spinv1alpha1.SpinApp) []corev1
 			ValueFrom: variable.ValueFrom,
 		}
 		envs[idx] = env
+	}
+
+	// Adding the OpenTelemetry params
+	if otel.Endpoint != "" {
+		envs = append(envs, corev1.EnvVar{Name: "OTEL_EXPORTER_OTLP_ENDPOINT", Value: otel.Endpoint})
 	}
 
 	return envs

@@ -94,6 +94,9 @@ func TestConstructEnvForApp(t *testing.T) {
 
 		value     string
 		valueFrom *corev1.EnvVarSource
+
+		expectedOtelEndpointVarName string
+		otelEndpointValue           string
 	}{
 		{
 			name:            "simple_secret_with_static_value",
@@ -129,6 +132,11 @@ func TestConstructEnvForApp(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:                        "otel_endpoint_is_properly_set",
+			expectedOtelEndpointVarName: "OTEL_EXPORTER_OTLP_ENDPOINT",
+			otelEndpointValue:           "http://test-endpoint",
+		},
 	}
 
 	for _, test := range tests {
@@ -142,11 +150,17 @@ func TestConstructEnvForApp(t *testing.T) {
 				},
 			}
 
-			envs := ConstructEnvForApp(context.Background(), app)
+			envs := ConstructEnvForApp(context.Background(), app, &spinv1alpha1.OtelConfig{Endpoint: test.otelEndpointValue})
 
 			require.Equal(t, test.expectedEnvName, envs[0].Name)
 			require.Equal(t, test.value, envs[0].Value)
 			require.Equal(t, test.valueFrom, envs[0].ValueFrom)
+
+			// This assumes that the test case which contains the OTel endpoint will not be testing for any other env vars
+			if test.expectedOtelEndpointVarName != "" {
+				require.Equal(t, test.expectedOtelEndpointVarName, envs[0].Name)
+				require.Equal(t, test.otelEndpointValue, envs[0].Value)
+			}
 		})
 	}
 }
