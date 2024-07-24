@@ -18,7 +18,7 @@ func TestValidateExecutor(t *testing.T) {
 	_, fldErr = validateExecutor(
 		spinv1alpha1.SpinAppSpec{Executor: constants.CyclotronExecutor},
 		func(string) (*spinv1alpha1.SpinAppExecutor, error) { return nil, errors.New("executor not found?") })
-	require.EqualError(t, fldErr, "spec.executor: Invalid value: \"cyclotron\": executor does not exist on cluster")
+	require.EqualError(t, fldErr, "spec.executor: Invalid value: \"cyclotron\": executor does not exist in namespace")
 
 	_, fldErr = validateExecutor(spinv1alpha1.SpinAppSpec{Executor: constants.ContainerDShimSpinExecutor}, func(string) (*spinv1alpha1.SpinAppExecutor, error) { return nil, nil })
 	require.Nil(t, fldErr)

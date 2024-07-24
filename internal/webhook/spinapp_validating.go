@@ -97,7 +97,7 @@ func validateExecutor(spec spinv1alpha1.SpinAppSpec, fetchExecutor func(name str
 	executor, err := fetchExecutor(spec.Executor)
 	if err != nil {
 		// Handle errors that are not just "Not Found"
-		return nil, field.Invalid(field.NewPath("spec").Child("executor"), spec.Executor, "executor does not exist on cluster")
+		return nil, field.Invalid(field.NewPath("spec").Child("executor"), spec.Executor, "executor does not exist in namespace")
 	}
 
 	return executor, nil
