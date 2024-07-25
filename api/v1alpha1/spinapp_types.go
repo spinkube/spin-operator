@@ -40,6 +40,8 @@ type SpinAppSpec struct {
 	// ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling the image.
 	ImagePullSecrets []corev1.LocalObjectReference `json:"imagePullSecrets,omitempty"`
 
+	// ImagePullPolicy is the policy for pulling the image.
+	ImagePullPolicy corev1.PullPolicy `json:"imagePullPolicy,omitempty"`
 	// Checks defines health checks that should be used by Kubernetes to monitor the application.
 	Checks HealthChecks `json:"checks,omitempty"`
 
