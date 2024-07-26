@@ -41,9 +41,9 @@ type SpinAppExecutorReconciler struct {
 	Recorder record.EventRecorder
 }
 
-//+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinappexecutors,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinappexecutors/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=core.spinoperator.dev,resources=spinappexecutors/finalizers,verbs=update
+//+kubebuilder:rbac:groups=core.spinkube.dev,resources=spinappexecutors,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core.spinkube.dev,resources=spinappexecutors/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=core.spinkube.dev,resources=spinappexecutors/finalizers,verbs=update
 //+kubebuilder:rbac:groups=core,resources=events,verbs=create;patch
 
 // SetupWithManager sets up the controller with the Manager.

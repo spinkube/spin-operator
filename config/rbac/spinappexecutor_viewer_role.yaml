@@ -12,7 +12,7 @@ metadata:
   name: spinappexecutor-viewer-role
 rules:
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinappexecutors
   verbs:
@@ -20,7 +20,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinappexecutors/status
   verbs:
