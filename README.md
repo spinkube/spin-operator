@@ -132,8 +132,8 @@ kubectl apply -f config/samples/spin-runtime-class.yaml
 kubectl apply -f config/samples/spin-shim-executor.yaml
 ```
 
-> OPTIONAL: You can build and push the Spin Operator image using `make docker-build` and `make
-> docker-push`.
+> OPTIONAL: You can build and push the Spin Operator image using `make docker-build` and
+> `make docker-push`.
 >
 >     export IMG_REPO=<some-registry>/spin-operator
 >     make docker-build docker-push
