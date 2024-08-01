@@ -24,16 +24,6 @@ func TestValidateExecutor(t *testing.T) {
 	require.Nil(t, fldErr)
 }
 
-func TestValidateReplicas(t *testing.T) {
-	t.Parallel()
-
-	fldErr := validateReplicas(spinv1alpha1.SpinAppSpec{})
-	require.EqualError(t, fldErr, "spec.replicas: Invalid value: 0: replicas must be > 0")
-
-	fldErr = validateReplicas(spinv1alpha1.SpinAppSpec{Replicas: 1})
-	require.Nil(t, fldErr)
-}
-
 func TestValidateAnnotations(t *testing.T) {
 	t.Parallel()
 

@@ -58,9 +58,6 @@ func (v *SpinAppValidator) validateSpinApp(ctx context.Context, spinApp *spinv1a
 	if err != nil {
 		allErrs = append(allErrs, err)
 	}
-	if err := validateReplicas(spinApp.Spec); err != nil {
-		allErrs = append(allErrs, err)
-	}
 	if err := validateAnnotations(spinApp.Spec, executor); err != nil {
 		allErrs = append(allErrs, err)
 	}
@@ -101,17 +98,6 @@ func validateExecutor(spec spinv1alpha1.SpinAppSpec, fetchExecutor func(name str
 	}
 
 	return executor, nil
-}
-
-func validateReplicas(spec spinv1alpha1.SpinAppSpec) *field.Error {
-	if spec.EnableAutoscaling && spec.Replicas != 0 {
-		return field.Invalid(field.NewPath("spec").Child("replicas"), spec.Replicas, "replicas cannot be set when autoscaling is enabled")
-	}
-	if !spec.EnableAutoscaling && spec.Replicas < 1 {
-		return field.Invalid(field.NewPath("spec").Child("replicas"), spec.Replicas, "replicas must be > 0")
-	}
-
-	return nil
 }
 
 func validateAnnotations(spec spinv1alpha1.SpinAppSpec, executor *spinv1alpha1.SpinAppExecutor) *field.Error {
