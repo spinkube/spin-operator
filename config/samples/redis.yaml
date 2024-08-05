@@ -3,7 +3,7 @@ kind: SpinApp
 metadata:
   name: redis-spinapp
 spec:
-  image: "ttl.sh/caleb-redis-thing-2:24h"
+  image: "ghcr.io/spinkube/redis-sample:20240805-185905-gdb3271f"
   replicas: 1
   executor: containerd-shim-spin
 # Steps to run this found at https://github.com/spinkube/spin-operator/pull/131
