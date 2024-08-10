@@ -48,7 +48,7 @@ rules:
   verbs:
   - get
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinappexecutors
   verbs:
@@ -60,13 +60,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinappexecutors/finalizers
   verbs:
   - update
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinappexecutors/status
   verbs:
@@ -74,7 +74,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinapps
   verbs:
@@ -86,7 +86,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinapps/status
   verbs:

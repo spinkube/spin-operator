@@ -4,9 +4,9 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: spinappexecutors.core.spinoperator.dev
+  name: spinappexecutors.core.spinkube.dev
 spec:
-  group: core.spinoperator.dev
+  group: core.spinkube.dev
   names:
     kind: SpinAppExecutor
     listKind: SpinAppExecutorList

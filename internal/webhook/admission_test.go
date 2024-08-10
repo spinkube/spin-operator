@@ -152,7 +152,7 @@ func TestCreateSpinAppWithNoExecutor(t *testing.T) {
 			Replicas: 2,
 		},
 	})
-	require.EqualError(t, err, "admission webhook \"vspinapp.kb.io\" denied the request: SpinApp.core.spinoperator.dev \"spinapp\" is invalid:"+
+	require.EqualError(t, err, "admission webhook \"vspinapp.kb.io\" denied the request: SpinApp.core.spinkube.dev \"spinapp\" is invalid:"+
 		" spec.executor: Invalid value: \"\": executor must be set, likely no default executor was set because you have no executors installed")
 }
 
