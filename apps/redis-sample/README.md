@@ -20,11 +20,9 @@ spec:
   variables:
     - name: redis_endpoint
       value: redis://redis.default.svc.cluster.local:6379
-
 ```
 
 Once created, run `kubectl apply -f redis_client.yaml`.
-
 
 ## Deploying Redis
 
@@ -51,10 +49,9 @@ spec:
         - name: redis
           image: redis
           ports:
-          - containerPort: 6379
+            - containerPort: 6379
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
