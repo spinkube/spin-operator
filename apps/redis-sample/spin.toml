@@ -1,0 +1,24 @@
+spin_manifest_version = 2
+
+[application]
+name = "spin-redis-sample"
+version = "0.1.0"
+authors = ["Fermyon Engineering Team <engineering@fermyon.com>"]
+
+[variables]
+redis_endpoint = {required = true}
+
+[[trigger.http]]
+route = "/..."
+component = "spin-redis-sample"
+
+[component.spin-redis-sample]
+source = "main.wasm"
+allowed_outbound_hosts = ["redis://*"]
+
+[component.spin-redis-sample.build]
+command = "tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go"
+watch = ["**/*.go", "go.mod"]
+
+[component.spin-redis-sample.variables]
+redis_endpoint = "{{ redis_endpoint }}"
