@@ -46,6 +46,20 @@ func TestConstructRuntimeConfigSecretMount_Contract(t *testing.T) {
 	require.Contains(t, mount.Name, "spin-")
 }
 
+func TestConstructCASecretMount(t *testing.T) {
+	t.Parallel()
+
+	volume, mount := constructCASecretMount(context.Background(), "a-secret-name")
+
+	// Mount and Volume refer to each other
+	require.Equal(t, volume.Name, mount.Name)
+
+	// uses provided secret name
+	require.Equal(t, "a-secret-name", volume.Secret.SecretName)
+
+	require.True(t, mount.ReadOnly)
+}
+
 func TestConstructVolumeMountsForApp_Contract(t *testing.T) {
 	t.Parallel()
 

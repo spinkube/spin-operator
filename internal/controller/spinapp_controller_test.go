@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	goruntime "runtime"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -507,6 +508,118 @@ func TestReconcile_Integration_AnnotationAndLabelPropagataion(t *testing.T) {
 	require.Equal(t, map[string]string{"my.pod.annotation": "value"}, deployment.Spec.Template.ObjectMeta.Annotations)
 	require.Equal(t, map[string]string{"my.deployment.annotation": "value"}, deployment.ObjectMeta.Annotations)
 
+	// Terminate the context to force the manager to shut down.
+	cancelFunc()
+	wg.Wait()
+}
+
+func TestReconcile_Integration_Deployment_SpinCAInjection(t *testing.T) {
+	t.Parallel()
+
+	envTest, mgr, _ := setupController(t)
+
+	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancelFunc()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		require.NoError(t, mgr.Start(ctx))
+		wg.Done()
+	}()
+
+	// Create an executor that creates a deployment with the default Spin CA Secret
+	executorWithDefaults := &spinv1alpha1.SpinAppExecutor{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "executor-default",
+			Namespace: "default",
+		},
+		Spec: spinv1alpha1.SpinAppExecutorSpec{
+			CreateDeployment: true,
+			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
+				RuntimeClassName:      "foobar",
+				InstallDefaultCACerts: true,
+			},
+		},
+	}
+
+	// Create an executor that creates a deployment with a custom secret that doesn't
+	// exist in the cluster
+	executorWithCustomNonExistentSecret := &spinv1alpha1.SpinAppExecutor{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "executor-custom-name",
+			Namespace: "default",
+		},
+		Spec: spinv1alpha1.SpinAppExecutorSpec{
+			CreateDeployment: true,
+			DeploymentConfig: &spinv1alpha1.ExecutorDeploymentConfig{
+				RuntimeClassName:      "foobar",
+				CACertSecret:          "my-custom-secret-name",
+				InstallDefaultCACerts: true,
+			},
+		},
+	}
+
+	require.NoError(t, envTest.k8sClient.Create(ctx, executorWithDefaults))
+	require.NoError(t, envTest.k8sClient.Create(ctx, executorWithCustomNonExistentSecret))
+
+	for _, executor := range []*spinv1alpha1.SpinAppExecutor{
+		executorWithDefaults,
+		executorWithCustomNonExistentSecret,
+	} {
+		spinApp := &spinv1alpha1.SpinApp{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "app-" + executor.Name,
+				Namespace: "default",
+			},
+			Spec: spinv1alpha1.SpinAppSpec{
+				Executor: executor.Name,
+				Image:    "ghcr.io/radu-matei/perftest:v1",
+			},
+		}
+		require.NoError(t, envTest.k8sClient.Create(ctx, spinApp))
+
+		var deployment appsv1.Deployment
+		require.Eventually(t, func() bool {
+			err := envTest.k8sClient.Get(ctx,
+				types.NamespacedName{
+					Namespace: "default",
+					Name:      spinApp.Name},
+				&deployment)
+			return err == nil
+		}, 3*time.Second, 100*time.Millisecond)
+
+		expectedSecretName := "spin-ca"
+		if executor.Spec.DeploymentConfig.CACertSecret != "" {
+			expectedSecretName = executor.Spec.DeploymentConfig.CACertSecret
+		}
+
+		// ensure the secret exists
+		var secret corev1.Secret
+		require.Eventually(t, func() bool {
+			err := envTest.k8sClient.Get(ctx,
+				types.NamespacedName{
+					Namespace: "default",
+					Name:      expectedSecretName,
+				},
+				&secret)
+			return err == nil
+		}, 3*time.Second, 100*time.Millisecond)
+
+		if !slices.ContainsFunc(deployment.Spec.Template.Spec.Volumes, func(v corev1.Volume) bool {
+			return v.Name == "spin-ca" && v.VolumeSource.Secret.SecretName == expectedSecretName
+		}) {
+			t.Errorf("deployment does not contain a binding to the correct CA Secret")
+		}
+
+		if !slices.ContainsFunc(deployment.Spec.Template.Spec.Containers, func(c corev1.Container) bool {
+			return slices.ContainsFunc(c.VolumeMounts, func(v corev1.VolumeMount) bool {
+				return v.Name == "spin-ca"
+			})
+		}) {
+			t.Fatalf("deployment does not include ca-bundle mount")
+		}
+	}
 	// Terminate the context to force the manager to shut down.
 	cancelFunc()
 	wg.Wait()
