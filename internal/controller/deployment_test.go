@@ -94,6 +94,9 @@ func TestConstructEnvForApp(t *testing.T) {
 
 		value     string
 		valueFrom *corev1.EnvVarSource
+
+		expectedOtelVars map[string]string
+		otelVars         spinv1alpha1.OtelConfig
 	}{
 		{
 			name:            "simple_secret_with_static_value",
@@ -129,6 +132,21 @@ func TestConstructEnvForApp(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "otel_vars_are_properly_set",
+			otelVars: spinv1alpha1.OtelConfig{
+				ExporterOtlpEndpoint:        "http://otlp",
+				ExporterOtlpTracesEndpoint:  "http://traces",
+				ExporterOtlpMetricsEndpoint: "http://metrics",
+				ExporterOtlpLogsEndpoint:    "http://logs",
+			},
+			expectedOtelVars: map[string]string{
+				"OTEL_EXPORTER_OTLP_ENDPOINT":         "http://otlp",
+				"OTEL_EXPORTER_OTLP_TRACES_ENDPOINT":  "http://traces",
+				"OTEL_EXPORTER_OTLP_METRICS_ENDPOINT": "http://metrics",
+				"OTEL_EXPORTER_OTLP_LOGS_ENDPOINT":    "http://logs",
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -142,11 +160,28 @@ func TestConstructEnvForApp(t *testing.T) {
 				},
 			}
 
-			envs := ConstructEnvForApp(context.Background(), app, 0)
+			envs := ConstructEnvForApp(context.Background(), app, 0, &test.otelVars)
 
 			require.Equal(t, test.expectedEnvName, envs[0].Name)
 			require.Equal(t, test.value, envs[0].Value)
 			require.Equal(t, test.valueFrom, envs[0].ValueFrom)
+
+			for key, value := range test.expectedOtelVars {
+				varNotFound := true
+				for _, envVar := range envs {
+					if envVar.Name == key {
+						varNotFound = false
+						if envVar.Value != value {
+							require.Equal(t, test.value, envVar.Value)
+							break
+						}
+					}
+				}
+
+				if varNotFound {
+					require.NotContains(t, test.expectedOtelVars, key)
+				}
+			}
 		})
 	}
 }

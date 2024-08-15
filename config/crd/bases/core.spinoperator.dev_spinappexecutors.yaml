@@ -61,6 +61,26 @@ spec:
                       will be created containing the certificates. If no secret name is
                       defined in `CACertSecret` the secret name will be `spin-ca`.
                     type: boolean
+                  otel:
+                    description: Otel provides Kubernetes Bindings to Otel Variables.
+                    properties:
+                      exporter_otlp_endpoint:
+                        description: ExporterOtlpEndpoint configures the default combined
+                          otlp endpoint for sending telemetry
+                        type: string
+                      exporter_otlp_logs_endpoint:
+                        description: ExporterOtlpLogsEndpoint configures the logs-specific
+                          otlp endpoint
+                        type: string
+                      exporter_otlp_metrics_endpoint:
+                        description: ExporterOtlpMetricsEndpoint configures the metrics-specific
+                          otlp endpoint
+                        type: string
+                      exporter_otlp_traces_endpoint:
+                        description: ExporterOtlpTracesEndpoint configures the trace-specific
+                          otlp endpoint
+                        type: string
+                    type: object
                   runtimeClassName:
                     description: |-
                       RuntimeClassName is the runtime class name that should be used by pods created
