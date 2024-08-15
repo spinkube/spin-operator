@@ -19,7 +19,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22.x'
+          go-version: '1.23.x'
           cache: true
 
       - name: Setup gotestsum
@@ -74,12 +74,12 @@ jobs:
     steps:
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22.x'
+          go-version: '1.23.x'
       - uses: actions/checkout@v4
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.55.2
+          version: v1.60.1
           args: --timeout=10m
 
   lint_shell:
@@ -98,7 +98,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22.x'
+          go-version: '1.23.x'
           cache: true
       - name: Install dependencies
         run: go mod download
