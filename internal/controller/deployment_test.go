@@ -142,7 +142,7 @@ func TestConstructEnvForApp(t *testing.T) {
 				},
 			}
 
-			envs := ConstructEnvForApp(context.Background(), app)
+			envs := ConstructEnvForApp(context.Background(), app, 0)
 
 			require.Equal(t, test.expectedEnvName, envs[0].Name)
 			require.Equal(t, test.value, envs[0].Value)
