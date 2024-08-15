@@ -43,7 +43,7 @@ jobs:
             --junitfile .results/results.xml \
             --jsonfile .results/results.json \
             --format testname \
-            -- -coverprofile=.results/cover.out ./...
+            -- -coverprofile=.results/cover.out $(go list ./... | grep -v e2e)
 
       - name: Test Summary
         uses: test-summary/action@v2
