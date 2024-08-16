@@ -35,6 +35,9 @@ func (c *Cluster) Create(context.Context, string) (string, error) {
 	}
 
 	command := fmt.Sprintf("%s cluster create %s --image %s -p '8081:80@loadbalancer' --agents 2 --wait", k3dBin, c.name, k3dImage)
+	if useNativeSnapshotter() {
+		command = command + ` --k3s-arg "--snapshotter=native@agent:0,1;server:0"`
+	}
 	klog.V(4).Info("Launching:", command)
 	p := utils.RunCommand(command)
 	if p.Err() != nil {
@@ -120,4 +123,8 @@ func clusterExists(name string) (string, bool) {
 		}
 	}
 	return clusters, false
+}
+
+func useNativeSnapshotter() bool {
+	return os.Getenv("E2E_USE_NATIVE_SNAPSHOTTER") == "true"
 }
