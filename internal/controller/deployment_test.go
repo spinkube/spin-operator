@@ -133,7 +133,10 @@ func TestConstructEnvForApp(t *testing.T) {
 			},
 		},
 		{
-			name: "otel_vars_are_properly_set",
+			name:            "otel_vars_are_properly_set",
+			varName:         "simple_secret",
+			expectedEnvName: "SPIN_VARIABLE_SIMPLE_SECRET",
+			value:           "f00",
 			otelVars: spinv1alpha1.OtelConfig{
 				ExporterOtlpEndpoint:        "http://otlp",
 				ExporterOtlpTracesEndpoint:  "http://traces",
