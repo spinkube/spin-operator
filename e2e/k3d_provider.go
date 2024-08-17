@@ -126,5 +126,5 @@ func clusterExists(name string) (string, bool) {
 }
 
 func useNativeSnapshotter() bool {
-	return os.Getenv("E2E_USE_NATIVE_SNAPSHOTTER") == "true"
+	return os.Getenv("E2E_USE_NATIVE_SNAPSHOTTER") == "true" // nolint:forbidigo
 }
