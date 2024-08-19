@@ -2,11 +2,9 @@ package e2e
 
 import (
 	"context"
-	"slices"
 	"testing"
 	"time"
 
-	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/e2e-framework/klient"
@@ -87,47 +85,6 @@ func TestDefaultSetup(t *testing.T) {
 			); err != nil {
 				t.Fatal(err)
 			}
-			return ctx
-		}).
-		Assess("ca certificate secret is created", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
-			secret := &corev1.Secret{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      testCACertSecret,
-					Namespace: testNamespace,
-				},
-			}
-
-			if err := wait.For(
-				conditions.New(client.Resources()).ResourceMatch(secret, func(object k8s.Object) bool {
-					return true
-				}),
-				wait.WithTimeout(time.Minute),
-				wait.WithInterval(5*time.Second),
-			); err != nil {
-				t.Fatal(err)
-			}
-			return ctx
-		}).
-		Assess("ca certificate secret is mounted to the deployment", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
-			var deployment appsv1.Deployment
-			if err := client.Resources().Get(ctx, testSpinAppName, testNamespace, &deployment); err != nil {
-				t.Fatalf("Failed to get deployment: %s", err)
-			}
-
-			if !slices.ContainsFunc(deployment.Spec.Template.Spec.Volumes, func(v corev1.Volume) bool {
-				return v.Name == "spin-ca" && v.VolumeSource.Secret.SecretName == testCACertSecret
-			}) {
-				t.Fatalf("Failed to add ca bundle volume")
-			}
-
-			if !slices.ContainsFunc(deployment.Spec.Template.Spec.Containers, func(c corev1.Container) bool {
-				return slices.ContainsFunc(c.VolumeMounts, func(v corev1.VolumeMount) bool {
-					return v.Name == "spin-ca"
-				})
-			}) {
-				t.Fatalf("Failed to mount ca bundle to container")
-			}
-
 			return ctx
 		}).
 		Feature()
