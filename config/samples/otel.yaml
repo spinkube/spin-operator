@@ -1,0 +1,20 @@
+apiVersion: core.spinoperator.dev/v1alpha1
+kind: SpinApp
+metadata:
+  name: otel-spinapp
+spec:
+  image: ghcr.io/spinkube/spin-operator/cpu-load-gen:20240311-163328-g1121986
+  executor: otel-shim-executor
+  replicas: 1
+---
+apiVersion: core.spinoperator.dev/v1alpha1
+kind: SpinAppExecutor
+metadata:
+  name: otel-shim-executor
+spec:
+  createDeployment: true
+  deploymentConfig:
+    runtimeClassName: wasmtime-spin-v2
+    installDefaultCACerts: true
+    otel:
+      exporter_otlp_endpoint: http://otel-collector.default.svc.cluster.local:4318

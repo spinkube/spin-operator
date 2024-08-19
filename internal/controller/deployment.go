@@ -103,8 +103,9 @@ func ConstructVolumeMountsForApp(ctx context.Context, app *spinv1alpha1.SpinApp,
 
 // ConstructEnvForApp constructs the env for a spin app that runs as a k8s pod.
 // Variables are not guaranteed to stay backed by ENV.
-func ConstructEnvForApp(ctx context.Context, app *spinv1alpha1.SpinApp, listenPort int) []corev1.EnvVar {
+func ConstructEnvForApp(ctx context.Context, app *spinv1alpha1.SpinApp, listenPort int, otel *spinv1alpha1.OtelConfig) []corev1.EnvVar {
 	envs := make([]corev1.EnvVar, len(app.Spec.Variables))
+	// Adding the Spin Variables
 	for idx, variable := range app.Spec.Variables {
 		env := corev1.EnvVar{
 			// Spin Variables only allow lowercase ascii characters, `_`, and numbers.
@@ -121,6 +122,24 @@ func ConstructEnvForApp(ctx context.Context, app *spinv1alpha1.SpinApp, listenPo
 		Name:  "SPIN_HTTP_LISTEN_ADDR",
 		Value: fmt.Sprintf("0.0.0.0:%d", listenPort),
 	})
+	// Adding the OpenTelemetry params
+	if otel != nil {
+		if otel.ExporterOtlpEndpoint != "" {
+			envs = append(envs, corev1.EnvVar{Name: "OTEL_EXPORTER_OTLP_ENDPOINT", Value: otel.ExporterOtlpEndpoint})
+		}
+
+		if otel.ExporterOtlpTracesEndpoint != "" {
+			envs = append(envs, corev1.EnvVar{Name: "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", Value: otel.ExporterOtlpTracesEndpoint})
+		}
+
+		if otel.ExporterOtlpMetricsEndpoint != "" {
+			envs = append(envs, corev1.EnvVar{Name: "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", Value: otel.ExporterOtlpMetricsEndpoint})
+		}
+
+		if otel.ExporterOtlpLogsEndpoint != "" {
+			envs = append(envs, corev1.EnvVar{Name: "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", Value: otel.ExporterOtlpLogsEndpoint})
+		}
+	}
 
 	return envs
 }

@@ -48,12 +48,27 @@ type ExecutorDeploymentConfig struct {
 	// will be created containing the certificates. If no secret name is
 	// defined in `CACertSecret` the secret name will be `spin-ca`.
 	InstallDefaultCACerts bool `json:"installDefaultCACerts,omitempty"`
+
+	// Otel provides Kubernetes Bindings to Otel Variables.
+	Otel *OtelConfig `json:"otel,omitempty"`
 }
 
 // SpinAppExecutorStatus defines the observed state of SpinAppExecutor
 type SpinAppExecutorStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+}
+
+// OtelConfig is the supported environment variables for OpenTelemetry
+type OtelConfig struct {
+	// ExporterOtlpEndpoint configures the default combined otlp endpoint for sending telemetry
+	ExporterOtlpEndpoint string `json:"exporter_otlp_endpoint,omitempty"`
+	// ExporterOtlpTracesEndpoint configures the trace-specific otlp endpoint
+	ExporterOtlpTracesEndpoint string `json:"exporter_otlp_traces_endpoint,omitempty"`
+	// ExporterOtlpMetricsEndpoint configures the metrics-specific otlp endpoint
+	ExporterOtlpMetricsEndpoint string `json:"exporter_otlp_metrics_endpoint,omitempty"`
+	// ExporterOtlpLogsEndpoint configures the logs-specific otlp endpoint
+	ExporterOtlpLogsEndpoint string `json:"exporter_otlp_logs_endpoint,omitempty"`
 }
 
 //+kubebuilder:object:root=true

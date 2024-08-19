@@ -426,7 +426,7 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 		Requests: app.Spec.Resources.Requests,
 	}
 
-	env := ConstructEnvForApp(ctx, app, spinapp.DefaultHTTPPort)
+	env := ConstructEnvForApp(ctx, app, spinapp.DefaultHTTPPort, config.Otel)
 
 	readinessProbe, livenessProbe, err := ConstructPodHealthChecks(app)
 	if err != nil {
