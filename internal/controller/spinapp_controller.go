@@ -238,6 +238,9 @@ func (r *SpinAppReconciler) ensureCASecret(ctx context.Context, caSecretName, na
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      caSecretName,
 			Namespace: namespace,
+			Annotations: map[string]string{
+				"app.kubernetes.io/managed-by": "spin-operator.spinkube.dev",
+			},
 		},
 		StringData: map[string]string{"ca-certificates.crt": cacerts.CACertificates()},
 	}
