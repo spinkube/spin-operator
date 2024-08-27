@@ -15,6 +15,8 @@ import (
 	"sigs.k8s.io/e2e-framework/pkg/envconf"
 	"sigs.k8s.io/e2e-framework/pkg/envfuncs"
 	"sigs.k8s.io/e2e-framework/support/utils"
+
+	spinapps_v1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 )
 
 const ErrFormat = "%v: %v\n"
@@ -35,7 +37,6 @@ func TestMain(m *testing.M) {
 	cluster.name = envconf.RandomName("crdtest-", 16)
 
 	testEnv.Setup(
-
 		func(ctx context.Context, e *envconf.Config) (context.Context, error) {
 			if _, err := cluster.Create(ctx, cluster.name); err != nil {
 				return ctx, err
@@ -85,6 +86,11 @@ func TestMain(m *testing.M) {
 
 			// wait for the controller deployment to be ready
 			client := cfg.Client()
+
+			if err := spinapps_v1alpha1.AddToScheme(client.Resources().GetScheme()); err != nil {
+				return ctx, fmt.Errorf("failed to register the spinapps_v1alpha1 types with Kubernetes scheme: %w", err)
+			}
+
 			if err := wait.For(
 				conditions.New(client.Resources()).
 					DeploymentAvailable(spinOperatorDeploymentName, spinOperatorNamespace),
@@ -96,7 +102,8 @@ func TestMain(m *testing.M) {
 
 			return ctx, nil
 		},
-		// deploy runtime class
+
+		// create runtime class
 		func(ctx context.Context, c *envconf.Config) (context.Context, error) {
 			client := cfg.Client()
 			runtimeClass := &nodev1.RuntimeClass{
@@ -109,6 +116,14 @@ func TestMain(m *testing.M) {
 			err := client.Resources().Create(ctx, runtimeClass)
 			return ctx, err
 		},
+
+		// create executor
+		func(ctx context.Context, c *envconf.Config) (context.Context, error) {
+			client := cfg.Client()
+
+			err := client.Resources().Create(ctx, newContainerdShimExecutor(testNamespace))
+			return ctx, err
+		},
 	)
 
 	testEnv.Finish(
@@ -118,4 +133,21 @@ func TestMain(m *testing.M) {
 	)
 
 	os.Exit(testEnv.Run(m))
+}
+
+func newContainerdShimExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecutor {
+	return &spinapps_v1alpha1.SpinAppExecutor{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "containerd-shim-spin",
+			Namespace: namespace,
+		},
+		Spec: spinapps_v1alpha1.SpinAppExecutorSpec{
+			CreateDeployment: true,
+			DeploymentConfig: &spinapps_v1alpha1.ExecutorDeploymentConfig{
+				RuntimeClassName:      runtimeClassName,
+				InstallDefaultCACerts: true,
+				CACertSecret:          testCACertSecret,
+			},
+		},
+	}
 }
