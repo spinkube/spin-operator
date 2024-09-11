@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"hash/adler32"
 	"maps"
+	"time"
 
 	"github.com/pelletier/go-toml/v2"
 	appsv1 "k8s.io/api/apps/v1"
@@ -110,7 +111,9 @@ func (r *SpinAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		log.Error(err, "unable to fetch executor")
 		r.Recorder.Event(&spinApp, "Warning", "MissingExecutor",
 			fmt.Sprintf("Could not find SpinAppExecutor %s/%s", req.NamespacedName.Namespace, spinApp.Spec.Executor))
-		return ctrl.Result{}, err
+		return ctrl.Result{
+			RequeueAfter: 15 * time.Second,
+		}, err
 	}
 
 	// Update the status of the SpinApp

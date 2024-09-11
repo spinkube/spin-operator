@@ -54,14 +54,7 @@ func (v *SpinAppValidator) ValidateDelete(ctx context.Context, obj runtime.Objec
 
 func (v *SpinAppValidator) validateSpinApp(ctx context.Context, spinApp *spinv1alpha1.SpinApp) error {
 	var allErrs field.ErrorList
-	executor, err := validateExecutor(spinApp.Spec, v.fetchExecutor(ctx, spinApp.Namespace))
-	if err != nil {
-		allErrs = append(allErrs, err)
-	}
 	if err := validateReplicas(spinApp.Spec); err != nil {
-		allErrs = append(allErrs, err)
-	}
-	if err := validateAnnotations(spinApp.Spec, executor); err != nil {
 		allErrs = append(allErrs, err)
 	}
 	if len(allErrs) == 0 {
@@ -109,30 +102,6 @@ func validateReplicas(spec spinv1alpha1.SpinAppSpec) *field.Error {
 	}
 	if !spec.EnableAutoscaling && spec.Replicas < 1 {
 		return field.Invalid(field.NewPath("spec").Child("replicas"), spec.Replicas, "replicas must be > 0")
-	}
-
-	return nil
-}
-
-func validateAnnotations(spec spinv1alpha1.SpinAppSpec, executor *spinv1alpha1.SpinAppExecutor) *field.Error {
-	// We can't do any validation if the executor isn't available, but validation
-	// will fail because of earlier errors.
-	if executor == nil {
-		return nil
-	}
-
-	if executor.Spec.CreateDeployment {
-		return nil
-	}
-	// TODO: Make these validations opt in for executors? - Some runtimes may want these regardless.
-	if len(spec.DeploymentAnnotations) != 0 {
-		return field.Invalid(
-			field.NewPath("spec").Child("deploymentAnnotations"),
-			spec.DeploymentAnnotations,
-			"deploymentAnnotations can't be set when the executor does not use operator deployments")
-	}
-	if len(spec.PodAnnotations) != 0 {
-		return field.Invalid(field.NewPath("spec").Child("podAnnotations"), spec.PodAnnotations, "podAnnotations can't be set when the executor does not use operator deployments")
 	}
 
 	return nil
