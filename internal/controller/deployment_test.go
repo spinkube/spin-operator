@@ -13,6 +13,7 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 
 	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
+	"github.com/spinkube/spin-operator/internal/generics"
 	"github.com/spinkube/spin-operator/pkg/spinapp"
 )
 
@@ -280,7 +281,16 @@ func TestSpinHealthCheckToCoreProbe(t *testing.T) {
 func TestDeploymentLabel(t *testing.T) {
 	scheme := registerAndGetScheme()
 	app := minimalSpinApp()
-	deployment, err := constructDeployment(context.Background(), app, &spinv1alpha1.ExecutorDeploymentConfig{}, "", "", scheme)
+	deployment, err := constructDeployment(
+		context.Background(),
+		app,
+		&spinv1alpha1.ExecutorDeploymentConfig{
+			RuntimeClassName: generics.Ptr("containerd-shim-spin"),
+		},
+		"",
+		"",
+		scheme,
+	)
 
 	require.Nil(t, err)
 	require.NotNil(t, deployment.ObjectMeta.Labels)

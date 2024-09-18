@@ -5,7 +5,10 @@ import (
 
 	spinv1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
 	"github.com/spinkube/spin-operator/internal/logging"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -50,5 +53,34 @@ func (v *SpinAppExecutorValidator) ValidateDelete(ctx context.Context, obj runti
 }
 
 func (v *SpinAppExecutorValidator) validateSpinAppExecutor(executor *spinv1alpha1.SpinAppExecutor) error {
+	var allErrs field.ErrorList
+
+	if err := validateRuntimeClassAndSpinImage(&executor.Spec); err != nil {
+		allErrs = append(allErrs, err)
+	}
+	if len(allErrs) == 0 {
+		return nil
+	}
+
+	return apierrors.NewInvalid(
+		schema.GroupKind{Group: "core.spinoperator.dev", Kind: "SpinAppExecutor"},
+		executor.Name, allErrs)
+}
+
+func validateRuntimeClassAndSpinImage(spec *spinv1alpha1.SpinAppExecutorSpec) *field.Error {
+	if spec.DeploymentConfig == nil {
+		return nil
+	}
+
+	if spec.DeploymentConfig.RuntimeClassName != nil && spec.DeploymentConfig.SpinImage != nil {
+		return field.Invalid(field.NewPath("spec").Child("deploymentConfig").Child("runtimeClassName"), spec.DeploymentConfig.RuntimeClassName,
+			"runtimeClassName and spinImage are mutually exclusive")
+	}
+
+	if spec.DeploymentConfig.RuntimeClassName == nil && spec.DeploymentConfig.SpinImage == nil {
+		return field.Invalid(field.NewPath("spec").Child("deploymentConfig").Child("runtimeClassName"), spec.DeploymentConfig.RuntimeClassName,
+			"either runtimeClassName or spinImage must be set")
+	}
+
 	return nil
 }
