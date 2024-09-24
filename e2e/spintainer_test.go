@@ -7,8 +7,8 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	controllerruntimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/e2e-framework/klient"
-	"sigs.k8s.io/e2e-framework/klient/k8s"
 	"sigs.k8s.io/e2e-framework/klient/wait"
 	"sigs.k8s.io/e2e-framework/klient/wait/conditions"
 	"sigs.k8s.io/e2e-framework/pkg/envconf"
@@ -40,22 +40,12 @@ func TestSpintainer(t *testing.T) {
 		Assess("spin app custom resource is created", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			testSpinApp := newSpinAppCR(testSpinAppName, helloWorldImage, "spintainer")
 
-			if err := client.Resources().Create(ctx, newSpintainerExecutor(testNamespace)); err != nil {
+			if err := client.Resources().Create(ctx, newSpintainerExecutor(testNamespace)); controllerruntimeclient.IgnoreAlreadyExists(err) != nil {
 				t.Fatalf("Failed to create spinappexecutor: %s", err)
 			}
 
 			if err := client.Resources().Create(ctx, testSpinApp); err != nil {
 				t.Fatalf("Failed to create spinapp: %s", err)
-			}
-			// wait for spinapp to be created
-			if err := wait.For(
-				conditions.New(client.Resources()).ResourceMatch(testSpinApp, func(object k8s.Object) bool {
-					return true
-				}),
-				wait.WithTimeout(3*time.Minute),
-				wait.WithInterval(30*time.Second),
-			); err != nil {
-				t.Fatal(err)
 			}
 
 			return ctx
@@ -65,7 +55,7 @@ func TestSpintainer(t *testing.T) {
 			if err := wait.For(
 				conditions.New(client.Resources()).DeploymentAvailable(testSpinAppName, testNamespace),
 				wait.WithTimeout(3*time.Minute),
-				wait.WithInterval(30*time.Second),
+				wait.WithInterval(time.Second),
 			); err != nil {
 				t.Fatal(err)
 			}
@@ -79,7 +69,7 @@ func TestSpintainer(t *testing.T) {
 			if err := wait.For(
 				conditions.New(client.Resources()).ResourcesFound(svc),
 				wait.WithTimeout(3*time.Minute),
-				wait.WithInterval(30*time.Second),
+				wait.WithInterval(500*time.Millisecond),
 			); err != nil {
 				t.Fatal(err)
 			}
