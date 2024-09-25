@@ -4,7 +4,7 @@ import "fmt"
 
 // OperatorResourceKeyspace is the keyspace used for constructing application
 // metadata on Kubernetes objects
-const OperatorResourceKeyspace = "core.spinoperator.dev"
+const OperatorResourceKeyspace = "core.spinkube.dev"
 
 // ConstructResourceLabelKey is used when building operator-managed labels for
 // resources.

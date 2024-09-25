@@ -2,7 +2,7 @@
 # This file is used to track the info used to scaffold your project
 # and allow the plugins properly work.
 # More info: https://book.kubebuilder.io/reference/project-config.html
-domain: spinoperator.dev
+domain: spinkube.dev
 layout:
 - go.kubebuilder.io/v4
 projectName: spin-operator
@@ -12,7 +12,7 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: spinoperator.dev
+  domain: spinkube.dev
   group: core
   kind: SpinApp
   path: github.com/spinkube/spin-operator/api/v1alpha1
@@ -25,7 +25,7 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: spinoperator.dev
+  domain: spinkube.dev
   group: core
   kind: SpinAppExecutor
   path: github.com/spinkube/spin-operator/api/v1alpha1

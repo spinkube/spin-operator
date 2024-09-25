@@ -16,13 +16,13 @@ func TestCRDInstalled(t *testing.T) {
 			if err := apiextensionsV1.AddToScheme(client.Resources().GetScheme()); err != nil {
 				t.Fatalf("failed to register the v1 API extension types with Kubernetes scheme: %s", err)
 			}
-			name := "spinapps.core.spinoperator.dev"
+			name := "spinapps.core.spinkube.dev"
 			var crd apiextensionsV1.CustomResourceDefinition
 			if err := client.Resources().Get(ctx, name, "", &crd); err != nil {
 				t.Fatalf("SpinApp CRD not found: %s", err)
 			}
 
-			if crd.Spec.Group != "core.spinoperator.dev" {
+			if crd.Spec.Group != "core.spinkube.dev" {
 				t.Fatalf("SpinApp CRD has unexpected group: %s", crd.Spec.Group)
 			}
 			return ctx
@@ -34,13 +34,13 @@ func TestCRDInstalled(t *testing.T) {
 				t.Fatalf("failed to register the v1 API extension types with Kubernetes scheme: %s", err)
 			}
 
-			name := "spinappexecutors.core.spinoperator.dev"
+			name := "spinappexecutors.core.spinkube.dev"
 			var crd apiextensionsV1.CustomResourceDefinition
 			if err := client.Resources().Get(ctx, name, "", &crd); err != nil {
 				t.Fatalf("SpinApp CRD not found: %s", err)
 			}
 
-			if crd.Spec.Group != "core.spinoperator.dev" {
+			if crd.Spec.Group != "core.spinkube.dev" {
 				t.Fatalf("SpinAppExecutor CRD has unexpected group: %s", crd.Spec.Group)
 			}
 			return ctx

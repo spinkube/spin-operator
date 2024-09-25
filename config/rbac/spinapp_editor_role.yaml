@@ -12,7 +12,7 @@ metadata:
   name: spinapp-editor-role
 rules:
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinapps
   verbs:
@@ -24,7 +24,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - core.spinoperator.dev
+  - core.spinkube.dev
   resources:
   - spinapps/status
   verbs:
