@@ -1,0 +1,11 @@
+apiVersion: core.spinoperator.dev/v1alpha1
+kind: SpinApp
+metadata:
+  name: hello-greeter-spinapp
+spec:
+  image: "ghcr.io/kate-goldenring/spin-operator/examples/spin-greetings:20241011-144454"
+  replicas: 1
+  executor: containerd-shim-spin
+  # Configure the application to only contain the "hello" component
+  # Who doesn't hate goodbyes?
+  components: ["hello"]
