@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"hash/adler32"
 	"maps"
+	"strings"
 
 	"github.com/pelletier/go-toml/v2"
 	appsv1 "k8s.io/api/apps/v1"
@@ -429,6 +430,12 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 	}
 
 	env := ConstructEnvForApp(ctx, app, spinapp.DefaultHTTPPort, config.Otel)
+	if app.Spec.Components != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  "SPIN_COMPONENTS_TO_RETAIN",
+			Value: strings.Join(app.Spec.Components[:], ","),
+		})
+	}
 
 	readinessProbe, livenessProbe, err := ConstructPodHealthChecks(app)
 	if err != nil {

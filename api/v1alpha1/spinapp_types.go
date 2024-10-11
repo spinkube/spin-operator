@@ -80,6 +80,12 @@ type SpinAppSpec struct {
 
 	// Resources defines the resource requirements for this app.
 	Resources Resources `json:"resources,omitempty"`
+
+	// Components of the app to execute.
+	//
+	// If this is not provided all components are executed.
+	// +kubebuilder:validation:MinItems:=1
+	Components []string `json:"components,omitempty"`
 }
 
 // SpinAppStatus defines the observed state of SpinApp

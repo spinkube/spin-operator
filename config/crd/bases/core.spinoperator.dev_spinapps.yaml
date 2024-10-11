@@ -188,6 +188,12 @@ spec:
                         type: integer
                     type: object
                 type: object
+              components:
+                description: Components to be executed in this group.
+                items:
+                  type: string
+                minItems: 1
+                type: array
               deploymentAnnotations:
                 additionalProperties:
                   type: string
