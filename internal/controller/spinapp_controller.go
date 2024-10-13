@@ -248,7 +248,7 @@ func (r *SpinAppReconciler) ensureCASecret(ctx context.Context, caSecretName, na
 	}
 
 	err := r.Client.Get(ctx, types.NamespacedName{Name: caSecretName, Namespace: namespace}, secret)
-	if !apierrors.IsNotFound(err) { // secret is not not found
+	if !apierrors.IsNotFound(err) {
 		return nil
 	}
 	return r.Client.Create(ctx, secret)

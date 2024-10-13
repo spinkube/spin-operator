@@ -1,7 +1,7 @@
 // Package logging provides the operators's recommended logging interface.
 //
 // The logging interface avoids the complexity of levels and provides a simpler
-// api that makes it harder to introduce unnecesasry ambiguity to logs (or
+// api that makes it harder to introduce unnecessary ambiguity to logs (or
 // ascribing value to arbitrary magic numbers).
 //
 // An Error logging helper exists primarily to facilitate including a stack trace
@@ -54,7 +54,7 @@ func (l nopLogger) WithValues(_ ...any) Logger        { return nopLogger{} }
 
 // NewLogrLogger returns a Logger that is satisfied by the supplied logr.Logger,
 // which may be satisfied in turn by various logging implementations.
-// Debug messages are logged at V(1) - following the reccomendation of
+// Debug messages are logged at V(1) - following the recommendation of
 // controller-runtime.
 func NewLogrLogger(l logr.Logger) Logger {
 	return logrLogger{log: l}
