@@ -434,7 +434,7 @@ func TestConstructDeployment_WithPodLabels(t *testing.T) {
 	require.Equal(t, deployment.Spec.Template.Labels[key], value)
 }
 
-func TestReconcile_Integration_AnnotationAndLabelPropagataion(t *testing.T) {
+func TestReconcile_Integration_AnnotationAndLabelPropagation(t *testing.T) {
 	t.Parallel()
 
 	envTest, mgr, _ := setupController(t)
