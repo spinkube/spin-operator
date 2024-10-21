@@ -1,0 +1,29 @@
+spin_manifest_version = 2
+
+[application]
+name = "greetings"
+version = "0.1.0"
+authors = ["Fermyon Engineering Team <engineering@fermyon.com>"]
+description = "An app that says hello and goodbye"
+
+[[trigger.http]]
+route = "/bye"
+component = "goodbye"
+
+[component.goodbye]
+source = "target/wasm32-wasi/release/goodbye.wasm"
+allowed_outbound_hosts = []
+[component.goodbye.build]
+command = "cargo build --target wasm32-wasi --release"
+watch = ["src/**/*.rs", "Cargo.toml"]
+
+[[trigger.http]]
+route = "/hi"
+component = "hello"
+
+[component.hello]
+source = "../hello-world/main.wasm"
+allowed_outbound_hosts = []
+[component.hello.build]
+command = "pushd ../hello-world && tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go && popd"
+watch = ["**/*.go", "go.mod"]
