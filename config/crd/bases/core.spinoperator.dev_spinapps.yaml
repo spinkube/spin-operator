@@ -189,7 +189,11 @@ spec:
                     type: object
                 type: object
               components:
-                description: Components to be executed in this group.
+                description: |-
+                  Components of the app to execute.
+
+
+                  If this is not provided all components are executed.
                 items:
                   type: string
                 minItems: 1

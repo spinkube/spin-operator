@@ -92,7 +92,7 @@ func TestShimRedis(t *testing.T) {
 		Assess("spin app is using redis", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			helper.EnsureDebugContainer(t, ctx, cfg, testNamespace)
 
-			_, status, err := helper.PostToSpinApp(t, ctx, cfg, testNamespace, testSpinAppName, "/api", "{\"key\": \"foo\", \"value\": \"bar\"}")
+			_, status, err := helper.CurlSpinApp(t, ctx, cfg, testNamespace, testSpinAppName, "/api", "{\"key\": \"foo\", \"value\": \"bar\"}")
 
 			require.NoError(t, err)
 			require.Equal(t, 200, status)
@@ -194,7 +194,7 @@ func TestSpintainerRedis(t *testing.T) {
 		Assess("spin app is using redis", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
 			helper.EnsureDebugContainer(t, ctx, cfg, testNamespace)
 
-			_, status, err := helper.PostToSpinApp(t, ctx, cfg, testNamespace, testSpinAppName, "/api", "{\"key\": \"foo\", \"value\": \"bar\"}")
+			_, status, err := helper.CurlSpinApp(t, ctx, cfg, testNamespace, testSpinAppName, "/api", "{\"key\": \"foo\", \"value\": \"bar\"}")
 
 			require.NoError(t, err)
 			require.Equal(t, 200, status)
