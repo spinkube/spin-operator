@@ -1,0 +1,29 @@
+spin_manifest_version = 2
+
+[application]
+name = "salutations"
+version = "0.1.0"
+authors = ["Kate Goldenring <kate.goldenring@fermyon.com>"]
+description = "An app that gives salutations"
+
+[[trigger.http]]
+route = "/hi"
+component = "hello"
+
+[component.hello]
+source = "../hello-world/main.wasm"
+allowed_outbound_hosts = []
+[component.hello.build]
+command = "pushd ../hello-world && tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go && popd"
+watch = ["**/*.go", "go.mod"]
+
+[[trigger.http]]
+route = "/bye"
+component = "goodbye"
+
+[component.goodbye]
+source = "main.wasm"
+allowed_outbound_hosts = []
+[component.goodbye.build]
+command = "tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go"
+watch = ["**/*.go", "go.mod"]

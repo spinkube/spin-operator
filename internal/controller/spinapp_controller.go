@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"hash/adler32"
 	"maps"
+	"strings"
 
 	"github.com/pelletier/go-toml/v2"
 	appsv1 "k8s.io/api/apps/v1"
@@ -429,6 +430,12 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 	}
 
 	env := ConstructEnvForApp(ctx, app, spinapp.DefaultHTTPPort, config.Otel)
+	if app.Spec.Components != nil {
+		env = append(env, corev1.EnvVar{
+			Name:  "SPIN_COMPONENTS_TO_RETAIN",
+			Value: strings.Join(app.Spec.Components[:], ","),
+		})
+	}
 
 	readinessProbe, livenessProbe, err := ConstructPodHealthChecks(app)
 	if err != nil {
@@ -457,7 +464,8 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 		container = corev1.Container{
 			Name:  app.Name,
 			Image: *config.SpinImage,
-			Args:  []string{"up", "--listen", fmt.Sprintf("0.0.0.0:%d", spinapp.DefaultHTTPPort), "-f", app.Spec.Image, "--runtime-config-file", "/runtime-config.toml"},
+			// TODO: add support for --component-id flags to set components to be retained once spintainer supports Spin v3.0
+			Args: []string{"up", "--listen", fmt.Sprintf("0.0.0.0:%d", spinapp.DefaultHTTPPort), "-f", app.Spec.Image, "--runtime-config-file", "/runtime-config.toml"},
 			Ports: []corev1.ContainerPort{{
 				Name:          spinapp.HTTPPortName,
 				ContainerPort: spinapp.DefaultHTTPPort,
