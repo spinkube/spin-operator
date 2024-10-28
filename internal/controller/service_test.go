@@ -18,9 +18,9 @@ func TestConstructService(t *testing.T) {
 	require.Equal(t, "v1", svc.TypeMeta.APIVersion)
 
 	// We expect that the service object has the app name and nothing else.
-	require.Equal(t, map[string]string{"core.spinoperator.dev/app-name": "my-app"}, svc.ObjectMeta.Labels)
+	require.Equal(t, map[string]string{"core.spinkube.dev/app-name": "my-app"}, svc.ObjectMeta.Labels)
 	// We expect that the service selector has the app status and nothing else.
-	require.Equal(t, map[string]string{"core.spinoperator.dev/app.my-app.status": "ready"}, svc.Spec.Selector)
+	require.Equal(t, map[string]string{"core.spinkube.dev/app.my-app.status": "ready"}, svc.Spec.Selector)
 
 	// We expect that the HTTP Port is part of the service. There's currently no
 	// non-http implementations of a Spin trigger in Kubernetes, thus nothing that

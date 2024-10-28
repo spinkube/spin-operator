@@ -10,7 +10,7 @@ import (
 )
 
 // nolint:lll
-//+kubebuilder:webhook:path=/mutate-core-spinoperator-dev-v1alpha1-spinappexecutor,mutating=true,failurePolicy=fail,sideEffects=None,groups=core.spinoperator.dev,resources=spinappexecutors,verbs=create;update,versions=v1alpha1,name=mspinappexecutor.kb.io,admissionReviewVersions=v1
+//+kubebuilder:webhook:path=/mutate-core-spinkube-dev-v1alpha1-spinappexecutor,mutating=true,failurePolicy=fail,sideEffects=None,groups=core.spinkube.dev,resources=spinappexecutors,verbs=create;update,versions=v1alpha1,name=mspinappexecutor.kb.io,admissionReviewVersions=v1
 
 // SpinAppExecutorDefaulter mutates SpinApps
 type SpinAppExecutorDefaulter struct {

@@ -9,7 +9,7 @@ This is an OCI-compliant package that can be used to demonstrate how a Spin app 
 Create a Kubernetes manifest file named `redis_client.yaml` with the following code:
 
 ```yaml
-apiVersion: core.spinoperator.dev/v1alpha1
+apiVersion: core.spinkube.dev/v1alpha1
 kind: SpinApp
 metadata:
   name: redis-spinapp
