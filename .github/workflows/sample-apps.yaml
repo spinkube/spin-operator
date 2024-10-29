@@ -31,6 +31,8 @@ jobs:
 
         - name: Install TinyGo
           uses: acifani/setup-tinygo@v2
+          with:
+            tinygo-version: '0.33.0'
 
         - name: Build and push versioned image
           uses: fermyon/actions/spin/push@v1
