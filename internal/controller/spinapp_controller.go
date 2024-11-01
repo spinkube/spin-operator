@@ -461,11 +461,17 @@ func constructDeployment(ctx context.Context, app *spinv1alpha1.SpinApp, config 
 			ReadinessProbe: readinessProbe,
 		}
 	} else if config.SpinImage != nil {
+		args := []string{"up", "--listen", fmt.Sprintf("0.0.0.0:%d", spinapp.DefaultHTTPPort), "-f", app.Spec.Image, "--runtime-config-file", "/runtime-config.toml"}
+		if app.Spec.Components != nil {
+			for _, component := range app.Spec.Components {
+				args = append(args, "--component-id", component)
+			}
+		}
 		container = corev1.Container{
 			Name:  app.Name,
 			Image: *config.SpinImage,
 			// TODO: add support for --component-id flags to set components to be retained once spintainer supports Spin v3.0
-			Args: []string{"up", "--listen", fmt.Sprintf("0.0.0.0:%d", spinapp.DefaultHTTPPort), "-f", app.Spec.Image, "--runtime-config-file", "/runtime-config.toml"},
+			Args: args,
 			Ports: []corev1.ContainerPort{{
 				Name:          spinapp.HTTPPortName,
 				ContainerPort: spinapp.DefaultHTTPPort,
