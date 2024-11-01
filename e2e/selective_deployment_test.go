@@ -7,7 +7,6 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	controllerruntimeclient "sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/e2e-framework/klient"
 	"sigs.k8s.io/e2e-framework/klient/wait"
 	"sigs.k8s.io/e2e-framework/klient/wait/conditions"
@@ -15,16 +14,17 @@ import (
 	"sigs.k8s.io/e2e-framework/pkg/features"
 
 	spinapps_v1alpha1 "github.com/spinkube/spin-operator/api/v1alpha1"
-	"github.com/spinkube/spin-operator/internal/generics"
+	"github.com/spinkube/spin-operator/e2e/helper"
+	"github.com/stretchr/testify/require"
 )
 
-// TestSpintainer is a test that checks that the minimal setup works
-// with the spintainer executor
-func TestSpintainer(t *testing.T) {
+// TestSelectiveDeployment checks that the operator and shim have support for running a subset of a Spin app's components
+func TestSelectiveDeployment(t *testing.T) {
 	var client klient.Client
 
-	helloWorldImage := "ghcr.io/spinkube/spin-operator/hello-world:20240708-130250-gfefd2b1"
-	testSpinAppName := "test-spintainer-app"
+	// TODO: Use an image from a sample app in this repository
+	appImage := "ghcr.io/kate-goldenring/spin-operator/examples/spin-salutations:20241022-144454"
+	testSpinAppName := "test-component-filtering"
 
 	defaultTest := features.New("default and most minimal setup").
 		Setup(func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
@@ -38,16 +38,11 @@ func TestSpintainer(t *testing.T) {
 			return ctx
 		}).
 		Assess("spin app custom resource is created", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
-			testSpinApp := newSpinAppCR(testSpinAppName, helloWorldImage, "spintainer", nil)
-
-			if err := client.Resources().Create(ctx, newSpintainerExecutor(testNamespace)); controllerruntimeclient.IgnoreAlreadyExists(err) != nil {
-				t.Fatalf("Failed to create spinappexecutor: %s", err)
-			}
+			testSpinApp := newSpinAppCR(testSpinAppName, appImage, "containerd-shim-spin", []string{"hello"})
 
 			if err := client.Resources().Create(ctx, testSpinApp); err != nil {
 				t.Fatalf("Failed to create spinapp: %s", err)
 			}
-
 			return ctx
 		}).
 		Assess("spin app deployment and service are available", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
@@ -75,23 +70,21 @@ func TestSpintainer(t *testing.T) {
 			}
 			return ctx
 		}).
+		Assess("spin app is only serving hello component", func(ctx context.Context, t *testing.T, cfg *envconf.Config) context.Context {
+			helper.EnsureDebugContainer(t, ctx, cfg, testNamespace)
+
+			_, status, err := helper.CurlSpinApp(t, ctx, cfg, testNamespace, testSpinAppName, "/hi", "")
+
+			require.NoError(t, err)
+			require.Equal(t, 200, status)
+
+			_, status, err = helper.CurlSpinApp(t, ctx, cfg, testNamespace, testSpinAppName, "/bye", "")
+
+			require.NoError(t, err)
+			require.Equal(t, 404, status)
+
+			return ctx
+		}).
 		Feature()
 	testEnv.Test(t, defaultTest)
-}
-
-func newSpintainerExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecutor {
-	var testSpinAppExecutor = &spinapps_v1alpha1.SpinAppExecutor{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "spintainer",
-			Namespace: namespace,
-		},
-		Spec: spinapps_v1alpha1.SpinAppExecutorSpec{
-			CreateDeployment: true,
-			DeploymentConfig: &spinapps_v1alpha1.ExecutorDeploymentConfig{
-				SpinImage: generics.Ptr("ghcr.io/fermyon/spin:v2.7.0"),
-			},
-		},
-	}
-
-	return testSpinAppExecutor
 }

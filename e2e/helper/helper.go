@@ -49,10 +49,9 @@ func EnsureDebugContainer(t *testing.T, ctx context.Context, cfg *envconf.Config
 	}
 }
 
-// PostToSpinApp is a crude function for using the debug pod to post to a spin app
-// within the cluster. It allows customization of the route, but all requests
-// are currently `POST`.
-func PostToSpinApp(t *testing.T, ctx context.Context, cfg *envconf.Config, namespace, spinAppName, route, body string) (string, int, error) {
+// CurlSpinApp is a crude function for using the debug pod to send a HTTP request to a spin app
+// within the cluster. It allows customization of the route, and all requests are GET requests unless a non-empty body is provided.
+func CurlSpinApp(t *testing.T, ctx context.Context, cfg *envconf.Config, namespace, spinAppName, route, body string) (string, int, error) {
 	t.Helper()
 
 	client, err := cfg.NewClient()
@@ -71,7 +70,10 @@ func PostToSpinApp(t *testing.T, ctx context.Context, cfg *envconf.Config, names
 
 	podName := debugPod.Name
 
-	command := []string{"curl", "-s", "-m", "5", "-w", "\n%{http_code}\n", "http://" + spinAppName + "." + namespace + route, "--data", body, "-o", "-"}
+	command := []string{"curl", "--silent", "--max-time", "5", "--write-out", "\n%{http_code}\n", "http://" + spinAppName + "." + namespace + route, "--output", "-"}
+	if body != "" {
+		command = append(command, "--data", body)
+	}
 
 	var stdout, stderr bytes.Buffer
 	if err := client.Resources().ExecInPod(ctx, namespace, podName, debugDeploymentName, command, &stdout, &stderr); err != nil {
