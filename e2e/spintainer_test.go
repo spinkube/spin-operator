@@ -88,7 +88,8 @@ func newSpintainerExecutor(namespace string) *spinapps_v1alpha1.SpinAppExecutor 
 		Spec: spinapps_v1alpha1.SpinAppExecutorSpec{
 			CreateDeployment: true,
 			DeploymentConfig: &spinapps_v1alpha1.ExecutorDeploymentConfig{
-				SpinImage: generics.Ptr("ghcr.io/fermyon/spin:v2.7.0"),
+				// TODO: pin this to Spin 3.0 once released
+				SpinImage: generics.Ptr("ghcr.io/fermyon/spin:canary"),
 			},
 		},
 	}
