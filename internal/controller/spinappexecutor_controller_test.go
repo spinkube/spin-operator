@@ -28,6 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	controllerconfig "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -43,13 +44,17 @@ func setupExecutorController(t *testing.T) (*envTestState, ctrl.Manager, *SpinAp
 	}
 	logger := zap.New(zap.UseFlagOptions(&opts))
 
+	// B/c of https://github.com/kubernetes-sigs/controller-runtime/issues/2937
+	skipNameValidation := true
+
 	mgr, err := ctrl.NewManager(envTest.cfg, manager.Options{
 		Metrics: metricsserver.Options{BindAddress: "0"},
 		Scheme:  envTest.scheme,
 		// Provide a real logger to controllers - this means that when tests fail we
 		// get to see the controller logs that lead to the failure - if we decide this
 		// is too noisy then we can gate this behind an env var like SPINKUBE_TEST_LOGS.
-		Logger: logger,
+		Logger:     logger,
+		Controller: controllerconfig.Controller{SkipNameValidation: &skipNameValidation},
 	})
 
 	require.NoError(t, err)
