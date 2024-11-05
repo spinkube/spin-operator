@@ -14,7 +14,7 @@ component = "hello"
 source = "../hello-world/main.wasm"
 allowed_outbound_hosts = []
 [component.hello.build]
-command = "pushd ../hello-world && tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go && popd"
+command = "cd ../hello-world && tinygo build -target=wasi -gc=leaking -no-debug -o main.wasm main.go"
 watch = ["**/*.go", "go.mod"]
 
 [[trigger.http]]
