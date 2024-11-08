@@ -23,8 +23,7 @@ import (
 func TestSelectiveDeployment(t *testing.T) {
 	var client klient.Client
 
-	// TODO: Use an image from a sample app in this repository
-	appImage := "ghcr.io/kate-goldenring/spin-operator/examples/spin-salutations:20241022-144454"
+	appImage := "ghcr.io/spinkube/spin-operator/salutations:20241105-223428-g4da3171"
 	testSpinAppName := "test-component-filtering"
 
 	defaultTest := features.New("default and most minimal setup").
@@ -82,7 +81,7 @@ func TestSelectiveDeployment(t *testing.T) {
 func TestSelectiveDeploymentSpintainer(t *testing.T) {
 	var client klient.Client
 
-	salutationsApp := "ghcr.io/kate-goldenring/spin-operator/examples/spin-salutations:20241022-144454"
+	salutationsApp := "ghcr.io/spinkube/spin-operator/salutations:20241105-223428-g4da3171"
 	testSpinAppName := "test-spintainer-selective-deployment"
 
 	defaultTest := features.New("default and most minimal setup").
