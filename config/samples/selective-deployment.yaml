@@ -3,8 +3,7 @@ kind: SpinApp
 metadata:
   name: hello-salutation-spinapp
 spec:
-  # TODO: change to image hosted at ghcr.io/spinkube/spin-operator/salutations when published
-  image: "ghcr.io/kate-goldenring/spin-operator/examples/spin-salutations:20241022-144454"
+  image: "ghcr.io/spinkube/spin-operator/salutations:20241105-223428-g4da3171"
   replicas: 1
   executor: containerd-shim-spin
   # Configure the application to only contain the "hello" component
