@@ -8,18 +8,14 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - secrets
+  - events
   verbs:
   - create
-  - delete
-  - get
-  - list
   - patch
-  - update
-  - watch
 - apiGroups:
   - ""
   resources:
+  - secrets
   - services
   verbs:
   - create
@@ -48,16 +44,10 @@ rules:
   verbs:
   - get
 - apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
-- apiGroups:
   - core.spinkube.dev
   resources:
   - spinappexecutors
+  - spinapps
   verbs:
   - create
   - delete
@@ -76,25 +66,6 @@ rules:
   - core.spinkube.dev
   resources:
   - spinappexecutors/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - core.spinkube.dev
-  resources:
-  - spinapps
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - core.spinkube.dev
-  resources:
   - spinapps/status
   verbs:
   - get
