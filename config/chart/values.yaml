@@ -8,7 +8,7 @@ controllerManager:
     ## In general, these should be left as-is.
     args:
     - --health-probe-bind-address=:8082
-    - --metrics-bind-address=127.0.0.1:8080
+    - --metrics-bind-address=:8443
     - --leader-elect
     - --enable-webhooks
     ## containerSecurityContext defines privilege and access control for the
@@ -38,38 +38,6 @@ controllerManager:
         cpu: 10m
         memory: 64Mi
 
-  ## kubeRbacProxy handles RBAC authorization with the Kubernetes API server.
-  kubeRbacProxy:
-    ## args are the default arguments to supply to the RBAC proxy.
-    ## In general, these should be left as-is.
-    args:
-    - --secure-listen-address=0.0.0.0:8443
-    - --upstream=http://127.0.0.1:8080/
-    - --logtostderr=true
-    - --v=0
-    ## containerSecurityContext defines privilege and access control for the
-    ## container.
-    ## See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-    containerSecurityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-        - ALL
-    ## image indicates which repository and tag combination will be used for
-    ## pulling the RBAC proxy image.
-    image:
-      repository: gcr.io/kubebuilder/kube-rbac-proxy
-      tag: v0.15.0
-    ## resources represent default cpu/mem limits for the RBAC proxy container.
-    resources:
-      # TODO: update these per https://github.com/spinkube/spin-operator/issues/21
-      limits:
-        cpu: 500m
-        memory: 128Mi
-      requests:
-        cpu: 5m
-        memory: 64Mi
-
   # replicas represent how many pod replicas of the controllerManager to run.
   replicas: 1
 
@@ -83,13 +51,13 @@ kubernetesClusterDomain: cluster.local
 
 ## metricsService configuration.
 ## This configuration should only be updated in tandem with corresponding
-## controller and RBAC proxy configuration.
+## controller configuration.
 metricsService:
   ports:
   - name: https
     port: 8443
     protocol: TCP
-    targetPort: https
+    targetPort: 8443
   type: ClusterIP
 
 ## webhookService configuration.
